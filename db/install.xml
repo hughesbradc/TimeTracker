@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/timetracker/db" VERSION="20110131" COMMENT="XMLDB
+file for Moodle Timetracker block"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+ <TABLES>
+   <TABLE NAME="block_timetracker_workerinfo" COMMENT="Worker information.
+   Contains Moodle userid, address, position, current pay rate, current 
+   maximum term earnings, department, the worker's id number, and comments."
+   NEXT="block_timetracker_pending">
+     <FIELDS>
+       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"
+UNSIGNED="true" SEQUENCE="false" NEXT="address"/>
+       <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="position"/>
+       <FIELD NAME="position" TYPE="char" LENGTH="255" NOTNULL="true"
+SEQUENCE="false" PREVIOUS="address" NEXT="currpayrate"/>
+       <FIELD NAME="currpayrate" TYPE="char" LENGTH="10"
+NOTNULL="true" SEQUENCE="false" PREVIOUS="position" NEXT="currmaxtermearnings"/>
+       <FIELD NAME="currmaxtermearnings" TYPE="char" LENGTH="10"
+NOTNULL="true" SEQUENCE="false" PREVIOUS="currpayrate" NEXT="dept"/>
+       <FIELD NAME="dept" TYPE="char" LENGTH="100" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="currmaxtermearnings" NEXT="idnum"/>
+       <FIELD NAME="idnum" TYPE="char" LENGTH="50" NOTNULL="true"
+SEQUENCE="false" PREVIOUS="dept" NEXT="comments"/>
+<FIELD NAME="comments" TYPE="char" LENGTH="1000" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="idnum"/>
+     </FIELDS>
+     <KEYS>
+       <KEY NAME="primary" TYPE="primary" FIELDS="userid" />
+     </KEYS>
+   </TABLE>
+   <TABLE NAME="block_timetracker_pending" COMMENT="Holds information for missed punches."
+   PREVIOUS="block_timetracker_workerinfo" NEXT="block_timetracker_workunit">
+     <FIELDS>
+       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
+UNSIGNED="true" SEQUENCE="true" NEXT="timein"/>
+       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"
+SEQUENCE="false" PREVIOUS="timein"/>
+     </FIELDS>
+     <KEYS>
+       <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+     </KEYS>
+   </TABLE>
+   <TABLE NAME="block_timetracker_workunit" COMMENT="Holds work unit information."
+   PREVIOUS="block_timetracker_pending" NEXT="block_timetracker_term">
+     <FIELDS>
+	   <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
+UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="timein"/>
+       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true"
+SEQUENCE="false" PREVIOUS="userid" NEXT="timeout"/>
+       <FIELD NAME="timeout" TYPE="int" LENGTH="10"
+NOTNULL="true" SEQUENCE="false" PREVIOUS="timein" NEXT="lastedited"/>
+       <FIELD NAME="lastedited" TYPE="int" LENGTH="10"
+NOTNULL="true" SEQUENCE="false" PREVIOUS="timeout" NEXT="lasteditedby"/>
+       <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited"/>
+     </FIELDS>
+     <KEYS>
+       <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+     </KEYS>
+   </TABLE>
+   <TABLE NAME="block_timetracker_term" COMMENT="Holds information regarding various terms."
+   PREVIOUS="block_timetracker_workunit">
+     <FIELDS>
+       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
+UNSIGNED="true" SEQUENCE="true" NEXT="starttime"/>
+       <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="endtime"/>
+       <FIELD NAME="endtime" TYPE="int" LENGTH="10" NOTNULL="true"
+SEQUENCE="false" PREVIOUS="starttime" NEXT="name"/>
+       <FIELD NAME="name" TYPE="char" LENGTH="100"
+NOTNULL="true" SEQUENCE="false" PREVIOUS="endtime" NEXT="description"/>
+       <FIELD NAME="description" TYPE="char" LENGTH="255"
+NOTNULL="true" SEQUENCE="false" PREVIOUS="name"/> 
+     </FIELDS>
+     <KEYS>
+       <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+     </KEYS>
+   </TABLE>  
+ </TABLES>
+</XMLDB>
