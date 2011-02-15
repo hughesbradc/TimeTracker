@@ -61,8 +61,6 @@
         $this->content = new stdClass;
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
             $this->content->text = 'You have manage capabilities!';
-
-
         } else {
             if ($this->config->block_timetracker_show_total_hours ||
             $this->config->block_timetracker_show_term_hours ||
@@ -121,7 +119,9 @@
             }
 
             $this->content->text .= '<br />'; 
-            $this->content->text .= '<a href="/workerhome.php">'.get_string('gotodetails','block_timetracker').'</a>';
+            $this->content->text .= '<a href="/workerhome.php">';
+            $this->content->text .= get_string('manage','block_timetracker');
+            $this->content->text .= '</a>';
        }
         return $this->content;
     }
@@ -194,5 +194,3 @@
 
     }
 }
-
-

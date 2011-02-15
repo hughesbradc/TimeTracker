@@ -19,7 +19,7 @@
  * Form for editing TimeTracker block instances.
  *
  * @package   TimeTracker
- * @copyright 2011 Marty Gilbert & Brad Hughes
+ * @copyright Marty Gilbert & Brad Hughes
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -18,8 +18,8 @@
 /**
  * Strings for component 'block_timetracker', language 'en', branch 'MOODLE_20_STABLE'
  *
- * @package   block_timetracker
- * @copyright 2011 Marty Gilbert & Brad Hughes
+ * @package  TimeTracker 
+ * @copyright Marty Gilbert & Brad Hughes
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -49,18 +49,20 @@ $string['dateto'] = ' to ';
 $string['submitbutton'] = 'Submit';
  
 // Strings for Block
-$string['blocktitle'] = "TimeTracker";
-$string['hourstitle'] = 'Hours:';
+$string['blocktitle'] = 'TimeTracker';
+//$string['hourstitle'] = '<span style=\'font-weight: bold\'>Hours</span>';
+//$string['earningstitle'] = '<span style=\'font-weight: bold\'>Earnings</span>';
+$string['hourstitle'] = 'Hours';
+$string['earningstitle'] = 'Earnings';
 $string['totalhoursworked'] = 'Total hours worked: ';
 $string['hoursworkedterm'] = 'Hours worked this term: ';
 $string['hoursworkedmonth'] = 'Hours worked this month:';
 $string['hoursytd'] = 'Year to date: ';
-$string['earningstitle'] = 'Earnings:';
 $string['earningsmonth'] = 'This month: ';
 $string['earningsterm'] = 'This term: ';
 $string['earningsytd'] = 'Year to date: ';
 $string['earningstotal'] = 'Total: ';
-$string['gotodetails'] = 'Go to Details';
+$string['manage'] = 'Manage';
 
 // Strings for Employee Home Page (also includes strings from the 'block' section above)
 $string['welcome'] = 'Welcome';
