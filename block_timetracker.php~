@@ -77,22 +77,22 @@
 //            		$this->content->text = 'EPIC FAIL! You do not have editing capabilities.';
 					if ($this->config->block_timetracker_show_month_hours){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('totalmonth', 'block_timetracker');
+						$this->content->text .= get_string('hoursworkedmonth', 'block_timetracker');
 					}
 					
                     if ($this->config->block_timetracker_show_term_hours){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('totalterm', 'block_timetracker');
+						$this->content->text .= get_string('hoursworkedterm', 'block_timetracker');
 					}
             
 					if ($this->config->block_timetracker_show_ytd_hours){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('totalytd', 'block_timetracker');
+						$this->content->text .= get_string('hoursytd', 'block_timetracker');
 					}
 					
                     if ($this->config->block_timetracker_show_total_hours){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('total', 'block_timetracker');
+						$this->content->text .= get_string('totalhoursworked', 'block_timetracker');
 					}
        
 					if ($this->config->block_timetracker_show_month_earnings ||
@@ -105,22 +105,22 @@
 
 					if ($this->config->block_timetracker_show_month_earnings){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('totalmonth', 'block_timetracker');
+						$this->content->text .= get_string('earningsmonth', 'block_timetracker');
 					}
 
 					if ($this->config->block_timetracker_show_term_earnings){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('totalterm', 'block_timetracker');
+						$this->content->text .= get_string('earningsterm', 'block_timetracker');
 					}
 
 					if ($this->config->block_timetracker_show_ytd_earnings){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('totalytd', 'block_timetracker');
+						$this->content->text .= get_string('earningsytd', 'block_timetracker');
 					}
 
 					if ($this->config->block_timetracker_show_total_earnings){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('total', 'block_timetracker');
+						$this->content->text .= get_string('earningstotal', 'block_timetracker');
 					}
 
 					$this->content->text .= '<br />'; 

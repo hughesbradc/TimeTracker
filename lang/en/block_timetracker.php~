@@ -54,10 +54,10 @@ $string['blocktitle'] = 'TimeTracker';
 //$string['earningstitle'] = '<span style=\'font-weight: bold\'>Earnings</span>';
 $string['hourstitle'] = 'Hours';
 $string['earningstitle'] = 'Earnings';
-$string['totalmonth'] = 'This month:';
-$string['totalterm'] = 'This term: ';
-$string['totalytd'] = 'Year to date: ';
 $string['total'] = 'Total: ';
+$string['totalterm'] = 'This term: ';
+$string['totalmonth'] = 'This month:';
+$string['totalytd'] = 'Year to date: ';
 $string['manage'] = 'Manage';
 $string['registerinfo'] = 'Register Work Study Information';
 
