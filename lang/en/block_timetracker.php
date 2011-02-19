@@ -47,6 +47,7 @@ $string['settings'] = 'Settings';
 $string['datefrom'] = 'Date from ';
 $string['dateto'] = ' to ';
 $string['submitbutton'] = 'Submit';
+$string['savebutton'] = 'Save';
  
 // Strings for Block
 $string['blocktitle'] = 'TimeTracker';
@@ -106,7 +107,7 @@ $string['iemployee'] = 'Individual Employee';
 $string['selemployee'] = 'Select Employee';
 $string['aemployees'] = 'All Employees';
 
-// Strings for Supervisor Settings Page
+// Strings for 'Update Worker Information' Page
 $string['emplinfo'] = 'Employee Information';
 $string['eidirection'] = 'Select an employee to edit';
 $string['sitesettings'] = 'Site Settings';
@@ -119,8 +120,10 @@ $string['firstname'] = 'First Name';
 $string['lastname'] = 'Last Name';
 $string['email'] = 'Email Address';
 $string['address'] = 'Address';
+$string['phone'] = 'Phone';
 $string['department'] = 'Department';
 $string['position'] = 'Position';
 $string['currpayrate'] = 'Current Pay Rate';
 $string['maxtermearnings'] = 'Maximum Earnings Per Term (enter 0 for unlimited)';
 $string['comments'] = 'Comments';
+$string['updateformheadertitle'] = 'Update Worker Information';

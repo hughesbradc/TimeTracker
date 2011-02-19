@@ -5,14 +5,21 @@ file for Moodle Timetracker block"
    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
  <TABLES>
    <TABLE NAME="block_timetracker_workerinfo" COMMENT="Worker information.
-   Contains Moodle userid, address, phone number, position, current pay rate, 
-   timetracker method, active, department, the worker's id number, and comments."
+   Contains Moodle userid, first name, last name, email, address, phone number, position,
+   current pay rate, timetracker method, active, department, the worker's id number, and comments."
    NEXT="block_timetracker_pending">
      <FIELDS>
        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"
 UNSIGNED="true" SEQUENCE="false" NEXT="address"/>
+       
+       <FIELD NAME="firstname" TYPE="char" LENGTH="255" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="lastname"/>
+       <FIELD NAME="lastname" TYPE="char" LENGTH="255" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="firstname" NEXT="email"/>
+       <FIELD NAME="email" TYPE="char" LENGTH="255" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastname" NEXT="address"/>
        <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="phonenumber"/>
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="phonenumber"/>   
        <FIELD NAME="phonenumber" TYPE="char" LENGTH="20" NOTNULL="true"
 UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="address" NEXT="position"/>
        <FIELD NAME="position" TYPE="char" LENGTH="255" NOTNULL="true"
