@@ -29,30 +29,8 @@
         $this->title = get_string('blocktitle', 'block_timetracker');
     }
 
-    /**
-    function preferred_width() {
-        return 210;
-    }
-
-    function applicable_formats() {
-        return array('all' => true, 'tag' => false);   // Needs work to make it work on tags MDL-11960
-    }
-
-    function specialization() {
-        // After the block has been loaded we customize the block's title display
-        if (!empty($this->config) && !empty($this->config->title)) {
-            // There is a customized block title, display it
-            $this->title = $this->config->title;
-        } else {
-            // No customized block title, use localized remote news feed string
-            $this->title = get_string('remotenewsfeed', 'block_timetracker');
-        }
-    }
-
-    */
-    
     function get_content() {
-        global $CFG, $DB, $USER;
+        global $CFG, $DB, $USER, $OUTPUT;
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -64,9 +42,11 @@
         } else {
 	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id));
             if ($numrecords == 0){
-                $this->content->text .= '<a href="/workerinfo.php">';
-				$this->content->text .= '<center>'.get_string('registerinfo','block_timetracker').'</center>';
-                $this->content->text .= '</a>';
+                $link = '/blocks/timetracker/updateworkerinfo.php';
+                $action = null; 
+                $this->content->text = '<center>';
+                $this->content->text .= $OUTPUT->action_link($link, get_string('registerinfo', 'block_timetracker'), $action);
+                $this->content->text .= '</center>';
             } else {
                 if ($this->config->block_timetracker_show_month_hours ||
                 $this->config->block_timetracker_show_term_hours ||
@@ -74,7 +54,6 @@
                 $this->config->block_timetracker_show_total_hours) {
 			        $this->content->text .= '<span style=font-weight:bold; ">'.get_string('hourstitle','block_timetracker').'</span>';
 
-//            		$this->content->text = 'EPIC FAIL! You do not have editing capabilities.';
 					if ($this->config->block_timetracker_show_month_hours){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalmonth', 'block_timetracker');
