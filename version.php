@@ -18,8 +18,9 @@
 /**
  * This block will display a summary of hours and earnings for the worker.
  *
- * @package    TimeTracker
- * @copyright  Marty Gilbert & Brad Hughes
+ * @package    Block
+ * @subpackage TimeTracker
+ * @copyright  2011 Marty Gilbert & Brad Hughes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 

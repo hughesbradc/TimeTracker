@@ -18,9 +18,10 @@
 /**
  * Strings for component 'block_timetracker', language 'en', branch 'MOODLE_20_STABLE'
  *
- * @package  TimeTracker 
- * @copyright Marty Gilbert & Brad Hughes
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    Block
+ * @subpackage TimeTracker
+ * @copyright  2011 Marty Gilbert & Brad Hughes
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $string['pluginname'] = 'TimeTracker';
