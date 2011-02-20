@@ -5,22 +5,33 @@ file for Moodle Timetracker block"
    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
  <TABLES>
    <TABLE NAME="block_timetracker_workerinfo" COMMENT="Worker information.
-   Contains Moodle userid, address, position, current pay rate, current 
-   maximum term earnings, department, the worker's id number, and comments."
+   Contains Moodle userid, first name, last name, email, address, phone number, position,
+   current pay rate, timetracker method, active, department, the worker's id number, and comments."
    NEXT="block_timetracker_pending">
      <FIELDS>
        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"
 UNSIGNED="true" SEQUENCE="false" NEXT="address"/>
+       
+       <FIELD NAME="firstname" TYPE="char" LENGTH="255" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="lastname"/>
+       <FIELD NAME="lastname" TYPE="char" LENGTH="255" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="firstname" NEXT="email"/>
+       <FIELD NAME="email" TYPE="char" LENGTH="255" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastname" NEXT="address"/>
        <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="position"/>
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="phonenumber"/>   
+       <FIELD NAME="phonenumber" TYPE="char" LENGTH="20" NOTNULL="true"
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="address" NEXT="position"/>
        <FIELD NAME="position" TYPE="char" LENGTH="255" NOTNULL="true"
-SEQUENCE="false" PREVIOUS="address" NEXT="currpayrate"/>
+SEQUENCE="false" PREVIOUS="phonenumber" NEXT="currpayrate"/>
        <FIELD NAME="currpayrate" TYPE="char" LENGTH="10"
-NOTNULL="true" SEQUENCE="false" PREVIOUS="position" NEXT="currmaxtermearnings"/>
-       <FIELD NAME="currmaxtermearnings" TYPE="char" LENGTH="10"
-NOTNULL="true" SEQUENCE="false" PREVIOUS="currpayrate" NEXT="dept"/>
+NOTNULL="true" SEQUENCE="false" PREVIOUS="position" NEXT="timetrackermethod"/>
+       <FIELD NAME="timetrackermethod" TYPE="int" LENGTH="1"
+NOTNULL="true" SEQUENCE="false" PREVIOUS="currpayrate" NEXT="active"/>
+       <FIELD NAME="active" TYPE="int" LENGTH="1"
+NOTNULL="true" SEQUENCE="false" PREVIOUS="timetrackermethod" NEXT="dept"/>
        <FIELD NAME="dept" TYPE="char" LENGTH="100" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="currmaxtermearnings" NEXT="idnum"/>
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="active" NEXT="idnum"/>
        <FIELD NAME="idnum" TYPE="char" LENGTH="50" NOTNULL="true"
 SEQUENCE="false" PREVIOUS="dept" NEXT="comments"/>
 <FIELD NAME="comments" TYPE="char" LENGTH="1000" NOTNULL="true"

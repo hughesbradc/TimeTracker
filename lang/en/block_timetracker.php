@@ -18,9 +18,10 @@
 /**
  * Strings for component 'block_timetracker', language 'en', branch 'MOODLE_20_STABLE'
  *
- * @package   block_timetracker
- * @copyright 2011 Marty Gilbert & Brad Hughes
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    Block
+ * @subpackage TimeTracker
+ * @copyright  2011 Marty Gilbert & Brad Hughes
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $string['pluginname'] = 'TimeTracker';
@@ -47,20 +48,20 @@ $string['settings'] = 'Settings';
 $string['datefrom'] = 'Date from ';
 $string['dateto'] = ' to ';
 $string['submitbutton'] = 'Submit';
+$string['savebutton'] = 'Save';
  
 // Strings for Block
-$string['blocktitle'] = "TimeTracker";
-$string['hourstitle'] = 'Hours:';
-$string['totalhoursworked'] = 'Total hours worked: ';
-$string['hoursworkedterm'] = 'Hours worked this term: ';
-$string['hoursworkedmonth'] = 'Hours worked this month:';
-$string['hoursytd'] = 'Year to date: ';
-$string['earningstitle'] = 'Earnings:';
-$string['earningsmonth'] = 'This month: ';
-$string['earningsterm'] = 'This term: ';
-$string['earningsytd'] = 'Year to date: ';
-$string['earningstotal'] = 'Total: ';
-$string['gotodetails'] = 'Go to Details';
+$string['blocktitle'] = 'TimeTracker';
+//$string['hourstitle'] = '<span style=\'font-weight: bold\'>Hours</span>';
+//$string['earningstitle'] = '<span style=\'font-weight: bold\'>Earnings</span>';
+$string['hourstitle'] = 'Hours';
+$string['earningstitle'] = 'Earnings';
+$string['totalmonth'] = 'This month:';
+$string['totalterm'] = 'This term: ';
+$string['totalytd'] = 'Year to date: ';
+$string['total'] = 'Total: ';
+$string['manage'] = 'Manage';
+$string['registerinfo'] = 'Register Work Study Information';
 
 // Strings for Employee Home Page (also includes strings from the 'block' section above)
 $string['welcome'] = 'Welcome';
@@ -107,7 +108,7 @@ $string['iemployee'] = 'Individual Employee';
 $string['selemployee'] = 'Select Employee';
 $string['aemployees'] = 'All Employees';
 
-// Strings for Supervisor Settings Page
+// Strings for 'Update Worker Information' Page
 $string['emplinfo'] = 'Employee Information';
 $string['eidirection'] = 'Select an employee to edit';
 $string['sitesettings'] = 'Site Settings';
@@ -120,6 +121,7 @@ $string['firstname'] = 'First Name';
 $string['lastname'] = 'Last Name';
 $string['email'] = 'Email Address';
 $string['address'] = 'Address';
+$string['phone'] = 'Phone';
 $string['department'] = 'Department';
 $string['position'] = 'Position';
 $string['currpayrate'] = 'Current Pay Rate';
@@ -131,5 +133,4 @@ $string['firstname'] = 'First name';
 $string['lastname'] = 'Last name';
 $string['email'] = 'Email address';
 $string['noworkers'] = 'No workers listed';
-
-
+$string['updateformheadertitle'] = 'Update Worker Information';

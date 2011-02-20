@@ -18,9 +18,10 @@
 /**
  * Form for editing TimeTracker block instances.
  *
- * @package   TimeTracker
- * @copyright 2011 Marty Gilbert & Brad Hughes
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    Block
+ * @subpackage TimeTracker
+ * @copyright  2011 Marty Gilbert & Brad Hughes
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 class block_timetracker_edit_form extends block_edit_form {

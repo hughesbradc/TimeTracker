@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -24,6 +23,28 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
-$plugin->version = '2011021422';
-$plugin->cron = 300; // Set min time between cron executions to 300 secs (5 mins)
-?>
+require_once('../../config.php');
+require('timetracker_updateworkerinfo_form.php');
+
+global $CFG, $COURSE, $USER;
+
+require_login();
+
+$context = get_context_instance(CONTEXT_SYSTEM);
+$PAGE->set_context($context);
+$PAGE->set_url('/blocks/timetracker/updateworkerinfo.php');
+
+$mform = new timetracker_updateworkerinfo_form();
+if ($formdata=$mform->get_data()){
+          //you need this section if you have a cancel button on your form
+    echo $OUTPUT->header();
+    //$mform->display();
+    print_object($formdata);
+    echo $OUTPUT->footer();
+} else {
+    //this branch is where data wasn't validated correctly.    
+    echo $OUTPUT->header();
+    $mform->display();
+    echo $OUTPUT->footer();
+  
+}

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -18,8 +17,9 @@
 /**
  * This block will display a summary of hours and earnings for the worker.
  *
- * @package    TimeTracker
- * @copyright  Marty Gilbert & Brad Hughes
+ * @package    Block
+ * @subpackage TimeTracker
+ * @copyright  2011 Marty Gilbert & Brad Hughes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
@@ -29,30 +29,8 @@
         $this->title = get_string('blocktitle', 'block_timetracker');
     }
 
-    /**
-    function preferred_width() {
-        return 210;
-    }
-
-    function applicable_formats() {
-        return array('all' => true, 'tag' => false);   // Needs work to make it work on tags MDL-11960
-    }
-
-    function specialization() {
-        // After the block has been loaded we customize the block's title display
-        if (!empty($this->config) && !empty($this->config->title)) {
-            // There is a customized block title, display it
-            $this->title = $this->config->title;
-        } else {
-            // No customized block title, use localized remote news feed string
-            $this->title = get_string('remotenewsfeed', 'block_timetracker');
-        }
-    }
-
-    */
-    
     function get_content() {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER, $OUTPUT;
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -61,69 +39,77 @@
         $this->content = new stdClass;
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
             $this->content->text = 'You have manage capabilities!';
-
-
         } else {
-            if ($this->config->block_timetracker_show_total_hours ||
-            $this->config->block_timetracker_show_term_hours ||
-            $this->config->block_timetracker_show_month_hours ||
-            $this->config->block_timetracker_show_ytd_hours) {
-                $this->content->text .= get_string('hourstitle','block_timetracker');   
-            }
+	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id));
+            if ($numrecords == 0){
+                $link = '/blocks/timetracker/updateworkerinfo.php';
+                $action = null; 
+                $this->content->text = '<center>';
+                $this->content->text .= $OUTPUT->action_link($link, get_string('registerinfo', 'block_timetracker'), $action);
+                $this->content->text .= '</center>';
+            } else {
+                if ($this->config->block_timetracker_show_month_hours ||
+                $this->config->block_timetracker_show_term_hours ||
+                $this->config->block_timetracker_show_ytd_hours ||
+                $this->config->block_timetracker_show_total_hours) {
+			        $this->content->text .= '<span style=font-weight:bold; ">'.get_string('hourstitle','block_timetracker').'</span>';
 
-//            $this->content->text = 'EPIC FAIL! You do not have editing capabilities.';
-            if ($this->config->block_timetracker_show_total_hours){
-                $this->content->text .= '<br />';
-                $this->content->text .= get_string('totalhoursworked', 'block_timetracker');
-            }
-
-            if ($this->config->block_timetracker_show_term_hours){
-                $this->content->text .= '<br />';
-                $this->content->text .= get_string('hoursworkedterm', 'block_timetracker');
-            }
-
-            if ($this->config->block_timetracker_show_month_hours){
-                $this->content->text .= '<br />';
-                $this->content->text .= get_string('hoursworkedmonth', 'block_timetracker');
-            }
+					if ($this->config->block_timetracker_show_month_hours){
+						$this->content->text .= '<br />';
+						$this->content->text .= get_string('totalmonth', 'block_timetracker');
+					}
+					
+                    if ($this->config->block_timetracker_show_term_hours){
+						$this->content->text .= '<br />';
+						$this->content->text .= get_string('totalterm', 'block_timetracker');
+					}
             
-            if ($this->config->block_timetracker_show_ytd_hours){
-                $this->content->text .= '<br />';
-                $this->content->text .= get_string('hoursytd', 'block_timetracker');
-            }
+					if ($this->config->block_timetracker_show_ytd_hours){
+						$this->content->text .= '<br />';
+						$this->content->text .= get_string('totalytd', 'block_timetracker');
+					}
+					
+                    if ($this->config->block_timetracker_show_total_hours){
+						$this->content->text .= '<br />';
+						$this->content->text .= get_string('total', 'block_timetracker');
+					}
        
-            if ($this->config->block_timetracker_show_month_earnings ||
-            $this->config->block_timetracker_show_term_earnings ||
-            $this->config->block_timetracker_show_ytd_earnings ||
-            $this->config->block_timetracker_show_total_earnings) {
-                $this->content->text .= '<br />';
-                $this->content->text .= get_string('earningstitle','block_timetracker');   
-            }
+					if ($this->config->block_timetracker_show_month_earnings ||
+					$this->config->block_timetracker_show_term_earnings ||
+					$this->config->block_timetracker_show_ytd_earnings ||
+					$this->config->block_timetracker_show_total_earnings) {
+						$this->content->text .= '<br />';
+						$this->content->text .= '<span style="font-weight:bold; ">'.get_string('earningstitle','block_timetracker').'</span>';
+					}
 
-            if ($this->config->block_timetracker_show_month_earnings){
-                $this->content->text .= '<br />';
-                $this->content->text .= get_string('earningsmonth', 'block_timetracker');
-            }
+					if ($this->config->block_timetracker_show_month_earnings){
+						$this->content->text .= '<br />';
+						$this->content->text .= get_string('totalmonth', 'block_timetracker');
+					}
 
-            if ($this->config->block_timetracker_show_term_earnings){
-                $this->content->text .= '<br />';
-                $this->content->text .= get_string('earningsterm', 'block_timetracker');
-            }
+					if ($this->config->block_timetracker_show_term_earnings){
+						$this->content->text .= '<br />';
+						$this->content->text .= get_string('totalterm', 'block_timetracker');
+					}
 
-            if ($this->config->block_timetracker_show_ytd_earnings){
-                $this->content->text .= '<br />';
-                $this->content->text .= get_string('earningsytd', 'block_timetracker');
-            }
+					if ($this->config->block_timetracker_show_ytd_earnings){
+						$this->content->text .= '<br />';
+						$this->content->text .= get_string('totalytd', 'block_timetracker');
+					}
 
-            if ($this->config->block_timetracker_show_total_earnings){
-                $this->content->text .= '<br />';
-                $this->content->text .= get_string('earningstotal', 'block_timetracker');
-            }
+					if ($this->config->block_timetracker_show_total_earnings){
+						$this->content->text .= '<br />';
+						$this->content->text .= get_string('total', 'block_timetracker');
+					}
 
-            $this->content->text .= '<br />'; 
-            $this->content->text .= '<a href="/workerhome.php">'.get_string('gotodetails','block_timetracker').'</a>';
-       }
-        return $this->content;
+					$this->content->text .= '<br />'; 
+					$this->content->text .= '<a href="/workerhome.php">';
+					$this->content->text .= '<center>'.get_string('manage','block_timetracker').'</center>';
+					$this->content->text .= '</a>';
+					return $this->content;
+				}
+			}
+		}
     }
 
 
@@ -147,7 +133,7 @@
      * @return boolean true if all feeds were retrieved succesfully
      */
     function cron() {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
    /**     require_once($CFG->libdir.'/simplepie/moodle_simplepie.php');
 
         // We are going to measure execution times
@@ -194,5 +180,3 @@
 
     }
 }
-
-
