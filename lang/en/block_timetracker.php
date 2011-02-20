@@ -125,3 +125,11 @@ $string['position'] = 'Position';
 $string['currpayrate'] = 'Current Pay Rate';
 $string['maxtermearnings'] = 'Maximum Earnings Per Term (enter 0 for unlimited)';
 $string['comments'] = 'Comments';
+$string['manageworkers'] = 'Worker Information';
+$string['active'] = 'Active';
+$string['firstname'] = 'First name';
+$string['lastname'] = 'Last name';
+$string['email'] = 'Email address';
+$string['noworkers'] = 'No workers listed';
+
+
