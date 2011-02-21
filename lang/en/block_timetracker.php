@@ -134,3 +134,5 @@ $string['lastname'] = 'Last name';
 $string['email'] = 'Email address';
 $string['noworkers'] = 'No workers listed';
 $string['updateformheadertitle'] = 'Update Worker Information';
+
+$string['manageworkertitle'] = 'Manage Workers';

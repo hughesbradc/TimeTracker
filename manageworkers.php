@@ -26,14 +26,46 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once('timetracker_manageworkers_form.php');
 
-
-
-
 require_login();
 
-$context = get_context_instance(CONTEXT_SYSTEM);
-$PAGE->set_context($context);
-$PAGE->set_url('/blocks/timetracker/manageworkers.php');
+$courseid = optional_param('id', 0, PARAM_INTEGER);
+
+$urlparams['id'] = $courseid;
+
+
+if($courseid){
+    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    $PAGE->set_course($course);
+    $context = $PAGE->context;
+} else {
+    $context = get_context_instance(CONTEXT_SYSTEM);
+    $PAGE->set_context($context);
+}
+
+$PAGE->set_url('/blocks/timetracker/manageworkers.php', $urlparams);
+$PAGE->set_pagelayout('base');
+
+$strtitle = get_string('manageworkertitle','block_timetracker');
+
+$PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
+
+$timetrackerurl = new moodle_url('/blocks/timetracker/index.php?id='.$courseid);
+$PAGE->navbar->add(get_string('blocks'));
+$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
+#$PAGE->navbar->add(get_string('managefeeds', 'block_rss_client'));
+$PAGE->navbar->add($strtitle);
+
+
+#$PAGE->set_title($strtitle);
+#$PAGE->set_heading($strtitle);
+
+#$settingsurl = new moodle_url('/blocks/timetracker/manageworkers.php?id='.$courseid);
+
+#$PAGE->navbar->add(get_string('blocks'));
+#$PAGE->navbar->add(get_string('manageworkertitle', 'block_timetracker'), $settingsurl);
+#$PAGE->navbar->add(get_string('managefeeds', 'block_rss_client'));
+#$PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_manageworkers_form();
 
@@ -41,6 +73,8 @@ if($formdata = $mform->get_data()){
 
 } else {
     echo $OUTPUT->header();
+    echo $OUTPUT->heading($strtitle, 2);
+    #$PAGE->print_header('Manage worker info', 'Manage worker info');
     $mform->display();
     echo $OUTPUT->footer();
     die;
