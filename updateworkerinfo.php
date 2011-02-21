@@ -30,12 +30,29 @@ global $CFG, $COURSE, $USER;
 
 require_login();
 
+$courseid = optional_param('id', 0, PARAM_INTEGER);
+
+$urlparams['id'] = $courseid;
+
 $context = get_context_instance(CONTEXT_SYSTEM);
 $PAGE->set_context($context);
 $PAGE->set_url('/blocks/timetracker/updateworkerinfo.php');
+$PAGE->set_pagelayout('base');
+
+$strtitle = get_string('updateformheadertitle','block_timetracker'); 
+$PAGE->set_title($strtitle);
+
+$timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
+
+$PAGE->navbar->add(get_string('blocks'));
+$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
+$PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_updateworkerinfo_form();
-if ($formdata=$mform->get_data()){
+
+if ($mform->is_cancelled()){ //user clicked cancel
+
+} else if ($formdata=$mform->get_data()){
           //you need this section if you have a cancel button on your form
     echo $OUTPUT->header();
     //$mform->display();

@@ -9,10 +9,10 @@ file for Moodle Timetracker block"
    current pay rate, timetracker method, active, department, the worker's id number, and comments."
    NEXT="block_timetracker_pending">
      <FIELDS>
-       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"
+       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
 UNSIGNED="true" SEQUENCE="false" NEXT="firstname"/>
        <FIELD NAME="firstname" TYPE="char" LENGTH="255" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="lastname"/>
+UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="lastname"/>
        <FIELD NAME="lastname" TYPE="char" LENGTH="255" NOTNULL="true"
 UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="firstname" NEXT="email"/>
        <FIELD NAME="email" TYPE="char" LENGTH="255" NOTNULL="true"
@@ -37,7 +37,7 @@ SEQUENCE="false" PREVIOUS="dept" NEXT="comments"/>
 UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="idnum"/>
     </FIELDS>
      <KEYS>
-       <KEY NAME="primary" TYPE="primary" FIELDS="userid" />
+       <KEY NAME="primary" TYPE="primary" FIELDS="id" />
      </KEYS>
    </TABLE>
    <TABLE NAME="block_timetracker_pending" COMMENT="Holds information for missed punches."
