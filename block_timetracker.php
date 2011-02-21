@@ -30,7 +30,7 @@
     }
 
     function get_content() {
-        global $CFG, $DB, $USER, $OUTPUT;
+        global $CFG, $DB, $USER, $OUTPUT, $COURSE;
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -38,9 +38,10 @@
 
         $this->content = new stdClass;
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
-            $this->content->text = 'You have manage capabilities!';
+            #$this->content->text = 'You have manage capabilities!';
+            $this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';
         } else {
-	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id));
+	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('id'=>$USER->id));
             if ($numrecords == 0){
                 $link = '/blocks/timetracker/updateworkerinfo.php';
                 $action = null; 

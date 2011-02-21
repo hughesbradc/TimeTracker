@@ -35,6 +35,7 @@ $urlparams['id'] = $courseid;
 
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    #print_object($course);
     $PAGE->set_course($course);
     $context = $PAGE->context;
 } else {
@@ -42,7 +43,9 @@ if($courseid){
     $PAGE->set_context($context);
 }
 
-$PAGE->set_url('/blocks/timetracker/manageworkers.php', $urlparams);
+$manageworkerurl = new moodle_url('/blocks/timetracker/manageworkers.php', $urlparams);
+
+$PAGE->set_url($manageworkerurl);
 $PAGE->set_pagelayout('base');
 
 $strtitle = get_string('manageworkertitle','block_timetracker');
@@ -50,26 +53,43 @@ $strtitle = get_string('manageworkertitle','block_timetracker');
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
-$timetrackerurl = new moodle_url('/blocks/timetracker/index.php?id='.$courseid);
+#print_object($urlparams);
+$timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
+
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
-#$PAGE->navbar->add(get_string('managefeeds', 'block_rss_client'));
 $PAGE->navbar->add($strtitle);
 
 
-#$PAGE->set_title($strtitle);
-#$PAGE->set_heading($strtitle);
-
-#$settingsurl = new moodle_url('/blocks/timetracker/manageworkers.php?id='.$courseid);
-
-#$PAGE->navbar->add(get_string('blocks'));
-#$PAGE->navbar->add(get_string('manageworkertitle', 'block_timetracker'), $settingsurl);
-#$PAGE->navbar->add(get_string('managefeeds', 'block_rss_client'));
-#$PAGE->navbar->add($strtitle);
-
 $mform = new timetracker_manageworkers_form();
 
-if($formdata = $mform->get_data()){
+if ($mform->is_cancelled()){ //user clicked 'cancel'
+
+    // XXX this seems to send a courseID of 0 to index.php, when, as best I can tell
+    // $urlparams has the correct id. TODO
+    redirect($timetrackerurl); 
+} else if($formdata = $mform->get_data()){
+    print_object($formdata);
+
+    $workers = $DB->get_records('block_timetracker_workerinfo');
+    print_object($workers);
+
+   foreach($formdata->workerid as $idx){
+         
+        if((isset($formdata->activeid[$idx]) && $workers[$idx]->active==0) ||  //not the same
+         (!isset($formdata->activeid[$idx]) && $workers[$idx]->active == 1)){ //not the same
+            $workers[$idx]->active = isset($formdata->activeid[$idx])?1:0;
+            print_object($workers[$idx]);
+            $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
+         }
+    }
+
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading($strtitle, 2);
+    //content goes here
+    echo 'Changes saved successfully<br />';
+    echo $manageworkerurl;
+    echo $OUTPUT->footer();
 
 } else {
     echo $OUTPUT->header();

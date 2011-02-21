@@ -34,9 +34,9 @@
 
          $mform->addElement('header','general',get_string('updateformheadertitle','block_timetracker'));
 
-         $mform->addElement('hidden','userid',$USER->id);
+         $mform->addElement('hidden','id',$USER->id);
 
-         //$worker = $DB->get_record('block_timetracker_workerinfo',array('userid'=>$USER->id));
+         //$worker = $DB->get_record('block_timetracker_workerinfo',array('id'=>$USER->id));
          $worker = $DB->get_record('user',array('id'=>$USER->id));
 
          $mform->addElement('text','firstname',get_string('firstname','block_timetracker'), 'readonly="readonly"');

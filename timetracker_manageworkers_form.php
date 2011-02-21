@@ -58,9 +58,9 @@ class timetracker_manageworkers_form  extends moodleform {
         foreach ($workers as $worker){
             $mform->addElement('html','<tr><td>'); 
             if($worker->active){
-                $mform->addElement('checkbox', 'activeid['.$worker->userid.']','','',array('checked="checked"'));
+                $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',array('checked="checked"'));
             } else {
-                $mform->addElement('checkbox', 'activeid['.$worker->userid.']');
+                $mform->addElement('checkbox', 'activeid['.$worker->id.']');
             }
 
             $row='</td>';
@@ -71,6 +71,8 @@ class timetracker_manageworkers_form  extends moodleform {
 
             $row.='</tr>';
             $mform->addElement('html',$row);
+
+            $mform->addElement('hidden','workerid['.$worker->id.']', $worker->id);
         }
 
         $mform->addElement('html','</table>');
