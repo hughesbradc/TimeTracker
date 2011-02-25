@@ -27,6 +27,11 @@ require_once ($CFG->libdir.'/formslib.php');
 
 class timetracker_manageworkers_form  extends moodleform {
 
+    function timetracker_manageworkers_form($context){
+        $this->context = $context;
+        parent::__construct();
+    }
+
     function definition() {
         global $CFG, $USER, $DB, $COURSE;
 
@@ -37,7 +42,7 @@ class timetracker_manageworkers_form  extends moodleform {
 
 
         if(!$workers = $DB->get_records('block_timetracker_workerinfo',array(),'lastname ASC')){
-            print_error('noworkers','block_timetracker');
+            print_error('noworkers','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
         }
 
         $stractive = get_string('active', 'block_timetracker');
@@ -55,12 +60,24 @@ class timetracker_manageworkers_form  extends moodleform {
                 <th>'.$stremail.'</th>
              </tr>');
 
+        $canactivate = true;
+        if (has_capability('block/timetracker:activateworkers', $this->context)) 
+            $canactivate = false;
+
         foreach ($workers as $worker){
             $mform->addElement('html','<tr><td>'); 
             if($worker->active){
-                $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',array('checked="checked"'));
+                if($canactivate){
+                    $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',array('checked="checked"'));
+                } else {
+                    $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',array('checked="checked"','disabled="disabled"'));
+                }
             } else {
-                $mform->addElement('checkbox', 'activeid['.$worker->id.']');
+                if($canactivate){
+                    $mform->addElement('checkbox', 'activeid['.$worker->id.']');
+                } else {
+                    $mform->addElement('checkbox', 'activeid['.$worker->id.']', array('disabled="disabled"'));
+                }
             }
 
             $row='</td>';

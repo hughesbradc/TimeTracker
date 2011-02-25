@@ -28,10 +28,9 @@ require_once('timetracker_manageworkers_form.php');
 
 require_login();
 
-$courseid = optional_param('id', 0, PARAM_INTEGER);
+$courseid = optional_param('id', $COURSE->id, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
-
 
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -44,6 +43,7 @@ if($courseid){
 }
 
 $manageworkerurl = new moodle_url('/blocks/timetracker/manageworkers.php', $urlparams);
+//echo $manageworkerurl;
 
 $PAGE->set_url($manageworkerurl);
 $PAGE->set_pagelayout('base');
@@ -61,7 +61,7 @@ $PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerur
 $PAGE->navbar->add($strtitle);
 
 
-$mform = new timetracker_manageworkers_form();
+$mform = new timetracker_manageworkers_form($PAGE->context);
 
 if ($mform->is_cancelled()){ //user clicked 'cancel'
 
@@ -69,17 +69,17 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     // $urlparams has the correct id. TODO
     redirect($timetrackerurl); 
 } else if($formdata = $mform->get_data()){
-    print_object($formdata);
+    //print_object($formdata);
 
     $workers = $DB->get_records('block_timetracker_workerinfo');
-    print_object($workers);
+    //print_object($workers);
 
-   foreach($formdata->workerid as $idx){
+    foreach($formdata->workerid as $idx){
          
         if((isset($formdata->activeid[$idx]) && $workers[$idx]->active==0) ||  //not the same
          (!isset($formdata->activeid[$idx]) && $workers[$idx]->active == 1)){ //not the same
             $workers[$idx]->active = isset($formdata->activeid[$idx])?1:0;
-            print_object($workers[$idx]);
+            //print_object($workers[$idx]);
             $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
          }
     }
@@ -88,7 +88,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     echo $OUTPUT->heading($strtitle, 2);
     //content goes here
     echo 'Changes saved successfully<br />';
-    echo $manageworkerurl;
+    echo '<a href="'.$manageworkerurl.'">Manage Workers</a>';
     echo $OUTPUT->footer();
 
 } else {
