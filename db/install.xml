@@ -5,36 +5,24 @@ file for Moodle Timetracker block"
    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
  <TABLES>
    <TABLE NAME="block_timetracker_workerinfo" COMMENT="Worker information.
-   Contains Moodle userid, first name, last name, email, address, phone number, position,
+   Contains id, Moodle userid, first name, last name, email, address, phone number, position,
    current pay rate, timetracker method, active, department, the worker's id number, and comments."
    NEXT="block_timetracker_pending">
      <FIELDS>
-       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
-UNSIGNED="true" SEQUENCE="false" NEXT="firstname"/>
-       <FIELD NAME="firstname" TYPE="char" LENGTH="255" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="lastname"/>
-       <FIELD NAME="lastname" TYPE="char" LENGTH="255" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="firstname" NEXT="email"/>
-       <FIELD NAME="email" TYPE="char" LENGTH="255" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastname" NEXT="address"/>
-       <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="email" NEXT="phonenumber"/>   
-       <FIELD NAME="phonenumber" TYPE="char" LENGTH="20" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="address" NEXT="position"/>
-       <FIELD NAME="position" TYPE="char" LENGTH="255" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="phonenumber" NEXT="currpayrate"/>
-       <FIELD NAME="currpayrate" TYPE="char" LENGTH="10"
-NOTNULL="true" SEQUENCE="false" PREVIOUS="position" NEXT="timetrackermethod"/>
-       <FIELD NAME="timetrackermethod" TYPE="int" LENGTH="1"
-NOTNULL="true" SEQUENCE="false" PREVIOUS="currpayrate" NEXT="active"/>
-       <FIELD NAME="active" TYPE="int" LENGTH="1"
-NOTNULL="true" SEQUENCE="false" PREVIOUS="timetrackermethod" NEXT="dept"/>
-       <FIELD NAME="dept" TYPE="char" LENGTH="100" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="active" NEXT="idnum"/>
-       <FIELD NAME="idnum" TYPE="char" LENGTH="50" NOTNULL="true"
-SEQUENCE="false" PREVIOUS="dept" NEXT="comments"/>
-    <FIELD NAME="comments" TYPE="char" LENGTH="1000" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="idnum"/>
+       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="firstname"/>
+       <FIELD NAME="firstname" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="lastname"/>
+       <FIELD NAME="lastname" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="firstname" NEXT="email"/>
+       <FIELD NAME="email" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastname" NEXT="address"/>
+       <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="email" NEXT="phonenumber"/>   
+       <FIELD NAME="phonenumber" TYPE="char" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="address" NEXT="position"/>
+       <FIELD NAME="position" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="phonenumber" NEXT="currpayrate"/>
+       <FIELD NAME="currpayrate" TYPE="number" LENGTH="10" DECIMAL="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="position" NEXT="timetrackermethod"/>
+       <FIELD NAME="timetrackermethod" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="currpayrate" NEXT="active"/>
+       <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timetrackermethod" NEXT="dept"/>
+       <FIELD NAME="dept" TYPE="char" LENGTH="100" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="active" NEXT="idnum"/>
+       <FIELD NAME="idnum" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="dept" NEXT="comments"/>
+       <FIELD NAME="comments" TYPE="char" LENGTH="1000" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="idnum"/>
     </FIELDS>
      <KEYS>
        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
@@ -43,12 +31,9 @@ UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="idnum"/>
    <TABLE NAME="block_timetracker_pending" COMMENT="Holds information for missed punches."
    PREVIOUS="block_timetracker_workerinfo" NEXT="block_timetracker_workunit">
      <FIELDS>
-       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
-UNSIGNED="true" SEQUENCE="true" NEXT="timein"/>
-       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
-       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"
-SEQUENCE="false" PREVIOUS="timein"/>
+       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="timein"/>
+       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timein"/>
      </FIELDS>
      <KEYS>
        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
@@ -57,18 +42,12 @@ SEQUENCE="false" PREVIOUS="timein"/>
    <TABLE NAME="block_timetracker_workunit" COMMENT="Holds work unit information."
    PREVIOUS="block_timetracker_pending" NEXT="block_timetracker_term">
      <FIELDS>
-	   <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
-UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
-       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="timein"/>
-       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true"
-SEQUENCE="false" PREVIOUS="userid" NEXT="timeout"/>
-       <FIELD NAME="timeout" TYPE="int" LENGTH="10"
-NOTNULL="true" SEQUENCE="false" PREVIOUS="timein" NEXT="lastedited"/>
-       <FIELD NAME="lastedited" TYPE="int" LENGTH="10"
-NOTNULL="true" SEQUENCE="false" PREVIOUS="timeout" NEXT="lasteditedby"/>
-       <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited"/>
+	   <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="timein"/>
+       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="timeout"/>
+       <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timein" NEXT="lastedited"/>
+       <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timeout" NEXT="lasteditedby"/>
+       <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited"/>
      </FIELDS>
      <KEYS>
        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
@@ -77,16 +56,11 @@ UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited"/>
    <TABLE NAME="block_timetracker_term" COMMENT="Holds information regarding various terms."
    PREVIOUS="block_timetracker_workunit">
      <FIELDS>
-       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
-UNSIGNED="true" SEQUENCE="true" NEXT="starttime"/>
-       <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="true"
-UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="endtime"/>
-       <FIELD NAME="endtime" TYPE="int" LENGTH="10" NOTNULL="true"
-SEQUENCE="false" PREVIOUS="starttime" NEXT="name"/>
-       <FIELD NAME="name" TYPE="char" LENGTH="100"
-NOTNULL="true" SEQUENCE="false" PREVIOUS="endtime" NEXT="description"/>
-       <FIELD NAME="description" TYPE="char" LENGTH="255"
-NOTNULL="true" SEQUENCE="false" PREVIOUS="name"/> 
+       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="starttime"/>
+       <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="endtime"/>
+       <FIELD NAME="endtime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="starttime" NEXT="name"/>
+       <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" PREVIOUS="endtime" NEXT="description"/>
+       <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="name"/> 
      </FIELDS>
      <KEYS>
        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
