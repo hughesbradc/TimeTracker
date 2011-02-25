@@ -64,9 +64,6 @@ if ($mform->is_cancelled()){ //user clicked cancel
 
     //form submitted
     echo $OUTPUT->header();
-    //$mform->display();
-    print_object($formdata);
-    echo ("Updated successfully");
     echo $OUTPUT->footer();
 } else {
     //form is shwon for the first time
