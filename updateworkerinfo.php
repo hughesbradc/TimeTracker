@@ -53,15 +53,24 @@ $mform = new timetracker_updateworkerinfo_form();
 if ($mform->is_cancelled()){ //user clicked cancel
 
 } else if ($formdata=$mform->get_data()){
-          //you need this section if you have a cancel button on your form
+	$numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id));
+    
+    if($numrecords == 0){
+        $DB->insert_record('block_timetracker_workerinfo', $formdata);
+    }
+    else {
+        $DB->update_record('block_timetracker_workerinfo', $formdata);
+    }
+
+    //form submitted
     echo $OUTPUT->header();
     //$mform->display();
     print_object($formdata);
+    echo ("Updated successfully");
     echo $OUTPUT->footer();
 } else {
-    //this branch is where data wasn't validated correctly.    
+    //form is shwon for the first time
     echo $OUTPUT->header();
     $mform->display();
     echo $OUTPUT->footer();
-  
 }
