@@ -37,6 +37,13 @@
         }
 
         $this->content = new stdClass;
+        if(!isset($this->config)){
+            if (has_capability('block/timetracker:manageworkers', $this->context)) {
+                $this->content->text='TimeTracker block must be configured before used.';
+            }
+            return $this->content;
+
+        } 
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
             #$this->content->text = 'You have manage capabilities!';
             $this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';

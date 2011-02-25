@@ -13,8 +13,7 @@ $capabilities = array(
             'user' => CAP_PREVENT,
             'guest' => CAP_PREVENT
         )
-    )
-),
+    ),
 
     'block/timetracker:activateworkers' => array(
         'captype' => 'write',
