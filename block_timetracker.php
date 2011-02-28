@@ -48,9 +48,10 @@
             #$this->content->text = 'You have manage capabilities!';
             $this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';
         } else {
-	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('id'=>$USER->id));
+	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('id'=>$USER->id,'courseid'=>$courseid));
+
             if ($numrecords == 0){
-                $link = '/blocks/timetracker/updateworkerinfo.php';
+                $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id;
                 $action = null; 
                 $this->content->text = '<center>';
                 $this->content->text .= $OUTPUT->action_link($link, get_string('registerinfo', 'block_timetracker'), $action);
@@ -81,7 +82,7 @@
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('total', 'block_timetracker');
 					}
-       
+      
 					if ($this->config->block_timetracker_show_month_earnings ||
 					$this->config->block_timetracker_show_term_earnings ||
 					$this->config->block_timetracker_show_ytd_earnings ||
