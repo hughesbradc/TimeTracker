@@ -48,7 +48,7 @@
             #$this->content->text = 'You have manage capabilities!';
             $this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';
         } else {
-	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('id'=>$USER->id,'courseid'=>$courseid));
+	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('id'=>$USER->id,'courseid'=>$COURSE->id));
 
             if ($numrecords == 0){
                 $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id;
