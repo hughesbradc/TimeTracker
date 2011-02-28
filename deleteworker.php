@@ -24,13 +24,15 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once('timetracker_manageworkers_form.php');
+
 
 require_login();
 
-$courseid = optional_param('id', $COURSE->id, PARAM_INTEGER);
+$courseid = required_param('id', PARAM_INTEGER);
+$userid = required_param('userid', PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
+$urlparams['userid'] = $userid;
 
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -42,8 +44,8 @@ if($courseid){
     $PAGE->set_context($context);
 }
 
+
 $manageworkerurl = new moodle_url('/blocks/timetracker/manageworkers.php', $urlparams);
-//echo $manageworkerurl;
 
 $PAGE->set_url($manageworkerurl);
 $PAGE->set_pagelayout('base');
@@ -60,43 +62,25 @@ $timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
 $PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
+echo $OUTPUT->header();
+echo $OUTPUT->heading($strtitle, 2);
 
-$mform = new timetracker_manageworkers_form($PAGE->context);
 
-if ($mform->is_cancelled()){ //user clicked 'cancel'
+//$PAGE->print_header('Delete TimeTracker Worker', 'Delete Worker');
 
-    // XXX this seems to send a courseID of 0 to index.php, when, as best I can tell
-    // $urlparams has the correct id. TODO
-    redirect($timetrackerurl); 
-} else if($formdata = $mform->get_data()){
-    //print_object($formdata);
-
-    $workers = $DB->get_records('block_timetracker_workerinfo');
-    //print_object($workers);
-
-    foreach($formdata->workerid as $idx){
-         
-        if((isset($formdata->activeid[$idx]) && $workers[$idx]->active==0) ||  //not the same
-         (!isset($formdata->activeid[$idx]) && $workers[$idx]->active == 1)){ //not the same
-            $workers[$idx]->active = isset($formdata->activeid[$idx])?1:0;
-            //print_object($workers[$idx]);
-            $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
-         }
-    }
-
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading($strtitle, 2);
-    //content goes here
-    echo 'Changes saved successfully<br />';
-    echo '<a href="'.$manageworkerurl.'">Manage Workers</a>';
-    echo $OUTPUT->footer();
-
+if (!has_capability('block/timetracker:manageworkers', $context)) {
+    print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 } else {
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading($strtitle, 2);
-    #$PAGE->print_header('Manage worker info', 'Manage worker info');
-    $mform->display();
-    echo $OUTPUT->footer();
-    die;
+    if($userid && confirm_sesskey()){
+        //purge them from the db
+        print_object($userid);
+        $DB->delete_records('block_timetracker_workerinfo',array('id'=>$userid));    
+        $DB->delete_records('block_timetracker_workunit',array('userid'=>$userid));    
+        $DB->delete_records('block_timetracker_pending',array('userid'=>$userid));    
+        echo 'Worker and all data have been deleted';
+    } else {
+        print_error('errordeleting','block_timetracker', $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
+    }
 }
 
+echo $OUTPUT->footer();
