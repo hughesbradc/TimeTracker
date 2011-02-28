@@ -37,19 +37,37 @@ $clockout = optional_param('clockout',0, PARAM_INTEGER);
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $ttuserid;
 
-$context = get_context_instance(CONTEXT_SYSTEM);
-$PAGE->set_context($context);
-$PAGE->set_url('/blocks/timetracker/timeclock.php');
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+$PAGE->set_course($course);
+$context = $PAGE->context;
+
+$timeclockurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',$urlparams);
+
+$PAGE->set_url($timeclockurl);
 $PAGE->set_pagelayout('base');
 
 
-$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$ttuserid,'id'=>$courseid));
-if(!$workerrrecord){
+$strtitle = get_string('timeclocktitle','block_timetracker'); 
+$PAGE->set_title($strtitle);
+
+$PAGE->navbar->add(get_string('blocks'));
+$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timeclockurl);
+$PAGE->navbar->add($strtitle);
+
+echo $OUTPUT->header();
+
+
+$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$ttuserid,'courseid'=>$courseid));
+if(!$workerrecord){
     echo "NO WORKER FOUND!";
+    die;
 }
 
 if($workerrecord->active == 0){
     print_string('notactiveerror','block_timetracker');
+    echo '<br />';
+    echo $OUTPUT->footer();
+    die;
 } else {
     if($clockin == 1){
         $cin = new stdClass();
@@ -77,16 +95,6 @@ if($workerrecord->active == 0){
         }
 }
 
-$strtitle = get_string('timeclocktitle','block_timetracker'); 
-$PAGE->set_title($strtitle);
-
-$timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
-
-$PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
-$PAGE->navbar->add($strtitle);
-
-echo $OUTPUT->header();
 
 $pendingrecord= $DB->count_records('block_timetracker_pending', array('userid'=>$ttuserid));
 if($pendingrecord == 0){ 
