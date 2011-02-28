@@ -24,6 +24,7 @@
  */
 
 require_once('../../config.php');
+require_once ('lib.php');
 
 global $CFG, $COURSE, $USER;
 
@@ -119,7 +120,7 @@ if($pendingrecord == 0){
     echo '<br />';
     echo print_string('pendingtimestamp','block_timetracker');
     echo '</b>';
-    $pendingtimestamp= $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid));
+    $pendingtimestamp= $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
     echo 'Clock in:
     '.userdate($pendingtimestamp->timein,get_string('strftimedatetimeshort','langconfig')).'<br />';
     echo $OUTPUT->action_link($link, get_string('clockoutlink', 'block_timetracker'), $action);
@@ -150,7 +151,7 @@ if($numrecords == 0){
         $str .= '<tr>'; 
         $str .= '<td>'.userdate($workunit->timein, get_string('strftimedatetimeshort','langconfig')).'</td>';
         $str .= '<td>'.userdate($workunit->timeout, get_string('strftimedatetimeshort','langconfig')).'</td>';
-        $str .= '<td>calculate this later</td>';
+        $str .= '<td>'.format_elapsed_time($workunit->timeout - $workunit->timein).'</td>';
         //$str .= '<td>'.userdate($workunit->timeout, get_string('strftimedatetimeshort','langconfig')).'</td>';
         $str .= '</tr>'; 
     }

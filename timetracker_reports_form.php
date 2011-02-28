@@ -24,6 +24,7 @@
  */
 
 require_once ($CFG->libdir.'/formslib.php');
+require_once ('lib.php');
 
 class timetracker_reports_form  extends moodleform {
 
@@ -47,20 +48,22 @@ class timetracker_reports_form  extends moodleform {
 
 
         if($this->reportstart == 0){
-            $startfrom = usergetdate(time()); 
-        } else {
-            $startfrom = usergetdate($this->reportstart);
+            $this->reportstart = time();
         }
 
         if($this->reportend == 0){
-            $goto = usergetdate(time()*30*24*60); //one month from now
+            $this->reportend = time()+(60*60*24*31);
         } else {
             $goto = usergetdate($this->reportend);
         }
 
 
-        $mform->addElement('date_selector', 'timein', 'Report start date',$startfrom);
-        $mform->addElement('date_selector', 'timeout', 'Report end date', $goto);
+        $mform->addElement('date_selector', 'reportstart', 'Report start date');
+        $mform->setDefault('reportstart',$this->reportstart);
+
+        $mform->addElement('date_selector', 'reportend', 'Report end date');
+        $mform->setDefault('reportend',$this->reportend);
+
         $mform->addElement('submit', 'datechange', 'Get work units');
 
 
@@ -79,12 +82,14 @@ class timetracker_reports_form  extends moodleform {
                 array('userid'=>$this->userid, 'courseid'=>$this->courseid));
         } else { //if ($this->userid != 0) //specific user, this course
             $pendingunits = $DB->get_records('block_timetracker_pending',
-                array('userid'=>$this->userid,'courseid'=>$courseid));
+                array('userid'=>$this->userid,'courseid'=>$this->courseid));
         }
 
 
-        if($pendingunits){ //if they have them.
-            $mform->addElement('header', 'general', 'Pending work units');
+        $mform->addElement('header', 'general', 'Pending work units');
+        if(!$pendingunits){ //if they don't have them.
+            $mform->addElement('html','No pending work units<br />');
+        } else { //if they do have pending
             $mform->addElement('html', '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">');
         
             $headers = 
@@ -105,7 +110,7 @@ class timetracker_reports_form  extends moodleform {
 
                 if($canmanage){
                     $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
-                    $paramstring = "?id=$COURSE->id&userid=$worker->id&sesskey=".sesskey();
+                    $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".sesskey();
     
                     $editurl = new moodle_url($baseurl.'/editpending.php'.$paramstring);
                     $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
@@ -135,12 +140,14 @@ class timetracker_reports_form  extends moodleform {
                 array('userid'=>$this->userid, 'courseid'=>$this->courseid));
         } else { //specific user, this course
             $units = $DB->get_records('block_timetracker_workunit',
-                array('userid'=>$this->userid,'courseid'=>$courseid));
+                array('userid'=>$this->userid,'courseid'=>$this->courseid));
         }
 
 
-        if($units){ //if they have them.
-            $mform->addElement('header', 'general', 'Pending work units');
+        $mform->addElement('header', 'general', 'Completed work units');
+        if(!$units){ //if they don't have them.
+            $mform->addElement('html','No completed work units<br />');
+        } else { //if they do have some
             $mform->addElement('html', '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">');
         
             $headers = 
@@ -158,7 +165,7 @@ class timetracker_reports_form  extends moodleform {
 
 
             $total = 0;
-            foreach($nits as $unit){
+            foreach($units as $unit){
                 $row='<tr>';
                 $row.='<td>'.userdate($unit->timein,get_string('strftimedatetime')).'</td>';
                 $row.='<td>'.userdate($unit->timeout,get_string('strftimedatetime')).'</td>';
@@ -168,7 +175,7 @@ class timetracker_reports_form  extends moodleform {
 
                 if($canmanage){
                     $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
-                    $paramstring = "?id=$COURSE->id&userid=$worker->id&sesskey=".sesskey();
+                    $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".sesskey();
     
                     $editurl = new moodle_url($baseurl.'/editworkunit.php'.$paramstring);
                     $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
@@ -191,36 +198,9 @@ class timetracker_reports_form  extends moodleform {
     
         $mform->addElement('hidden','courseid', $this->courseid);
         $mform->addElement('hidden','userid', $this->userid);
-        $mform->addElement('hidden','reportstart', $this->reportstart);
-        $mform->addElement('hidden','reportend', $this->reportend);
+        #$mform->addElement('hidden','reportstart', $this->reportstart);
+        #$mform->addElement('hidden','reportend', $this->reportend);
     
     }
 
-}
-
-function format_elapsed_time($totalsecs=0){
-    if($totalsecs <= 0){
-        return '0 hours 0 minutes';
-    }
-
-    $hours = floor($totalsecs/3600);
-
-    $totalsecs = $totalsecs % 3600;
-
-    //round to the nearest 900 seconds (1/4 hour)
-    if($totalsecs < 450) {
-        $minutes = '0 minutes';
-    } else if($totalsecs < 1350){
-        $minutes = '15 minutes';
-    } else if ($totalsecs < 2250){
-        $minutes = '30 minutes';
-    } else if ($totalsecs < 3150){
-        $minutes = '45 minutes';
-    } else {
-        $minutes = '0 minues';
-        $hours++;
-    }
-    
-    return $hours.' hours and '.$minutes; 
-    
 }
