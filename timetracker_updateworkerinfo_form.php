@@ -26,15 +26,16 @@
  require_once("$CFG->libdir/formslib.php");
 
  class timetracker_updateworkerinfo_form extends moodleform {
-     
+
      function definition() {
-         global $CFG, $USER, $DB;
+         global $CFG, $USER, $DB, $COURSE;
 
          $mform =& $this->_form;
 
          $mform->addElement('header','general',get_string('updateformheadertitle','block_timetracker'));
 
-         $mform->addElement('hidden','userid',$USER->id);
+         $mform->addElement('hidden','userid', $USER->id);
+         $mform->addElement('hidden','courseid', $COURSE->id);
 
          //$worker = $DB->get_record('block_timetracker_workerinfo',array('id'=>$USER->id));
          $worker = $DB->get_record('user',array('id'=>$USER->id));

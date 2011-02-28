@@ -4,14 +4,13 @@ file for Moodle Timetracker block"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
  <TABLES>
-   <TABLE NAME="block_timetracker_workerinfo" COMMENT="Worker information.
-   Contains id, Moodle userid, first name, last name, email, address, phone number, position,
-   current pay rate, timetracker method, active, department, the worker's id number, and comments."
+   <TABLE NAME="block_timetracker_workerinfo" COMMENT="Holds worker demographic information."
    NEXT="block_timetracker_pending">
      <FIELDS>
        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
-       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="firstname"/>
-       <FIELD NAME="firstname" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="lastname"/>
+       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
+       <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="firstname"/>
+       <FIELD NAME="firstname" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="courseid" NEXT="lastname"/>
        <FIELD NAME="lastname" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="firstname" NEXT="email"/>
        <FIELD NAME="email" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastname" NEXT="address"/>
        <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="email" NEXT="phonenumber"/>   
@@ -31,8 +30,9 @@ file for Moodle Timetracker block"
    <TABLE NAME="block_timetracker_pending" COMMENT="Holds information for missed punches."
    PREVIOUS="block_timetracker_workerinfo" NEXT="block_timetracker_workunit">
      <FIELDS>
-       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="timein"/>
-       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="courseid"/>
+       <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="timein"/>
+       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="courseid" NEXT="userid"/>
        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timein"/>
      </FIELDS>
      <KEYS>
@@ -43,8 +43,9 @@ file for Moodle Timetracker block"
    PREVIOUS="block_timetracker_pending" NEXT="block_timetracker_term">
      <FIELDS>
 	   <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
-       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="timein"/>
-       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="timeout"/>
+       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
+       <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="timein"/>
+       <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="timeout"/>
        <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timein" NEXT="lastedited"/>
        <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timeout" NEXT="lasteditedby"/>
        <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited"/>

@@ -56,6 +56,7 @@ class block_timetracker_edit_form extends block_edit_form {
         $mform->addElement('selectyesno', 'config_block_timetracker_show_total_earnings', get_string('showtotalearnings', 'block_timetracker'));
         $mform->setDefault('config_block_timetracker_show_total_earnings', 1);
 
-
+        $mform->addElement('select', 'type',get_string('trackermethod','block_timetracker'),
+        array('Timeclock','Hourlog'));
     }
 }
