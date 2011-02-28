@@ -16,14 +16,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This block will display a summary of hours and earnings for the worker.
+ * This form will allow the user to input the date, time, and duration of their workunit. 
  *
- * @package    Block
- * @subpackage TimeTracker
- * @copyright  2011 Marty Gilbert & Brad Hughes
+ * @package    TimeTracker
+ * @copyright  Marty Gilbert & Brad Hughes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
-$plugin->version = '2011022810';
-$plugin->cron = 300; // Set min time between cron executions to 300 secs (5 mins)
-?>
+require_once ($CFG->libdir.'/formslib.php');
+
+class timetracker_hourlog_form  extends moodleform {
+
+    function timetracker_hourlog_form($context){
+        $this->context = $context;
+        parent::__construct();
+    }
+
+    function definition() {
+        global $CFG, $USER, $DB, $COURSE;
+
+
+        $mform =& $this->_form; // Don't forget the underscore! 
+
+        $mform->addElement('header', 'general', get_string('hourlogtitle','block_timetracker')); 

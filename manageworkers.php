@@ -65,7 +65,7 @@ $mform = new timetracker_manageworkers_form($PAGE->context);
 
 if ($mform->is_cancelled()){ //user clicked 'cancel'
 
-    // XXX this seems to send a courseID of 0 to index.php, when, as best I can tell
+    // this seems to send a courseID of 0 to index.php, when, as best I can tell
     // $urlparams has the correct id. TODO
     redirect($timetrackerurl); 
 } else if($formdata = $mform->get_data()){

@@ -2,30 +2,29 @@
 
 // This file is part of Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// Moodle is free software: you can redistribute it and/or modify it under the terms of the GNU
+// General Public License as published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// Moodle is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+// Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with Moodle.  If not, see
+// <http://www.gnu.org/licenses/>.
 
-/**
- * Strings for component 'block_timetracker', language 'en', branch 'MOODLE_20_STABLE'
+/** Strings for component 'block_timetracker', language 'en', branch 'MOODLE_20_STABLE'
  *
- * @package    Block
- * @subpackage TimeTracker
- * @copyright  2011 Marty Gilbert & Brad Hughes
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    Block @subpackage TimeTracker @copyright  2011 Marty Gilbert & Brad Hughes @license
+ * http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
+$string['couldnotclockout'] = 'Error adding clock out'; 
+$string['trackermethod'] = 'Which timetracking method would you like to use?';
 $string['pluginname'] = 'TimeTracker';
 $string['timetracker:manageworkers'] = 'Manage Workers';
+$string['notactiveerror'] = 'You are not authorized to work.  Please contact your supervisor.';
 
 //Strings for Block Settings
 $string['workerdisplaysettings'] = 'Worker Display Settings';
@@ -52,8 +51,6 @@ $string['savebutton'] = 'Save';
  
 // Strings for Block
 $string['blocktitle'] = 'TimeTracker';
-//$string['hourstitle'] = '<span style=\'font-weight: bold\'>Hours</span>';
-//$string['earningstitle'] = '<span style=\'font-weight: bold\'>Earnings</span>';
 $string['hourstitle'] = 'Hours';
 $string['earningstitle'] = 'Earnings';
 $string['totalmonth'] = 'This month:';
@@ -79,12 +76,15 @@ $string['duration'] = 'Duration';
 $string['hours'] = 'hours';
 $string['minutes'] = 'minutes';
 $string['previousentries'] = 'Previous Entries';
+$string['noprevious'] = 'You have no previous entries.';
 
+$string['timeclocktitle'] = 'Timeclock';
 $string['clockinouttitle'] = 'Clock in/out';
-$string['notclockedin'] = 'You are not currently clocked in.';
+$string['clockedout'] = 'You are not currently clocked in.';
 $string['clockedin'] = 'You are currently clocked in.';
-$string['clockinbutton'] = 'Clock In';
-$string['clockoutbutton'] = 'Clock Out';
+$string['clockinlink'] = 'Clock In';
+$string['clockoutlink'] = 'Clock Out';
+$string['pendingtimestamp'] = 'You have a pending timestamp: ';
 
 // Strings for Employee Reports Page
 $string['reportstitle'] = 'Reports';

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This block will display a summary of hours and earnings for the worker.
+ * This page will allow the worker to input the date, time, and duration of a workunit.
  *
  * @package    Block
  * @subpackage TimeTracker
@@ -23,23 +23,23 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
-require_once(dirname(__FILE__) . '/../../config.php');
-require('timetracker_updateworkerinfo_form.php');
+require_once('../../config.php');
+require('timetracker_hourlog_form.php');
+
+global $CFG, $COURSE, $USER;
 
 require_login();
 
-$courseid = optional_param('id', $COURSE->id, PARAM_INTEGER);
+$courseid = optional_param('id', 0, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 
-$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-$PAGE->set_course($course);
-$context = $PAGE->context;
-
-$PAGE->set_url(new moodle_url('/blocks/timetracker/updateworkerinfo.php',$urlparams));
+$context = get_context_instance(CONTEXT_SYSTEM);
+$PAGE->set_context($context);
+$PAGE->set_url('/blocks/timetracker/hourlog.php');
 $PAGE->set_pagelayout('base');
 
-$strtitle = get_string('updateformheadertitle','block_timetracker'); 
+$strtitle = get_string('hourlogtitle','block_timetracker'); 
 $PAGE->set_title($strtitle);
 
 $timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
@@ -53,7 +53,7 @@ $mform = new timetracker_updateworkerinfo_form();
 if ($mform->is_cancelled()){ //user clicked cancel
 
 } else if ($formdata=$mform->get_data()){
-	$numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
+	$numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id));
     
     if($numrecords == 0){
         $DB->insert_record('block_timetracker_workerinfo', $formdata);
