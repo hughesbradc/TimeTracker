@@ -25,29 +25,32 @@
 defined('MOODLE_INTERNAL') || die();
 
 
+/*
+* rounds to nearest 15 minutes (900 secs)
+*/
+function get_elapsed_time($totalsecs=0){
+    if($totalsecs <=0) return 0;
+    
+    $temp = $totalsecs % 3600;
+    $distto900 = $temp % 900;
+    if($distto900 > 449) 
+        $totalsecs = $totalsecs + (900 - $distto900); //round up
+    else 
+        $totalsecs = $totalsecs - $distto900; //round down
+
+    return $totalsecs;
+
+    
+}
+
 function format_elapsed_time($totalsecs=0){
     if($totalsecs <= 0){
         return '0 hours 0 minutes';
     }
 
+    $totalsecs = get_elapsed_time($totalsecs);
     $hours = floor($totalsecs/3600);
-
-    $totalsecs = $totalsecs % 3600;
-
-    //round to the nearest 900 seconds (1/4 hour)
-    if($totalsecs < 450) {
-        $minutes = '0 minutes';
-    } else if($totalsecs < 1350){
-        $minutes = '15 minutes';
-    } else if ($totalsecs < 2250){
-        $minutes = '30 minutes';
-    } else if ($totalsecs < 3150){
-        $minutes = '45 minutes';
-    } else {
-        $minutes = '0 minues';
-        $hours++;
-    }
+    $minutes = ($totalsecs % 3600)/60;
     
-    return $hours.' hours and '.$minutes; 
-    
+    return $hours.' hour(s) and '.$minutes. ' minute(s)'; 
 }

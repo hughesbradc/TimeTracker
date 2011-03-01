@@ -30,11 +30,13 @@ require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
-$reportstart = optional_param('reportstart', 0,PARAM_INTEGER);
-$reportend = optional_param('reportend', 0,PARAM_INTEGER);
+$reportstart = optional_param('repstart', 0,PARAM_INTEGER);
+$reportend = optional_param('repend', 0,PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
+$urlparams['repstart'] = $reportstart;
+$urlparams['repend'] = $reportend;
 
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -46,7 +48,9 @@ if($courseid){
     $PAGE->set_context($context);
 }
 
+//print_object($urlparams);
 $reportsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
+
 
 $PAGE->set_url($reportsurl);
 $PAGE->set_pagelayout('base');
@@ -63,37 +67,26 @@ $PAGE->navbar->add($strtitle);
 
 
 $mform = new timetracker_reports_form($PAGE->context,$userid,$courseid,$reportstart,$reportend);
+//$mform = new timetracker_reports_form($PAGE->context,$userid,$courseid,0,0);
 
 if ($mform->is_cancelled()){ //user clicked 'cancel'
 
     // XXX this seems to send a courseID of 0 to index.php, when, as best I can tell
     // $urlparams has the correct id. TODO
     redirect($timetrackerurl); 
+
 } else if($formdata = $mform->get_data()){
-    /*
+
     //print_object($formdata);
+    $urlparams['repstart'] = $formdata->reportstart;
+    $urlparams['repend'] = $formdata->reportend;
+    //echo ("Form was submitted");
+    //$mform->reportstart = $formdata->reportstart;
+    //$mform->reportend = $formdata->reportend;
 
-    $workers = $DB->get_records('block_timetracker_workerinfo');
-    //print_object($workers);
+    $reportsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
 
-    foreach($formdata->workerid as $idx){
-         
-        if((isset($formdata->activeid[$idx]) && $workers[$idx]->active==0) ||  //not the same
-         (!isset($formdata->activeid[$idx]) && $workers[$idx]->active == 1)){ //not the same
-            $workers[$idx]->active = isset($formdata->activeid[$idx])?1:0;
-            //print_object($workers[$idx]);
-            $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
-         }
-    }
-
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading($strtitle, 2);
-    //content goes here
-    echo 'Changes saved successfully<br />';
-    echo '<a href="'.$manageworkerurl.'">Manage Workers</a>';
-    echo $OUTPUT->footer();
-    */
-
+    redirect($reportsurl);
 } else {
     echo $OUTPUT->header();
     echo $OUTPUT->heading($strtitle, 2);

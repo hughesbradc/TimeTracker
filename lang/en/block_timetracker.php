@@ -18,7 +18,7 @@
  * @package    Block @subpackage TimeTracker @copyright  2011 Marty Gilbert & Brad Hughes @license
  * http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+$string['datetimeformat']='%m/%d/%y, %I:%M %p';
 
 $string['couldnotclockout'] = 'Error adding clock out'; 
 $string['trackermethod'] = 'Which timetracking method would you like to use?';

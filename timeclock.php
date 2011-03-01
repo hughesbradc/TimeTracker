@@ -59,6 +59,7 @@ echo $OUTPUT->header();
 
 
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$ttuserid,'courseid'=>$courseid));
+
 if(!$workerrecord){
     echo "NO WORKER FOUND!";
     die;
@@ -69,35 +70,45 @@ if($workerrecord->active == 0){
     echo '<br />';
     echo $OUTPUT->footer();
     die;
-} else {
-    if($clockin == 1){
-        $cin = new stdClass();
-        $cin->userid = $ttuserid;
-        $cin->timein = time();
-        $cin->courseid = $courseid;
-        $DB->insert_record('block_timetracker_pending', $cin);
-    } else if ($clockout == 1){
-        $cin = $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
-            if($cin){
-
-                $cin->timeout = time();
-                $cin->lastedited = time();
-                $cin->lasteditedby = $ttuserid;
-    
-                unset($cin->id);
-    
-                $worked = $DB->insert_record('block_timetracker_workunit',$cin);
-                    if($worked){
-                        $DB->delete_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
-                    } else {
-                        print_error('couldnotclockout', 'block_timetracker', $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.$courseid.'&userid='.$ttuserid);
-                }
-            }
+} else if($clockin == 1){
+        //protect against refreshing a 'clockin' screen
+        $pendingrecord= $DB->count_records('block_timetracker_pending', 
+            array('userid'=>$ttuserid,'courseid'=>$courseid));
+        if(!$pendingrecord){
+            $cin = new stdClass();
+            $cin->userid = $ttuserid;
+            $cin->timein = time();
+            $cin->courseid = $courseid;
+            //echo 'inserting .... <br >';
+            $DB->insert_record('block_timetracker_pending', $cin);
         }
-}
+
+} else if ($clockout == 1){
+    $cin = $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+    if($cin){
+
+        $cin->timeout = time();
+        $cin->lastedited = time();
+        $cin->lasteditedby = $ttuserid;
+
+        unset($cin->id);
+
+        $worked = $DB->insert_record('block_timetracker_workunit',$cin);
+        if($worked){
+            $DB->delete_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+
+        } else {
+
+            print_error('couldnotclockout', 'block_timetracker', 
+                $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.$courseid.'&userid='.$ttuserid);
+
+        }
+    }
+} 
 
 
-$pendingrecord= $DB->count_records('block_timetracker_pending', array('userid'=>$ttuserid));
+$pendingrecord= $DB->count_records('block_timetracker_pending', 
+    array('userid'=>$ttuserid,'courseid'=>$courseid));
 if($pendingrecord == 0){ 
     $action = null;
     //$link = '/blocks/timetracker/timeclock.php';
@@ -116,41 +127,42 @@ if($pendingrecord == 0){
     $link = new moodle_url('/blocks/timetracker/timeclock.php', $urlparams);
     
     echo '<b>';
-    echo print_string('clockedin','block_timetracker');
+    print_string('clockedin','block_timetracker');
     echo '<br />';
-    echo print_string('pendingtimestamp','block_timetracker');
+    print_string('pendingtimestamp','block_timetracker');
     echo '</b>';
     $pendingtimestamp= $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
     echo 'Clock in:
-    '.userdate($pendingtimestamp->timein,get_string('strftimedatetimeshort','langconfig')).'<br />';
+        '.userdate($pendingtimestamp->timein,get_string('datetimeformat','block_timetracker')).'<br />';
     echo $OUTPUT->action_link($link, get_string('clockoutlink', 'block_timetracker'), $action);
     echo '<br />';
 }
 
-$numrecords = $DB->count_records('block_timetracker_workunit', array('userid'=>$ttuserid));
+$numrecords = $DB->count_records('block_timetracker_workunit', 
+    array('userid'=>$ttuserid,'courseid'=>$courseid));
 if($numrecords == 0){
     //DB CALL - No previous punches, show message.
     echo '<br />';
     echo '<hr>';
     echo '<b>';
-    echo print_string('previousentries','block_timetracker');
+    print_string('previousentries','block_timetracker');
     echo '</b><br />';
-    echo print_string('noprevious','block_timetracker'); 
+    print_string('noprevious','block_timetracker'); 
 
 } else {
     
     echo '<br />';
     echo '<hr>';
     echo '<b>';
-    echo print_string('previousentries','block_timetracker');
+    print_string('previousentries','block_timetracker');
     echo '</b><br />';
     $last10workunits = $DB->get_records('block_timetracker_workunit', array('userid'=>$ttuserid), 'timeout DESC','*',0,10);
     
     $str = '<table><tr><th>Clock in</th><th>Clock out</th><th>Elapsed</th></tr>';
     foreach($last10workunits as $workunit){
         $str .= '<tr>'; 
-        $str .= '<td>'.userdate($workunit->timein, get_string('strftimedatetimeshort','langconfig')).'</td>';
-        $str .= '<td>'.userdate($workunit->timeout, get_string('strftimedatetimeshort','langconfig')).'</td>';
+        $str .= '<td>'.userdate($workunit->timein, get_string('datetimeformat','block_timetracker')).'</td>';
+        $str .= '<td>'.userdate($workunit->timeout, get_string('datetimeformat','block_timetracker')).'</td>';
         $str .= '<td>'.format_elapsed_time($workunit->timeout - $workunit->timein).'</td>';
         //$str .= '<td>'.userdate($workunit->timeout, get_string('strftimedatetimeshort','langconfig')).'</td>';
         $str .= '</tr>'; 

@@ -24,6 +24,7 @@
  */
 
 require_once ($CFG->libdir.'/formslib.php');
+require_once ('lib.php');
 
 class timetracker_manageworkers_form  extends moodleform {
 
@@ -91,11 +92,17 @@ class timetracker_manageworkers_form  extends moodleform {
                 $lastworkunit =
                     $DB->get_records('block_timetracker_workunit',array('userid'=>$worker->id),'timeout DESC','*',0,1);
                 if(!$lastworkunit){
-                    $row.='None';
+                    $row .='None';
                 } else {
-                    $row.='Time in:
-                    '.userdate($lastworkunit->timein,get_string('strftimedatetime')).'<br />'.
-                    userdate($lastworkunit->timeout,get_string('strftimedatetime'));
+                    //print_object($lastworkunit);
+                    foreach ($lastworkunit as $u){
+                        $elapsed = format_elapsed_time($u->timeout - $u->timein);
+                        $row .='<b>Time in: </b>'.
+                            userdate($u->timein, get_string('datetimeformat','block_timetracker')).' <b>Time out: </b>'.
+                            userdate($u->timeout,
+                            get_string('datetimeformat','block_timetracker')).'<br /><b>Elapsed: </b>'.
+                            $elapsed;
+                    }
                 }
 
                 $row.='</td>';
