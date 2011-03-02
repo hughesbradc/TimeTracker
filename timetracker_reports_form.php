@@ -29,7 +29,6 @@ require_once ('lib.php');
 class timetracker_reports_form  extends moodleform {
 
     function timetracker_reports_form($context,$userid = 0,$courseid=0, $reportstart=0, $reportend=0){
-    //function timetracker_reports_form($context,$userid = 0,$courseid=0){//, $reportstart=0, $reportend=0){
         $this->context = $context;
         $this->userid = $userid;
         $this->courseid = $courseid;
@@ -222,12 +221,14 @@ class timetracker_reports_form  extends moodleform {
     
     }
 
+    /*
     function definition_after_data(){
-        $mform =& $this->_form;
+        //$mform =& $this->_form;
         //echo ("in def after data");
         //$this->reportstart = $mform->getElementValue('reportstart');
         //$this->reportend = $mform->getElementValue('reportend');
     }
+    */
 
     function validation ($data){
         $errors = array();

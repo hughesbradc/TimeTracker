@@ -43,6 +43,9 @@ function get_elapsed_time($totalsecs=0){
     
 }
 
+/**
+* returns the $totalsecs as 'xx hour(s) xx minute(s)', rounded to the nearest 15 min
+*/
 function format_elapsed_time($totalsecs=0){
     if($totalsecs <= 0){
         return '0 hours 0 minutes';
