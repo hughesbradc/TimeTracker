@@ -48,7 +48,7 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_updateworkerinfo_form();
+$mform = new timetracker_hourlog_form();
 
 if ($mform->is_cancelled()){ //user clicked cancel
 

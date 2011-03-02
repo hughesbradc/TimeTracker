@@ -35,7 +35,24 @@ class timetracker_hourlog_form  extends moodleform {
     function definition() {
         global $CFG, $USER, $DB, $COURSE;
 
-
         $mform =& $this->_form; // Don't forget the underscore! 
 
-        $mform->addElement('header', 'general', get_string('hourlogtitle','block_timetracker')); 
+        $mform->addElement('header', 'general', get_string('hourlogtitle','block_timetracker'));
+
+        $mform->addElement('hidden','userid', $USER->id);
+        $mform->addElement('hidden','courseid', $COURSE->id);
+
+        $workunit = $DB->get_record('block_timetracker_workunit', array('id'=>$USER->id,'courseid'=>$COURSE->id));
+
+        $mform->addElement('date_time_selector','timein','Time In: ');
+        
+        $mform->addElement('date_time_selector','timeout','Time Out: ');
+
+        $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
+    }
+
+    function validation($data) {
+
+    }
+}
+?>

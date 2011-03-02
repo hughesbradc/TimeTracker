@@ -26,6 +26,10 @@ $string['pluginname'] = 'TimeTracker';
 $string['timetracker:manageworkers'] = 'Manage Workers';
 $string['notactiveerror'] = 'You are not authorized to work.  Please contact your supervisor.';
 
+
+
+
+
 //Strings for Block Settings
 $string['workerdisplaysettings'] = 'Worker Display Settings';
 $string['showtotalhours'] = 'Display total hours worked';
@@ -72,7 +76,7 @@ $string['hourlogtitle'] = 'Hourlog for {$b}';
 $string['addentry'] = 'Add Entry';
 $string['date'] = 'Date';
 $string['timein'] = 'Time In';
-$string['duration'] = 'Duration';
+$string['duration'] = 'Duration: ';
 $string['hours'] = 'hours';
 $string['minutes'] = 'minutes';
 $string['previousentries'] = 'Previous Entries';
