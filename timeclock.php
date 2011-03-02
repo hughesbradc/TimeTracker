@@ -57,7 +57,6 @@ $PAGE->navbar->add($strtitle);
 
 echo $OUTPUT->header();
 
-
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$ttuserid,'courseid'=>$courseid));
 
 if(!$workerrecord){

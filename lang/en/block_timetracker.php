@@ -72,7 +72,7 @@ $string['supervisor'] = 'Supervisor';
 $string['finaid'] = 'Financial Aid Work Study Coordinator';
 
 // Strings for Employee Hourlog Page
-$string['hourlogtitle'] = 'Hourlog for {$b}';
+$string['hourlogtitle'] = 'Hourlog for {$a}';
 $string['addentry'] = 'Add Entry';
 $string['date'] = 'Date';
 $string['timein'] = 'Time In';
