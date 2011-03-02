@@ -134,7 +134,7 @@ class timetracker_manageworkers_form  extends moodleform {
     
             $mform->addElement('html','</table>');
     
-            $mform->addElement('hidden','courseid', $COURSE->id);
+            $mform->addElement('hidden','id', $COURSE->id);
     
             $this->add_action_buttons(true, 'Save Changes');
     
