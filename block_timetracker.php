@@ -112,7 +112,7 @@
 					}
 
 					$this->content->text .= '<br />'; 
-					$this->content->text .= '<a href="/workerhome.php">';
+                    $this->content->text .= '<a href="'.$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id.'">';
 					$this->content->text .= '<center>'.get_string('manage','block_timetracker').'</center>';
 					$this->content->text .= '</a>';
 					return $this->content;
