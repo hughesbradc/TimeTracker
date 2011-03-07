@@ -57,7 +57,6 @@ $PAGE->navbar->add($strtitle);
 
 echo $OUTPUT->header();
 
-
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$ttuserid,'courseid'=>$courseid));
 
 if(!$workerrecord){
@@ -72,8 +71,7 @@ if($workerrecord->active == 0){
     die;
 } else if($clockin == 1){
         //protect against refreshing a 'clockin' screen
-        $pendingrecord= $DB->count_records('block_timetracker_pending', 
-            array('userid'=>$ttuserid,'courseid'=>$courseid));
+        $pendingrecord= $DB->count_records('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
         if(!$pendingrecord){
             $cin = new stdClass();
             $cin->userid = $ttuserid;

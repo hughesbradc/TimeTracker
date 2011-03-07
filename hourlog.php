@@ -30,16 +30,29 @@ global $CFG, $COURSE, $USER;
 
 require_login();
 
-$courseid = optional_param('id', 0, PARAM_INTEGER);
+$courseid = required_param('id', PARAM_INTEGER);
+$userid = required_param('userid', PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
+$urlparams['userid'] = $userid;
+
+$hourlogurl = new moodle_url('/blocks/timetracker/hourlog.php',$urlparams);
 
 $context = get_context_instance(CONTEXT_SYSTEM);
 $PAGE->set_context($context);
-$PAGE->set_url('/blocks/timetracker/hourlog.php');
-$PAGE->set_pagelayout('base');
+$PAGE->set_url($hourlogurl);
+$PAGE->set_pagelayout('course');
 
-$strtitle = get_string('hourlogtitle','block_timetracker'); 
+echo $OUTPUT->header();
+
+$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
+
+if(!$workerrecord){
+    echo "NO WORKER FOUND!";
+    die;
+}
+
+$strtitle = get_string('hourlogtitle','block_timetracker',$workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
 
 $timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
@@ -48,26 +61,33 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_updateworkerinfo_form();
+$mform = new timetracker_hourlog_form($context, $userid, $courseid);
+
+
+if($workerrecord->active == 0){
+    print_string('notactiveerror','block_timetracker');
+    echo '<br />';
+    echo $OUTPUT->footer();
+    die;
+}
 
 if ($mform->is_cancelled()){ //user clicked cancel
 
 } else if ($formdata=$mform->get_data()){
-	$numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id));
-    
-    if($numrecords == 0){
-        $DB->insert_record('block_timetracker_workerinfo', $formdata);
-    }
-    else {
-        $DB->update_record('block_timetracker_workerinfo', $formdata);
-    }
+        $formdata->courseid = $formdata->id;
+        unset($formdata->id);
+        $formdata->lastedited = time();
+        $formdata->lasteditedby = $formdata->editedby;
+        $DB->insert_record('block_timetracker_workunit', $formdata);
 
-    //form submitted
-    echo $OUTPUT->header();
+    echo "Hours submitted successfully"
+    //echo $OUTPUT->header();
     echo $OUTPUT->footer();
 } else {
     //form is shwon for the first time
-    echo $OUTPUT->header();
+    //echo $OUTPUT->header();
     $mform->display();
     echo $OUTPUT->footer();
 }
+
+
