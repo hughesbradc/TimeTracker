@@ -201,7 +201,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
                 userdate($unit->timein,get_string('datetimeformat','block_timetracker')),
                 userdate($unit->timeout,get_string('datetimeformat','block_timetracker')),
                 format_elapsed_time($unit->timeout - $unit->timein),
-                'actions here'));
+                    'actions here'));
         }
 
         $table->print_html();

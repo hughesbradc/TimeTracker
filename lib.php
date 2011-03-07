@@ -59,6 +59,17 @@ function format_elapsed_time($totalsecs=0){
 }
 
 /**
+* Calculate Total Hours
+* @param $workerunits is an array, each $subunit has $subunit->timein and $subunit->timeout
+*/
+function get_total_hours($workerunits){
+
+    if(!$workerunits) return 0;
+
+}
+
+
+/**
 *
 */
 function get_user_stats($userid,$courseid){
