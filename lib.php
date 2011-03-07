@@ -57,3 +57,26 @@ function format_elapsed_time($totalsecs=0){
     
     return $hours.' hour(s) and '.$minutes. ' minute(s)'; 
 }
+
+/**
+* Calculate Total Hours
+* @param $workerunits is an array, each $subunit has $subunit->timein and $subunit->timeout
+*/
+function get_total_hours($workerunits){
+
+    if(!$workerunits) return 0;
+
+}
+
+
+/**
+*
+*/
+function get_user_stats($userid,$courseid){
+
+    $units = $DB->get_recordset_sql(get_string('allunits','block_timetracker', $userid, $courseid));
+    if(!$units) return '';
+    
+    $totalhours=0;
+
+}
