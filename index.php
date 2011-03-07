@@ -191,7 +191,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
         $table->column_class('action', 'action');
 
         $table->setup();
-        $table->add_data;
+        //$table->add_data;
 
         //$titlerow = new html_table_cell();
         //print_object($userUnits);

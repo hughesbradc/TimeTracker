@@ -57,6 +57,10 @@ $PAGE->set_title($strtitle);
 
 $timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
 
+$indexparams['userid'] = $ttuserid;
+$indexparams['id'] = $courseid;
+$index = new moodle_url('/blocks/timetracker/index.php', $indexparams);
+
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
@@ -76,15 +80,15 @@ if ($mform->is_cancelled()){ //user clicked cancel
 } else if ($formdata=$mform->get_data()){
         $formdata->courseid = $formdata->id;
         unset($formdata->id);
+        $formdata->payrate = $workerrecord->currpayrate;
         $formdata->lastedited = time();
         $formdata->lasteditedby = $formdata->editedby;
         $DB->insert_record('block_timetracker_workunit', $formdata);
+    
+    redirect($index);
 
-    echo "Hours submitted successfully"
-    //echo $OUTPUT->header();
-    echo $OUTPUT->footer();
 } else {
-    //form is shwon for the first time
+    //form is shown for the first time
     //echo $OUTPUT->header();
     $mform->display();
     echo $OUTPUT->footer();

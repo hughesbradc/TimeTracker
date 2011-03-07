@@ -29,12 +29,14 @@ require('timetracker_updateworkerinfo_form.php');
 require_login();
 
 $worker = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id));
-$ttuserid = $worker->id;
+if($worker){
+    $ttuserid = $worker->id;
+}
 
-$courseid = optional_param('id', $COURSE->id, PARAM_INTEGER);
+
+$courseid = required_param('id', PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
-
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
@@ -52,17 +54,17 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_updateworkerinfo_form();
+$mform = new timetracker_updateworkerinfo_form($context, $courseid);
 
 if ($mform->is_cancelled()){ //user clicked cancel
 
 } else if ($formdata=$mform->get_data()){
-	$numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
-    
-    if($numrecords == 0){
-        $DB->insert_record('block_timetracker_workerinfo', $formdata);
-    }
-    else {
+	$worker = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$courseid));
+    if(!$worker){
+        unset($formdata->id);
+        $ttuserid = $DB->insert_record('block_timetracker_workerinfo', $formdata);
+    } else {
+        $formdata->id = $worker->id;
         $DB->update_record('block_timetracker_workerinfo', $formdata);
     }
 
@@ -72,10 +74,6 @@ if ($mform->is_cancelled()){ //user clicked cancel
 
     redirect($index);
     
-    //form submitted
-    echo $OUTPUT->header();
-    echo $OUTPUT->footer();
-
 } else {
     //form is shwon for the first time
     echo $OUTPUT->header();

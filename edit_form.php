@@ -37,8 +37,7 @@ class block_timetracker_edit_form extends block_edit_form {
         $mform->addElement('text','config_block_timetracker_curr_pay_rate',get_string('currpayrate','block_timetracker'));
         $mform->setDefault('config_block_timetracker_curr_pay_rate',0);
         
-        $mform->addElement('select', 'type',get_string('trackermethod','block_timetracker'),array('Timeclock','Hourlog'));
-        $mform->setDefault('trackermethod','Timeclock');
+        $mform->addElement('select','config_block_timetracker_trackermethod',get_string('trackermethod','block_timetracker'),array('Timeclock','Hourlog'));
         
         $mform->addElement('header', 'displayheader', get_string('workerdisplaysettings','block_timetracker'));
 

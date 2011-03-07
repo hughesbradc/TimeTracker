@@ -46,8 +46,9 @@ file for Moodle Timetracker block"
        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="timein"/>
        <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="timeout"/>
-       <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timein" NEXT="lastedited"/>
-       <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timeout" NEXT="lasteditedby"/>
+       <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timein" NEXT="payrate"/>
+       <FIELD NAME="payrate" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timeout" NEXT="lastedited"/>
+       <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="payrate" NEXT="lasteditedby"/>
        <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited"/>
      </FIELDS>
      <KEYS>

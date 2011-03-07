@@ -70,9 +70,9 @@
                     //die;
                 }           
             
-            // Implement Icons    
-            //TODO
-            //if($this->config->trackermethod){
+
+            // Implement Icons - Timeclock Method
+            if($this->config->block_timetracker_trackermethod == 0){
                 $ttuserid = $worker->id;
 
             $pendingrecord = $DB->count_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
@@ -126,7 +126,32 @@
                 $this->content->text .= '</div>';
 }
 
-   // }
+   }
+
+
+            // Implement Icons - Hourlog Method
+            if($this->config->block_timetracker_trackermethod == 1){
+                $ttuserid = $worker->id;
+
+                $urlparams['userid']=$ttuserid;
+                $urlparams['id']=$courseid;
+                $indexparams['userid'] = $ttuserid;
+                $indexparams['id'] = $courseid;
+                $link = new moodle_url('/blocks/timetracker/hourlog.php', $urlparams);
+                $index = new moodle_url('/blocks/timetracker/index.php', $indexparams);
+
+                // Clock In Icon
+                $this->content->text .= '<div style="text-align: center">';
+                $clockinicon = new pix_icon('clock_in','Add work unit', 'block_timetracker');
+                $clockinaction = $OUTPUT->action_icon($link, $clockinicon);
+    
+                $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
+                $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
+    
+                $this->content->text .= $clockinaction. $timeclockdataaction.'<br />';
+                $this->content->text .= '</div>';
+                }
+
             }
 
 
