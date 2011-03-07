@@ -28,9 +28,13 @@ require('timetracker_updateworkerinfo_form.php');
 
 require_login();
 
+$worker = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id));
+$ttuserid = $worker->id;
+
 $courseid = optional_param('id', $COURSE->id, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
+
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
@@ -62,9 +66,16 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $DB->update_record('block_timetracker_workerinfo', $formdata);
     }
 
+    $indexparams['userid'] = $ttuserid;
+    $indexparams['id'] = $courseid;
+    $index = new moodle_url('/blocks/timetracker/index.php', $indexparams);
+
+    redirect($index);
+    
     //form submitted
     echo $OUTPUT->header();
     echo $OUTPUT->footer();
+
 } else {
     //form is shwon for the first time
     echo $OUTPUT->header();
