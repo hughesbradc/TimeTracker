@@ -98,7 +98,7 @@ class timetracker_manageworkers_form  extends moodleform {
                     foreach ($lastworkunit as $u){
                         $elapsed = format_elapsed_time($u->timeout - $u->timein);
                         $row .='<b>Time in: </b>'.
-                            userdate($u->timein, get_string('datetimeformat','block_timetracker')).' <b>Time out: </b>'.
+                            userdate($u->timein, get_string('datetimeformat','block_timetracker')).'<br /><b>Time out: </b>'.
                             userdate($u->timeout,
                             get_string('datetimeformat','block_timetracker')).'<br /><b>Elapsed: </b>'.
                             $elapsed;
