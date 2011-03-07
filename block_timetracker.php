@@ -31,6 +31,11 @@
 
     function get_content() {
         global $CFG, $DB, $USER, $OUTPUT, $COURSE;
+        $clockin = optional_param('clockin', 0,PARAM_INTEGER);
+        $clockout = optional_param('clockout',0, PARAM_INTEGER);
+        $courseid = $COURSE->id;
+        $worker = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id));
+        $ttuserid = $worker->id;
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -45,7 +50,6 @@
 
         } 
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
-            #$this->content->text = 'You have manage capabilities!';
             $this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';
         } else {
 	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
@@ -57,10 +61,21 @@
                 $this->content->text .= $OUTPUT->action_link($link, get_string('registerinfo', 'block_timetracker'), $action);
                 $this->content->text .= '</center>';
             } else {
-                if ($this->config->block_timetracker_show_month_hours ||
+                  
+                $workerrecord = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
+                
+                if($workerrecord->active == 0){
+                    $this->content->text = get_string('notactiveerror','block_timetracker');
+                    //echo $OUTPUT->footer();
+                    return $this->content;
+                    //die;
+                }           
+                
+                if($this->config->block_timetracker_show_month_hours ||
                 $this->config->block_timetracker_show_term_hours ||
                 $this->config->block_timetracker_show_ytd_hours ||
                 $this->config->block_timetracker_show_total_hours) {
+
 			        $this->content->text .= '<span style=font-weight:bold; ">'.get_string('hourstitle','block_timetracker').'</span>';
 
 					if ($this->config->block_timetracker_show_month_hours){
@@ -71,7 +86,7 @@
                     if ($this->config->block_timetracker_show_term_hours){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
-					}
+					
             
 					if ($this->config->block_timetracker_show_ytd_hours){
 						$this->content->text .= '<br />';
@@ -82,43 +97,122 @@
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('total', 'block_timetracker');
 					}
+                }
       
-					if ($this->config->block_timetracker_show_month_earnings ||
-					$this->config->block_timetracker_show_term_earnings ||
-					$this->config->block_timetracker_show_ytd_earnings ||
-					$this->config->block_timetracker_show_total_earnings) {
-						$this->content->text .= '<br />';
-						$this->content->text .= '<span style="font-weight:bold; ">'.get_string('earningstitle','block_timetracker').'</span>';
-					}
+				if ($this->config->block_timetracker_show_month_earnings ||
+				$this->config->block_timetracker_show_term_earnings ||
+				$this->config->block_timetracker_show_ytd_earnings ||
+				$this->config->block_timetracker_show_total_earnings) {
+					$this->content->text .= '<br />';
+					$this->content->text .= '<span style="font-weight:bold; ">'.get_string('earningstitle','block_timetracker').'</span>';
 
 					if ($this->config->block_timetracker_show_month_earnings){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalmonth', 'block_timetracker');
 					}
-
+                    
 					if ($this->config->block_timetracker_show_term_earnings){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
 					}
-
+                    
 					if ($this->config->block_timetracker_show_ytd_earnings){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalytd', 'block_timetracker');
 					}
-
+                    
 					if ($this->config->block_timetracker_show_total_earnings){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('total', 'block_timetracker');
 					}
-
-					$this->content->text .= '<br />'; 
-                    $this->content->text .= '<a href="'.$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id.'">';
-					$this->content->text .= '<center>'.get_string('manage','block_timetracker').'</center>';
-					$this->content->text .= '</a>';
-					return $this->content;
 				}
+
+				if($numrecords != 0){
+                    if($clockin == 1){
+                    //protect against refreshing a 'clockin' screen
+                    $pendingrecord= $DB->count_records('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
+                        if(!$pendingrecord){
+                            $cin = new stdClass();
+                            $cin->userid = $ttuserid;
+                            $cin->timein = time();
+                            $cin->courseid = $courseid;
+                            //echo 'inserting .... <br >';
+                            $DB->insert_record('block_timetracker_pending', $cin);
+                        }
+
+                    } else if ($clockout == 1){
+                        $cin = $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+                        if($cin){
+
+                            $cin->timeout = time();
+                            $cin->lastedited = time();
+                            $cin->lasteditedby = $ttuserid;
+
+                            unset($cin->id);
+
+                            $worked = $DB->insert_record('block_timetracker_workunit',$cin);
+                            if($worked){
+                                $DB->delete_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+
+                            } else {
+
+                                print_error('couldnotclockout', 'block_timetracker', $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.$courseid.'&userid='.$ttuserid);
+
+                            }
+                        }
+                    }
+                }
+
+
+$pendingrecord = $DB->count_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+if($pendingrecord == 0){ 
+    $action = null;
+    //$link = '/blocks/timetracker/timeclock.php';
+    $urlparams['userid']=$ttuserid;
+    $urlparams['id']=$courseid;
+    $urlparams['clockin']=1;
+    $link = new moodle_url('/blocks/timetracker/timeclock.php', $urlparams);
+    
+    $this->content->text .= '<div style="text-align: center">';
+    $this->content->text .= '<b>';
+    $this->content->text .= '<br />';
+    $this->content->text .= get_string('clockedout','block_timetracker');
+    $this->content->text .= '<br />';
+    $this->content->text .= '</b>';
+    $this->content->text .= $OUTPUT->action_link($link, get_string('clockinlink', 'block_timetracker'), $action);
+    $this->content->text .= '<br />';
+    $this->content->text .= '</div>';
+} else {
+    $action = null;
+    $urlparams['userid']=$ttuserid;
+    $urlparams['id']=$courseid;
+    $urlparams['clockout']=1;
+    $link = new moodle_url('/blocks/timetracker/timeclock.php', $urlparams);
+    
+    $this->content->text .= '<div style="text-align: center">';
+    $this->content->text .= '<b>';
+    $this->content->text .= '<br /><br />';
+    $this->content->text .= get_string('clockedin','block_timetracker');
+    $this->content->text .= '<br />';
+    $this->content->text .= print_string('pendingtimestamp','block_timetracker');
+    $this->content->text .= '</b>';
+    $pendingtimestamp= $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+    $this->content->text .= 'Clock in: '.userdate($pendingtimestamp->timein,get_string('datetimeformat','block_timetracker')).'<br />';
+    $this->content->text .= $OUTPUT->action_link($link, get_string('clockoutlink', 'block_timetracker'), $action);
+    $this->content->text .= '<br />';
+    $this->content->text .= '</div>';
+}
+        }
+                
+                $this->content->text .= '<div style="text-align: center">';
+                $this->content->text .= '<br />'; 
+                $this->content->text .= '<a href="'.$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id.'">';
+                $this->content->text .= get_string('manage','block_timetracker');
+				$this->content->text .= '</a>';
+				$this->content->text .= '</div>';
 			}
 		}
+	    return $this->content;
     }
 
 

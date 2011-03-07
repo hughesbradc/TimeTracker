@@ -25,6 +25,7 @@ $string['trackermethod'] = 'Which timetracking method would you like to use?';
 $string['pluginname'] = 'TimeTracker';
 $string['timetracker:manageworkers'] = 'Manage Workers';
 $string['notactiveerror'] = 'You are not authorized to work.  Please contact your supervisor.';
+$string['defaultworkerconfig'] = 'Default Worker Configuration';
 
 
 
@@ -72,7 +73,7 @@ $string['supervisor'] = 'Supervisor';
 $string['finaid'] = 'Financial Aid Work Study Coordinator';
 
 // Strings for Employee Hourlog Page
-$string['hourlogtitle'] = 'Hourlog for {$b}';
+$string['hourlogtitle'] = 'Hourlog for {$a}';
 $string['addentry'] = 'Add Entry';
 $string['date'] = 'Date';
 $string['timein'] = 'Time In';
