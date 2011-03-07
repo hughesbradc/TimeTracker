@@ -138,3 +138,11 @@ $string['updateformheadertitle'] = 'Update Worker Information';
 $string['manageworkertitle'] = 'Manage Workers';
 $string['notpermissible'] = 'You do not have permissions to perform this action';
 $string['errordeleting'] = 'Invalid session key or user id';
+
+// SQL SECTION 
+
+$string['last10forallworkers']= 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.$CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.'block_timetracker_workunit.* FROM '.$CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.$CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.$CFG->prefix.'block_timetracker_workunit.courseid={$a} ORDER BY '.$CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+
+$string['last10']= "SELECT {$CFG->prefix}block_timetracker_workerinfo.firstname, {$CFG->prefix}block_timetracker_workerinfo.lastname, {$CFG->prefix}block_timetracker_workunit.* FROM {$CFG->prefix}block_timetracker_workerinfo,{$CFG->prefix}block_timetracker_workunit WHERE {$CFG->prefix}block_timetracker_workunit.userid={$CFG->prefix}block_timetracker_workerinfo.id AND {$CFG->prefix}block_timetracker_workerinfo.id={$a} {$CFG->prefix}block_timetracker_workunit.courseid={$b} ORDER BY {$CFG->prefix}block_timetracker_workunit.timeout DESC LIMIT 10";
+
+$string['allunits']= "SELECT {$CFG->prefix}block_timetracker_workerinfo.firstname, {$CFG->prefix}block_timetracker_workerinfo.lastname, {$CFG->prefix}block_timetracker_workunit.* FROM {$CFG->prefix}block_timetracker_workerinfo,{$CFG->prefix}block_timetracker_workunit WHERE {$CFG->prefix}block_timetracker_workunit.userid={$CFG->prefix}block_timetracker_workerinfo.id AND {$CFG->prefix}block_timetracker_workerinfo.id={$a} {$CFG->prefix}block_timetracker_workunit.courseid={$b} ORDER BY {$CFG->prefix}block_timetracker_workunit.timeout DESC LIMIT 10";
