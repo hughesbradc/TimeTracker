@@ -57,3 +57,15 @@ function format_elapsed_time($totalsecs=0){
     
     return $hours.' hour(s) and '.$minutes. ' minute(s)'; 
 }
+
+/**
+*
+*/
+function get_user_stats($userid,$courseid){
+
+    $units = $DB->get_recordset_sql(get_string('allunits','block_timetracker', $userid, $courseid));
+    if(!$units) return '';
+    
+    $totalhours=0;
+
+}

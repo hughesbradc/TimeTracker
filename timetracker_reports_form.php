@@ -53,16 +53,12 @@ class timetracker_reports_form  extends moodleform {
             $mform->addElement('html','You do not have permission to view this user\'s work units.');
             return;
         }
-        //print_object($this->reportstart);
-        //print_object($this->reportend);
-
 
         $mform->addElement('header', 'general', 'Report time period'); 
 
         $mform->addElement('hidden','id', $this->courseid);
         $mform->addElement('hidden','userid', $this->userid);
         $mform->addElement('hidden','sesskey', sesskey());
-
         if($this->reportstart == 0){
             $this->reportstart = time()-(60*60*24*31);
         }
@@ -70,7 +66,6 @@ class timetracker_reports_form  extends moodleform {
         if($this->reportend == 0){
             $this->reportend = time();
         } 
-
 
         $mform->addElement('date_selector', 'reportstart', 'Report start date');
         $mform->setDefault('reportstart',$this->reportstart);
@@ -157,7 +152,7 @@ class timetracker_reports_form  extends moodleform {
         if($this->userid==0 && $this->courseid == 0){ //see all workers, all courses
             $units = $DB->get_records_sql($sql);
         } else if ($this->userid==0 && $this->courseid!=0){ //see all workers, this course
-            $sql .= 'AND courseid='.$courseid;
+            $sql .= 'AND courseid='.$this->courseid;
             $units =
                 $DB->get_records_sql($sql);
         } else { //specific user, this course

@@ -47,13 +47,6 @@ $strtitle = 'TimeTracker';
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
-//print_object($urlparams);
-//$timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
-
-//$PAGE->navbar->add(get_string('blocks'));
-//$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
-//$PAGE->navbar->add($strtitle);
-
 $PAGE->set_pagelayout('course');
 $PAGE->set_pagetype('course-view-' . $course->format);
 $PAGE->set_other_editing_capability('moodle/course:manageactivities');
@@ -64,7 +57,8 @@ echo $OUTPUT->header();
 
 $tabs = array(array(
     new tabobject('home', $index, 'Main'),
-    new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage'),
+    new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports'),
+    new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers'),
     ));
 
 //print_tabs($tabs, 'manage');
@@ -96,7 +90,6 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     if(!$user){
         print_error('User is not known to TimeTracker. Please register on the course main page');
     }
-    //echo 'Hello, '.$user->firstname.' '.$user->lastname.'!';
     echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">';
     echo '<tr><th colspan=5">Last 10 Work Units</th></tr>'."\n";
     echo '<tr>
@@ -106,14 +99,11 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
             <th>Elapsed</th>
             <th>Action</th>
          ';
-    $last10unitssql = "SELECT {$CFG->prefix}block_timetracker_workerinfo.firstname, {$CFG->prefix}block_timetracker_workerinfo.lastname,
-        {$CFG->prefix}block_timetracker_workunit.* FROM {$CFG->prefix}block_timetracker_workerinfo,{$CFG->prefix}block_timetracker_workunit
-        WHERE {$CFG->prefix}block_timetracker_workunit.userid={$CFG->prefix}block_timetracker_workerinfo.id
-        AND {$CFG->prefix}block_timetracker_workunit.courseid=$courseid 
-        ORDER BY {$CFG->prefix}block_timetracker_workunit.timeout DESC LIMIT 10";
-    //print_object($last10unitssql);
+
+    $last10unitssql = get_string('last10forallworkers', 'block_timetracker', $courseid);
+
     $last10units = $DB->get_recordset_sql($last10unitssql);
-    //print_object($last10units);
+
     if(!$last10units){
         echo '<tr><td colspan="5" style="text-align:center">No work units found</a></td></tr>';
     } else {
