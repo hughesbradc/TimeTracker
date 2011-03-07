@@ -47,6 +47,11 @@ echo $OUTPUT->header();
 
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
 
+if(!$workerrecord){
+    echo "NO WORKER FOUND!";
+    die;
+}
+
 $strtitle = get_string('hourlogtitle','block_timetracker',$workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
 
@@ -56,12 +61,8 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_hourlog_form($context, $userid);
+$mform = new timetracker_hourlog_form($context, $userid, $courseid);
 
-if(!$workerrecord){
-    echo "NO WORKER FOUND!";
-    die;
-}
 
 if($workerrecord->active == 0){
     print_string('notactiveerror','block_timetracker');
@@ -79,12 +80,12 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $formdata->lasteditedby = $formdata->editedby;
         $DB->insert_record('block_timetracker_workunit', $formdata);
 
-    //form submitted
-    echo $OUTPUT->header();
+    echo "Hours submitted successfully"
+    //echo $OUTPUT->header();
     echo $OUTPUT->footer();
 } else {
     //form is shwon for the first time
-    echo $OUTPUT->header();
+    //echo $OUTPUT->header();
     $mform->display();
     echo $OUTPUT->footer();
 }

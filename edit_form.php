@@ -29,8 +29,17 @@ class block_timetracker_edit_form extends block_edit_form {
         global $CFG, $DB, $USER;
 
         // Fields for editing block contents.
-        $mform->addElement('header', 'configheader', get_string('workerdisplaysettings',
-        'block_timetracker'));
+        $mform->addElement('header', 'configheader', get_string('defaultworkerconfig','block_timetracker'));
+        
+        $mform->addElement('text','config_block_timetracker_default_max_earnings',get_string('maxtermearnings','block_timetracker'));
+        $mform->setDefault('config_block_timetracker_default_max_earnings',0);
+        
+        $mform->addElement('text','config_block_timetracker_curr_pay_rate',get_string('currpayrate','block_timetracker'));
+        $mform->setDefault('config_block_timetracker_curr_pay_rate',0);
+        
+        $mform->addElement('select', 'type',get_string('trackermethod','block_timetracker'),array('Timeclock','Hourlog'));
+        
+        $mform->addElement('header', 'displayheader', get_string('workerdisplaysettings','block_timetracker'));
 
         $mform->addElement('selectyesno', 'config_block_timetracker_show_total_hours', get_string('showtotalhours', 'block_timetracker'));
         $mform->setDefault('config_block_timetracker_show_total_hours', 1);
@@ -56,7 +65,22 @@ class block_timetracker_edit_form extends block_edit_form {
         $mform->addElement('selectyesno', 'config_block_timetracker_show_total_earnings', get_string('showtotalearnings', 'block_timetracker'));
         $mform->setDefault('config_block_timetracker_show_total_earnings', 1);
 
-        $mform->addElement('select', 'type',get_string('trackermethod','block_timetracker'),
-        array('Timeclock','Hourlog'));
     }
+
+    function validation ($data){
+        $errors = array();
+
+        if($data['config_block_timetracker_default_max_earnings'] < 0){
+            echo('in the first if');
+            $errors['config_block_timetracker_default_max_earnings'] = 'The default maximum earnings must be zero or greater.';    
+        }
+
+        if($data['config_block_timetracker_curr_pay_rate'] < 0){
+            echo('in the second if');
+            $errors['config_block_timetracker_curr_pay_rate'] = 'The current pay rate must be zero or greater.';    
+        }
+        return $errors;
+        
+    }
+
 }

@@ -27,9 +27,10 @@ require_once ($CFG->libdir.'/formslib.php');
 
 class timetracker_hourlog_form  extends moodleform {
 
-    function timetracker_hourlog_form($context, $userid){
+    function timetracker_hourlog_form($context, $userid, $courseid){
         $this->context = $context;
         $this->userid = $userid;
+        $this->courseid = $courseid;
         parent::__construct();
     }
 
@@ -56,14 +57,15 @@ class timetracker_hourlog_form  extends moodleform {
             $userinfo->firstname.' '.$userinfo->lastname));
 
         $mform->addElement('hidden','userid', $this->userid);
-        $mform->addElement('hidden','id', $COURSE->id);
+        $mform->addElement('hidden','id', $this->courseid);
+
         if($canmanage){
             $mform->addElement('hidden','editedby', '0');
         }else{
             $mform->addElement('hidden','editedby', $this->userid);
         }
 
-        $workunit = $DB->get_record('block_timetracker_workunit', array('id'=>$this->userid,'courseid'=>$COURSE->id));
+        $workunit = $DB->get_record('block_timetracker_workunit', array('id'=>$this->userid,'courseid'=>$this->courseid));
 
         $mform->addElement('date_time_selector','timein','Time In: ');
         
