@@ -42,13 +42,13 @@ $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
 
-$PAGE->set_url(new moodle_url('/blocks/timetracker/updateworkerinfo.php',$urlparams));
+$PAGE->set_url(new moodle_url($CFG->wwwroot.'/blocks/timetracker/updateworkerinfo.php',$urlparams));
 $PAGE->set_pagelayout('base');
 
 $strtitle = get_string('updateformheadertitle','block_timetracker'); 
 $PAGE->set_title($strtitle);
 
-$timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
+$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
@@ -70,7 +70,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
 
     $indexparams['userid'] = $ttuserid;
     $indexparams['id'] = $courseid;
-    $index = new moodle_url('/blocks/timetracker/index.php', $indexparams);
+    $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
     redirect($index);
     

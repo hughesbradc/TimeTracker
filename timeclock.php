@@ -43,31 +43,32 @@ $PAGE->set_course($course);
 $context = $PAGE->context;
 
 $timeclockurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',$urlparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
-$PAGE->set_url($timeclockurl);
-$PAGE->set_pagelayout('base');
+//$PAGE->set_url($timeclockurl);
+//$PAGE->set_pagelayout('base');
 
 
-$strtitle = get_string('timeclocktitle','block_timetracker'); 
-$PAGE->set_title($strtitle);
+//$strtitle = get_string('timeclocktitle','block_timetracker'); 
+//$PAGE->set_title($strtitle);
 
-$PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timeclockurl);
-$PAGE->navbar->add($strtitle);
+//$PAGE->navbar->add(get_string('blocks'));
+//$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
+//$PAGE->navbar->add($strtitle);
 
-echo $OUTPUT->header();
-
+//echo $OUTPUT->header();
+//
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$ttuserid,'courseid'=>$courseid));
 
 if(!$workerrecord){
-    echo "NO WORKER FOUND!";
+    print_error("NO WORKER FOUND!");
     die;
 }
 
 if($workerrecord->active == 0){
-    print_string('notactiveerror','block_timetracker');
-    echo '<br />';
-    echo $OUTPUT->footer();
+    print_error('notactiveerror','block_timetracker');
+    //echo '<br />';
+    //echo $OUTPUT->footer();
     die;
 } else if($clockin == 1){
         //protect against refreshing a 'clockin' screen
@@ -103,6 +104,9 @@ if($workerrecord->active == 0){
     }
 } 
 
+redirect($index);
+
+/*
 
 $pendingrecord= $DB->count_records('block_timetracker_pending', 
     array('userid'=>$ttuserid,'courseid'=>$courseid));
@@ -110,18 +114,18 @@ if($pendingrecord == 0){
     $action = null;
     //$link = '/blocks/timetracker/timeclock.php';
     $urlparams['clockin']=1;
-    $link = new moodle_url('/blocks/timetracker/timeclock.php', $urlparams);
+    $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
     
-    echo '<b>';
-    echo print_string('clockedout','block_timetracker');
-    echo '<br />';
-    echo '</b>';
-    echo $OUTPUT->action_link($link, get_string('clockinlink', 'block_timetracker'), $action);
-    echo '<br />';
+    //echo '<b>';
+    //echo print_string('clockedout','block_timetracker');
+    //echo '<br />';
+    //echo '</b>';
+    //echo $OUTPUT->action_link($link, get_string('clockinlink', 'block_timetracker'), $action);
+    //echo '<br />';
 } else {
     $action = null;
     $urlparams['clockout']=1;
-    $link = new moodle_url('/blocks/timetracker/timeclock.php', $urlparams);
+    $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
     
     echo '<b>';
     print_string('clockedin','block_timetracker');
@@ -171,4 +175,5 @@ if($numrecords == 0){
 }
 
 echo $OUTPUT->footer();
+*/
 

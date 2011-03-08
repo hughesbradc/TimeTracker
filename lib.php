@@ -67,27 +67,29 @@ function format_elapsed_time($totalsecs=0){
 }
 
 /**
-* @return earnings (in decimal) for this calendar year
-*
+* Calculate Total Earnings 
+* @param $userid, $courseid
+* @return total money earned
 */
-/*
-function get_money_this_month($userid,$courseid){
+function get_total_earnings($userid, $courseid){
+    global $CFG, $DB;
+    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
+        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.
+        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
+        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+    $workerunits = $DB->get_recordset_sql($sql);
 
-    $currtime = usergetdate(time());
-    $firstofyear = time() - ((($currtime['yday']-1) * (24*3600)) + ($currtime['hours']*3600) + 
-        ($currtime['minutes']*60) + ($currtime['seconds']));
+    if(!$workerunits) return 0;
 
-    $units = $DB->get_recordset_sql(get_string('allunitsinrange','block_timetracker', 
-        $firstofyear, time(), $userid, $courseid));
-
-    if(!$units) return 0;
-    $total = 0;
-    foreach($units as $unit){
-        $total += round_time($unit->timeout - $unit->timein) * $unit->payrate;
+    $earnings = 0;
+    foreach($workerunits as $subunit){
+        $earnings += get_hours(round_time($subunit->timeout - $subunit->timein))*$subunit->payrate;
     }
-    return get_hours($total);
+
+    return round($earnings,2);
+
 }
-*/
 
 /**
 * Calculate Total Hours
@@ -115,6 +117,34 @@ function get_total_hours($userid, $courseid){
 
 }
 
+/**
+* @return earnings (in dollars) for this month
+*
+*/
+function get_earnings_this_month($userid,$courseid){
+    global $CFG, $DB;
+    $currtime = usergetdate(time());
+
+    $firstofmonth = time() - ((($currtime['mday']-1) * (24*3600)) + ($currtime['hours']*3600) + 
+        ($currtime['minutes']*60) + ($currtime['seconds']));
+
+    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
+        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.$firstofmonth.' AND '.time().' AND '.
+        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.
+        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
+        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+
+    $units = $DB->get_recordset_sql($sql);
+
+    if(!$units) return 0;
+    $earnings = 0;
+    foreach($units as $unit){
+        $earnings += get_hours(round_time($unit->timeout - $unit->timein))*$unit->payrate;
+    }
+    return round($earnings,2);
+}
+
 
 /**
 * @return hours (in decimal) for this month
@@ -127,8 +157,7 @@ function get_hours_this_month($userid,$courseid){
     $firstofmonth = time() - ((($currtime['mday']-1) * (24*3600)) + ($currtime['hours']*3600) + 
         ($currtime['minutes']*60) + ($currtime['seconds']));
 
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.
-        $CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
+    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
         $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
         $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.$firstofmonth.' AND '.time().' AND '.
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.
@@ -146,6 +175,35 @@ function get_hours_this_month($userid,$courseid){
 }
 
 /**
+* @return earnings (in dollars) for this calendar year
+*
+*/
+function get_earnings_this_year($userid,$courseid){
+    global $CFG, $DB;
+
+    $currtime = usergetdate(time());
+    $firstofyear = time() - ((($currtime['yday']-1) * (24*3600)) + ($currtime['hours']*3600) + 
+        ($currtime['minutes']*60) + ($currtime['seconds']));
+
+    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
+        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.$firstofyear.' AND '.time().' AND '.
+        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.
+        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
+        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+
+    $units = $DB->get_recordset_sql($sql);
+
+
+    if(!$units) return 0;
+    $earnings = 0;
+    foreach($units as $unit){
+        $earnings += get_hours(round_time($unit->timeout - $unit->timein)) * $unit->payrate;
+    }
+    return round($earnings,2);
+}
+
+/**
 * @return hours (in decimal) for this calendar year
 *
 */
@@ -155,8 +213,7 @@ function get_hours_this_year($userid,$courseid){
     $firstofyear = time() - ((($currtime['yday']-1) * (24*3600)) + ($currtime['hours']*3600) + 
         ($currtime['minutes']*60) + ($currtime['seconds']));
 
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.
-        $CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
+    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
         $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
         $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.$firstofyear.' AND '.time().' AND '.
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.
@@ -182,8 +239,15 @@ function get_hours_this_year($userid,$courseid){
 */
 
 /**
-* Gives an array with worker stats
-* $worker['totalhours'];
+* Gives an array with worker stats:
+* $stats['totalhours']
+* $stats['monthhours']
+* $stats['yearhours']
+* $stats['termhours']
+* $stats['totalearnings'] 
+* $stats['monthearnings']
+* $stats['yearearnings']
+* $stats['termearnings']
 * @return an array with useful values
 */
 function get_worker_stats($userid,$courseid){
@@ -193,7 +257,15 @@ function get_worker_stats($userid,$courseid){
     $stats['totalhours'] = get_total_hours($userid,$courseid);
     $stats['monthhours'] = get_hours_this_month($userid, $courseid);
     $stats['yearhours'] = get_hours_this_year($userid, $courseid);
-    $stats['termhours'] = 0;
+    //TODO fix this
+    $stats['termhours'] = $stats['yearhours'];
+
+    $stats['totalearnings'] = get_total_earnings($userid,$courseid);
+    $stats['monthearnings'] = get_earnings_this_month($userid,$courseid);
+    $stats['yearearnings'] = get_earnings_this_year($userid,$courseid);
+    //TODO fix this
+    $stats['termearnings'] = $stats['yearearnings'];
 
     return $stats; 
+
 }

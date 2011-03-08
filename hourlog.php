@@ -36,7 +36,7 @@ $userid = required_param('userid', PARAM_INTEGER);
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 
-$hourlogurl = new moodle_url('/blocks/timetracker/hourlog.php',$urlparams);
+$hourlogurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams);
 
 $context = get_context_instance(CONTEXT_SYSTEM);
 $PAGE->set_context($context);
@@ -55,11 +55,11 @@ if(!$workerrecord){
 $strtitle = get_string('hourlogtitle','block_timetracker',$workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
 
-$timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
+$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 $indexparams['userid'] = $ttuserid;
 $indexparams['id'] = $courseid;
-$index = new moodle_url('/blocks/timetracker/index.php', $indexparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);

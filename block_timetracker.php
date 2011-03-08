@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
+ require_once($CFG->dirroot.'/blocks/timetracker/lib.php');
+
  class block_timetracker extends block_base {
 
     function init() {
@@ -44,6 +46,9 @@
         if(!isset($this->config)){
             if (has_capability('block/timetracker:manageworkers', $this->context)) {
                 $this->content->text='TimeTracker block must be configured before used.';
+            } else {
+                $this->content->text='TimeTracker is not yet configured. Contact your supervisor
+                with this error';
             }
             return $this->content;
 
@@ -83,8 +88,8 @@
                 $urlparams['clockin']=1;
                 $indexparams['userid'] = $ttuserid;
                 $indexparams['id'] = $courseid;
-                $link = new moodle_url('/blocks/timetracker/timeclock.php', $urlparams);
-                $index = new moodle_url('/blocks/timetracker/index.php', $indexparams);
+                $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
+                $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
                 // Clock In Icon
                 $this->content->text .= '<div style="text-align: center">';
@@ -106,8 +111,8 @@
                 $urlparams['clockout']=1;
                 $indexparams['userid'] = $ttuserid;
                 $indexparams['id'] = $courseid;
-                $link = new moodle_url('/blocks/timetracker/timeclock.php', $urlparams);
-                $index = new moodle_url('/blocks/timetracker/index.php', $indexparams);
+                $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
+                $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
     
                 $this->content->text .= '<div style="text-align: center">';
                 
@@ -138,8 +143,8 @@
                 $urlparams['id']=$courseid;
                 $indexparams['userid'] = $ttuserid;
                 $indexparams['id'] = $courseid;
-                $link = new moodle_url('/blocks/timetracker/hourlog.php', $urlparams);
-                $index = new moodle_url('/blocks/timetracker/index.php', $indexparams);
+                $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php', $urlparams);
+                $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
                 // Clock In Icon
                 $this->content->text .= '<div style="text-align: center">';
@@ -165,24 +170,31 @@
 
 			        $this->content->text .= '<span style=font-weight:bold; ">'.get_string('hourstitle','block_timetracker').'</span>';
 
+                    $stats = get_worker_stats($ttuserid,$COURSE->id);
+
 					if ($this->config->block_timetracker_show_month_hours){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalmonth', 'block_timetracker');
+                        $this->content->text .= $stats['monthhours'];
+                        
 					}
 					
                     if ($this->config->block_timetracker_show_term_hours){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
+                        $this->content->text .= $stats['termhours'];
 					
             
 					if ($this->config->block_timetracker_show_ytd_hours){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalytd', 'block_timetracker');
+                        $this->content->text .= $stats['yearhours'];
 					}
 					
                     if ($this->config->block_timetracker_show_total_hours){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('total', 'block_timetracker');
+                        $this->content->text .= $stats['totalhours'];
 					}
                 }
       
@@ -196,21 +208,25 @@
 					if ($this->config->block_timetracker_show_month_earnings){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalmonth', 'block_timetracker');
+                        $this->content->text .= '$'.$stats['monthearnings'];
 					}
                     
 					if ($this->config->block_timetracker_show_term_earnings){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
+                        $this->content->text .= '$'.$stats['termearnings'];
 					}
                     
 					if ($this->config->block_timetracker_show_ytd_earnings){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalytd', 'block_timetracker');
+                        $this->content->text .= '$'.$stats['yearearnings'];
 					}
                     
 					if ($this->config->block_timetracker_show_total_earnings){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('total', 'block_timetracker');
+                        $this->content->text .= '$'.$stats['totalearnings'];
 					}
 				}
 

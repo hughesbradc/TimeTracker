@@ -30,14 +30,16 @@ require_once('lib.php');
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
+$userid = optional_param('userid',$USER->id, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
+$urlparams['userid'] = $userid;
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
 
-$index = new moodle_url('/blocks/timetracker/index.php', $urlparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
 $PAGE->set_url($index);
 //$PAGE->set_pagelayout('base');
@@ -48,28 +50,40 @@ $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
 $PAGE->set_pagelayout('course');
-$PAGE->set_pagetype('course-view-' . $course->format);
-$PAGE->set_other_editing_capability('moodle/course:manageactivities');
+//$PAGE->set_pagetype('course-view-' . $course->format);
+//$PAGE->set_other_editing_capability('moodle/course:manageactivities');
 
+$canmanage = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+    $canmanage = true;
+}
 
 echo $OUTPUT->header();
 //echo $OUTPUT->heading($strtitle, 2);
+$maintabs[] = new tabobject('home', $index, 'Main');
+$maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+if($canmanage){
+    $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+}
 
+$tabs = array($maintabs);
+/*
 $tabs = array(array(
-    new tabobject('home', $index, 'Main'),
+    new tabobject('home', $index, 'main'),
     new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports'),
     new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers'),
     ));
+*/
 
-//print_tabs($tabs, 'manage');
 print_tabs($tabs, 'home');
 
-if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
-    //echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo $OUTPUT->box_start();
+if ($canmanage) { //supervisor
+    echo $OUTPUT->box_start('generalbox boxaligncenter');
+    //echo $OUTPUT->box_start();
     //echo format_module_intro('assignment', $this->assignment, $this->cm->id);
     echo 'Welcome, supervisor!<br />'; 
     echo '<br />Below you will find the last 10 work units by your employees<br />';
+    /*
     echo 'Here are two example clock in (green) and clock out (redish) icons<br />';
 
     $clockinicon = new pix_icon('clock_in','Clock in', 'block_timetracker');
@@ -83,6 +97,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
 
     echo $clockinaction.'<br />'.$clockoutaction.'<br />'.$timeclockdataaction.'<br />';
+    */
     echo $OUTPUT->box_end();
 
 
@@ -100,7 +115,12 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
             <th>Action</th>
          ';
 
-    $last10unitssql = get_string('last10forallworkers', 'block_timetracker', $courseid);
+    $last10unitssql = 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.
+        $CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
+        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.
+        $CFG->prefix.'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
+        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
 
     $last10units = $DB->get_recordset_sql($last10unitssql);
 
@@ -138,19 +158,67 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
         }
     }
     echo '</table>';
-    print_object(get_worker_stats(1,2));
+    //print_object(get_worker_stats(1,2));
 
 } else { //worker
     $user = $DB->get_record('block_timetracker_workerinfo',array('userid'=>$USER->id));
     if(!$user){
         print_error('User is not known to TimeTracker. Please register on the course main page');
     }
-    $userUnits = $DB->get_records('block_timetracker_workunit',array('userid'=>$user->id));
+    $userUnits = $DB->get_records('block_timetracker_workunit',array('userid'=>$user->id),'timeout DESC','*',0,10);
     $userPending = $DB->get_records('block_timetracker_pending', array('userid'=>$user->id));
-    
-    
 
+    //add clockin/clockout box
+    if(!$userPending){
+        echo $OUTPUT->box_start('generalbox boxaligncenter');
+        echo '<h2>Clock in?</h2>';
+        $clockinicon = new pix_icon('clock_in','Clock in', 'block_timetracker');
+        $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',$urlparams);
+        $clockinurl->params(array('clockin'=>1));
+        $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
+        echo "You are not currently clocked in. Click the green clock below to clock in now.<br />";
+        echo $clockinaction;
+        echo $OUTPUT->box_end();
+    }
+
+
+    //summary data
+    echo $OUTPUT->box_start('generalbox boxaligncenter');
+    echo '<h2>Worker Summary Data</h2>';
+    $stats = get_worker_stats($userid, $courseid);
+
+    $statstable = new flexible_table('timetracker-display-worker-summary');
+    $statstable->define_columns(array('perid', 'hvalue','evalue'));
+    $statstable->define_headers(array('Period', 'Hours', 'Earnings'));
+    $statstable->set_attribute('cellspacing', '0');
+    $statstable->setup();
+
+    $statstable->add_data(array(
+        'This month',$stats['monthhours'],
+        '$'.$stats['monthearnings']
+        ));
+    $statstable->add_data(array(
+        'This term',$stats['termhours'],
+        '$'.$stats['termearnings']
+        ));
+    $statstable->add_data(array(
+        'This year',$stats['yearhours'],
+        '$'.$stats['yearearnings']
+        ));
+    $statstable->add_data(array(
+        'Total hours',$stats['totalhours'],
+        '$'.$stats['totalearnings']
+        ));
+
+    $statstable->print_html();
+
+    echo $OUTPUT->box_end();
+
+    //clockin/clockout box
     if($userPending){
+        echo $OUTPUT->box_start('generalbox boxaligncenter');
+        echo '<h2>Pending Clock-ins</h2>';
+        //show clockout and pending clock-in
         $table = new flexible_table('timetracker-display-worker-index');
     
         //$table->define_columns(array('timein', 'timeout', 'elapsed', 'action'));
@@ -168,15 +236,26 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
         $table->column_class('action', 'action');
 
         $table->setup();
-
+        
+        $clockouturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
+        $clockouturl->params(array('clockout'=>1));
         foreach ($userPending as $pending){
-            $table->add_data(array(userdate($pending->timein,get_string('datetimeformat','block_timetracker')),'Actions here'));
+            $clockouticon = new pix_icon('clock_out','Clock out','block_timetracker');
+            $clockoutaction = $OUTPUT->action_icon($clockouturl, $clockouticon);
+            $table->add_data(array(userdate($pending->timein,get_string('datetimeformat','block_timetracker')),$clockoutaction));
         }
 
         $table->print_html();
+
+        echo $OUTPUT->box_end();
+    } else {
+        //show clock in
+
     }
-    
+
     if($userUnits){
+        echo $OUTPUT->box_start('generalbox boxaligncenter');
+        echo '<h2>Last 10 Work Units</h2>';
         $table = new flexible_table('timetracker-display-worker-index');
     
         $table->define_columns(array('timein', 'timeout', 'elapsed', 'action'));
@@ -202,12 +281,13 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
                 userdate($unit->timein,get_string('datetimeformat','block_timetracker')),
                 userdate($unit->timeout,get_string('datetimeformat','block_timetracker')),
                 format_elapsed_time($unit->timeout - $unit->timein),
-                    'actions here'));
+                    'Not implemented yet'));
         }
 
         $table->print_html();
 
 
+        echo $OUTPUT->box_end();
     }
 }
 

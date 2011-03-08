@@ -47,7 +47,7 @@ if($courseid){
 }
 
 
-$reportsurl = new moodle_url('/blocks/timetracker/reports.php', $urlparams);
+$reportsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
 
 $PAGE->set_url($reportsurl);
 $PAGE->set_pagelayout('base');
@@ -58,7 +58,7 @@ $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
 #print_object($urlparams);
-$timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
+$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 //$PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);

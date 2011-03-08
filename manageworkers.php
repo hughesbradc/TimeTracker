@@ -42,7 +42,7 @@ if($courseid){
     $PAGE->set_context($context);
 }
 
-$manageworkerurl = new moodle_url('/blocks/timetracker/manageworkers.php', $urlparams);
+$manageworkerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
 $PAGE->set_url($manageworkerurl);
 $PAGE->set_pagelayout('base');
@@ -53,7 +53,7 @@ $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
 #print_object($urlparams);
-$timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
+$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 //$PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);

@@ -62,7 +62,7 @@ $strtitle = 'Reports';
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
-$timetrackerurl = new moodle_url('/blocks/timetracker/index.php',$urlparams);
+$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 $PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);

@@ -42,6 +42,7 @@
          $mform->addElement('hidden','userid', $USER->id);
          $mform->addElement('hidden','id', $this->courseid);
          $mform->addElement('hidden','courseid', $this->courseid);
+         $mform->addElement('hidden','maxearnings','750');
 
          //$worker = $DB->get_record('block_timetracker_workerinfo',array('id'=>$USER->id));
          $worker = $DB->get_record('user',array('id'=>$USER->id));
@@ -62,10 +63,15 @@
     
          if (has_capability('block/timetracker:manageworkers', $this->context)) {
              $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'));
-             $mform->setDefault('currpayrate',$CFG->block_timetracker_curr_pay_rate);
+             //$mform->setDefault('currpayrate',$CFG->block_timetracker_curr_pay_rate);
+             //TODO
+             $mform->setDefault('currpayrate','7.75');
+
          } else {
              $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'), 'readonly="readonly"');
-             $mform->setDefault('currpayrate',$CFG->block_timetracker_curr_pay_rate);
+             //$mform->setDefault('currpayrate',$CFG->block_timetracker_curr_pay_rate);
+             //TODO
+             $mform->setDefault('currpayrate','7.75');
          }
          $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
      }
