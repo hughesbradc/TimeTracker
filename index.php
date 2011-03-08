@@ -138,6 +138,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
         }
     }
     echo '</table>';
+    print_object(get_worker_stats(1,2));
 
 } else { //worker
     $user = $DB->get_record('block_timetracker_workerinfo',array('userid'=>$USER->id));
@@ -191,7 +192,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
         $table->column_class('action', 'action');
 
         $table->setup();
-        $table->add_data;
+        //$table->add_data;
 
         //$titlerow = new html_table_cell();
         //print_object($userUnits);
@@ -208,11 +209,6 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 
 
     }
-
-
-
-
-
 }
 
 echo $OUTPUT->footer();
