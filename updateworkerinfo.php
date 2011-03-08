@@ -75,7 +75,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
     redirect($index);
     
 } else {
-    //form is shwon for the first time
+    //form is shown for the first time
     echo $OUTPUT->header();
     $mform->display();
     echo $OUTPUT->footer();

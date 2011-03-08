@@ -59,7 +59,14 @@
          $mform->addRule('address', null, 'required', null, 'client', 'false');
          $mform->setDefault('address', $worker->address);
          $mform->addElement('text','phone',get_string('phone','block_timetracker'));
-     
+    
+         if (has_capability('block/timetracker:manageworkers', $this->context)) {
+             $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'));
+             $mform->setDefault('currpayrate',$CFG->block_timetracker_curr_pay_rate);
+         } else {
+             $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'), 'readonly="readonly"');
+             $mform->setDefault('currpayrate',$CFG->block_timetracker_curr_pay_rate);
+         }
          $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
      }
 
