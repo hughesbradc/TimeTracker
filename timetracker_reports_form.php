@@ -187,7 +187,7 @@ class timetracker_reports_form  extends moodleform {
                 $row.='<td style="text-align: center">'.userdate($unit->timein,get_string('datetimeformat','block_timetracker')).'</td>';
                 $row.='<td style="text-align: center">'.userdate($unit->timeout,get_string('datetimeformat','block_timetracker')).'</td>';
                 $currelapsed = $unit->timeout - $unit->timein;  
-                $total += get_elapsed_time($currelapsed);
+                $total += round_time($currelapsed);
                 $row.='<td style="text-align: center">'.format_elapsed_time($currelapsed).'</td>';
 
                 if($canmanage){
