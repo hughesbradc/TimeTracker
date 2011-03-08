@@ -83,7 +83,7 @@ if($workerrecord->active == 0){
 } else if ($clockout == 1){
     $cin = $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
     if($cin){
-
+        $cin->payrate = $workerrecord->currpayrate;
         $cin->timeout = time();
         $cin->lastedited = time();
         $cin->lasteditedby = $ttuserid;
