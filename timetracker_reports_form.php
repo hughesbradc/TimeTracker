@@ -49,7 +49,8 @@ class timetracker_reports_form  extends moodleform {
             $canmanage = true;
         }
 
-        if($USER->id != $this->userid && !$canmanage){
+        $usersid = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid), 'id');
+        if($usersid->id != $this->userid && !$canmanage){
             $mform->addElement('html','You do not have permission to view this user\'s work units.');
             return;
         }
