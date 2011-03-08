@@ -16,7 +16,7 @@ file for Moodle Timetracker block"
        <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="email" NEXT="phonenumber"/>   
        <FIELD NAME="phonenumber" TYPE="char" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="address" NEXT="position"/>
        <FIELD NAME="position" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="phonenumber" NEXT="currpayrate"/>
-       <FIELD NAME="currpayrate" TYPE="number" LENGTH="10" DECIMAL="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="position" NEXT="timetrackermethod"/>
+       <FIELD NAME="currpayrate" TYPE="number" LENGTH="10" DECIMALS="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="position" NEXT="timetrackermethod"/>
        <FIELD NAME="timetrackermethod" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="currpayrate" NEXT="active"/>
        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timetrackermethod" NEXT="dept"/>
        <FIELD NAME="dept" TYPE="char" LENGTH="100" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="active" NEXT="idnum"/>
@@ -47,7 +47,7 @@ file for Moodle Timetracker block"
        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="timein"/>
        <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="timeout"/>
        <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timein" NEXT="payrate"/>
-       <FIELD NAME="payrate" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timeout" NEXT="lastedited"/>
+       <FIELD NAME="payrate" TYPE="number" LENGTH="10" DECIMALS="3" NOTNULL="true" SEQUENCE="false" PREVIOUS="timeout" NEXT="lastedited"/>
        <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="payrate" NEXT="lasteditedby"/>
        <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited"/>
      </FIELDS>
