@@ -77,7 +77,6 @@ if($workerrecord->active == 0){
             $cin->userid = $ttuserid;
             $cin->timein = time();
             $cin->courseid = $courseid;
-            //echo 'inserting .... <br >';
             $DB->insert_record('block_timetracker_pending', $cin);
         }
 

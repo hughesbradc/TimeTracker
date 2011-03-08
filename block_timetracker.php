@@ -124,6 +124,7 @@
                 $this->content->text .= 'Clock in: '.userdate($pendingtimestamp->timein,get_string('datetimeformat','block_timetracker')).'<br />';
                 $this->content->text .= '<br />';
                 $this->content->text .= '</div>';
+                $this->content->text .= '<hr>';
 }
 
    }
@@ -150,6 +151,7 @@
     
                 $this->content->text .= $clockinaction. $timeclockdataaction.'<br />';
                 $this->content->text .= '</div>';
+                $this->content->text .= '<hr>';
                 }
 
             }
@@ -222,7 +224,6 @@
                             $cin->userid = $ttuserid;
                             $cin->timein = time();
                             $cin->courseid = $courseid;
-                            //echo 'inserting .... <br >';
                             $DB->insert_record('block_timetracker_pending', $cin);
                         }
 
