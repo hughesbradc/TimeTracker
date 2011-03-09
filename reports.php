@@ -35,44 +35,53 @@ $reportend = optional_param('repend', 0,PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
-$urlparams['repstart'] = $reportstart;
-$urlparams['repend'] = $reportend;
+if($reportstart) $urlparams['repstart'] = $reportstart;
+if($reportend) $urlparams['repend'] = $reportend;
 
-if($courseid){
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    #print_object($course);
-    $PAGE->set_course($course);
-    $context = $PAGE->context;
-} else {
-    $context = get_context_instance(CONTEXT_SYSTEM);
-    $PAGE->set_context($context);
-}
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+$PAGE->set_course($course);
+$context = $PAGE->context;
 
-//print_object($urlparams);
 $reportsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
 
 $PAGE->set_url($reportsurl);
-
 $PAGE->set_pagelayout('course');
-$PAGE->set_pagetype('course-view-' . $course->format);
-$PAGE->set_other_editing_capability('moodle/course:manageactivities');
-
-$strtitle = 'Reports';
-
+$strtitle = 'TimeTracker : Reports';
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
-$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
-$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
+$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
+
+$canmanage = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+    $canmanage = true;
+}
+
+$worker = $DB->get_record('block_timetracker_workerinfo',array('userid'=>$USER->id));
+
+echo $OUTPUT->header();
+$maintabs[] = new tabobject('home', $index, 'Main');
+$maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+if($worker && $worker->timetrackermethod==1){
+    $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
+}
+
+if($canmanage){
+    $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+}
+
+$tabs = array($maintabs);
+print_tabs($tabs, 'reports');
 
 
 $mform = new timetracker_reports_form($PAGE->context,$userid,$courseid,$reportstart,$reportend);
 
 if ($mform->is_cancelled()){ //user clicked 'cancel'
 
-    redirect($timetrackerurl); 
+    redirect($index); 
 
 } else if($formdata = $mform->get_data()){
 
@@ -83,8 +92,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     redirect($reportsurl);
 
 } else {
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading($strtitle, 2);
+    //echo $OUTPUT->heading($strtitle, 2);
     $mform->display();
     echo $OUTPUT->footer();
 }
