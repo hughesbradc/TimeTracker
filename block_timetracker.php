@@ -59,7 +59,7 @@
         } else {
 	        $recordexists = $DB->record_exists('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
 
-            if ($recordexists){
+            if (!$recordexists){
                 $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id;
                 $action = null; 
                 $this->content->text = '<center>';
@@ -79,7 +79,7 @@
                 $ttuserid = $worker->id;
 
             $pendingrecord = $DB->record_exists('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
-            if($pendingrecord == 0){ 
+            if(!$pendingrecord){ 
                 //$action = null;
                 $urlparams['userid']=$ttuserid;
                 $urlparams['id']=$courseid;
@@ -102,7 +102,7 @@
                 }
 
 
-            if($pendingrecord != 0){ 
+            if($pendingrecord){ 
                 //$action = null;
                 $urlparams['userid']=$ttuserid;
                 $urlparams['id']=$courseid;
@@ -160,7 +160,7 @@
             }
 
 
-           if(!$recordexists){     
+           if($recordexists){     
                 if($this->config->block_timetracker_show_month_hours ||
                 $this->config->block_timetracker_show_term_hours ||
                 $this->config->block_timetracker_show_ytd_hours ||
