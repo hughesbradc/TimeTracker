@@ -30,7 +30,7 @@ require_once('lib.php');
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
-$userid = optional_param('userid',$USER->id, PARAM_INTEGER);
+$userid = optional_param('userid',0, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
@@ -55,7 +55,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
-$worker = $DB->get_record('block_timetracker_workerinfo',array('userid'=>$USER->id));
+$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id));
 
 echo $OUTPUT->header();
 $maintabs[] = new tabobject('home', $index, 'Main');

@@ -36,7 +36,7 @@
         $clockin = optional_param('clockin', 0,PARAM_INTEGER);
         $clockout = optional_param('clockout',0, PARAM_INTEGER);
         $courseid = $COURSE->id;
-        $worker = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id));
+        $worker = $DB->get_record('block_timetracker_workerinfo', array('mdluserid'=>$USER->id));
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -57,7 +57,7 @@
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
             $this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';
         } else {
-	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
+	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
             if ($numrecords == 0){
                 $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id;
