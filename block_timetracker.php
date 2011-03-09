@@ -300,4 +300,28 @@
         //what would we need to do? Send reminders if last day of month?
 
     }
+
+    /**
+    * Override the instance_config_save method
+    */
+    function instance_config_save($data, $nolongerused = false){
+        parent::instance_config_save($data, $nolongerused);
+        global $DB, $COURSE;
+        foreach ($data as $name => $value){
+            $rec = $DB->get_record('block_timetracker_config',array('courseid'=>$COURSE->id,'name'=>$name));
+
+            $conf = new stdClass;
+            $conf->name = $name;
+            $conf->value = $value;
+            $conf->courseid= $COURSE->id;
+
+            if($rec){
+                $conf->id = $rec->id;
+                $DB->update_record('block_timetracker_config',$conf);
+            } else {
+                $DB->insert_record('block_timetracker_config',$conf);
+            }
+
+        }
+    }
 }
