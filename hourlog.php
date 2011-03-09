@@ -38,12 +38,12 @@ $urlparams['userid'] = $userid;
 
 $hourlogurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams);
 
-$context = get_context_instance(CONTEXT_SYSTEM);
-$PAGE->set_context($context);
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+$PAGE->set_course($course);
+$context = $PAGE->context;
+
 $PAGE->set_url($hourlogurl);
 $PAGE->set_pagelayout('course');
-
-echo $OUTPUT->header();
 
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
 
@@ -51,6 +51,33 @@ if(!$workerrecord){
     echo "NO WORKER FOUND!";
     die;
 }
+
+$canmanage = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+    $canmanage = true;
+}
+
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
+
+if($USER->id != $workerrecord->userid && !$canmanage){
+    print_error('You do not have permissions to add hours for this user');
+} else if(!$canmanage && $workerrecord->timetrackermethod==0){
+    redirect($index);
+}
+
+
+echo $OUTPUT->header();
+$maintabs[] = new tabobject('home', $index, 'Main');
+$maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+$maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
+if($canmanage){
+    $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+}
+
+$tabs = array($maintabs);
+print_tabs($tabs, 'hourlog');
+
+
 
 $strtitle = get_string('hourlogtitle','block_timetracker',$workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
