@@ -30,7 +30,7 @@ class block_timetracker_edit_form extends block_edit_form {
 
         // Fields for editing block contents.
         $mform->addElement('header', 'configheader', get_string('defaultworkerconfig','block_timetracker'));
-        
+
         $mform->addElement('text','config_block_timetracker_default_max_earnings',get_string('maxtermearnings','block_timetracker'));
         $mform->setDefault('config_block_timetracker_default_max_earnings',0);
         
