@@ -39,10 +39,14 @@
 
          $mform->addElement('header','general',get_string('updateformheadertitle','block_timetracker'));
 
+         $config = $DB->get_records('block_timetracker_config','courseid'=>$this->courseid);
+
          $mform->addElement('hidden','userid', $USER->id);
          $mform->addElement('hidden','id', $this->courseid);
          $mform->addElement('hidden','courseid', $this->courseid);
+         //if($config && $config['config_block_timetracker_curr_pay_rate']
          $mform->addElement('hidden','maxearnings','750');
+         
 
          //$worker = $DB->get_record('block_timetracker_workerinfo',array('id'=>$USER->id));
          $worker = $DB->get_record('user',array('id'=>$USER->id));
