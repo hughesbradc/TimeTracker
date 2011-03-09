@@ -25,7 +25,6 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 
-
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
@@ -36,21 +35,15 @@ $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 
 
-if($courseid){
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    #print_object($course);
-    $PAGE->set_course($course);
-    $context = $PAGE->context;
-} else {
-    $context = get_context_instance(CONTEXT_SYSTEM);
-    $PAGE->set_context($context);
-}
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+$PAGE->set_course($course);
+$context = $PAGE->context;
 
 
 $reportsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
 
 $PAGE->set_url($reportsurl);
-$PAGE->set_pagelayout('base');
+$PAGE->set_pagelayout('course');
 
 $strtitle = 'Delete Pending Work Unit';
 
@@ -58,28 +51,33 @@ $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
 #print_object($urlparams);
-$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 //$PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
-$PAGE->navbar->add('Reports', $reportsurl);
+$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading($strtitle, 2);
+//echo $OUTPUT->header();
 
+$canmanage = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+    $canmanage = true;
+}
+$worker = $DB->get_record('block_timetracker_workerinfo',array('userid'=>$USER->id));
 
 //$PAGE->print_header('Delete TimeTracker Worker', 'Delete Worker');
 
-if (!has_capability('block/timetracker:manageworkers', $context)) {
+if ($USER->id != $worker->userid && !$canmanage){
     print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 } else {
     if($userid && $courseid && $pendingid && confirm_sesskey()){
         $DB->delete_records('block_timetracker_pending',array('id'=>$pendingid));
-        echo '<span style="text-align: center">Pending work unit has been deleted</span>';
+        //echo '<div style="text-align: center">Pending work unit has been deleted. <br />';
+        //echo '<a href="'.$index.'">Continue</a></div>';
+        redirect($index,'Pending work unit has been deleted',2);
     } else {
         print_error('errordeleting','block_timetracker', $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
     }
 }
 
-echo $OUTPUT->footer();
+//echo $OUTPUT->footer();
