@@ -57,7 +57,7 @@ $PAGE->set_title($strtitle);
 
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
-$indexparams['userid'] = $ttuserid;
+$indexparams['userid'] = $userid;
 $indexparams['id'] = $courseid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
