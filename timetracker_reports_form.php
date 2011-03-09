@@ -109,10 +109,8 @@ class timetracker_reports_form  extends moodleform {
             $headers = 
                 '<tr>
                     <th>Time in</th>
+                    <th>Action</th>
                 ';
-            if($canmanage){
-                    $headers .='<th>'.get_string('action').'</th>';
-            }
             $headers .='</tr>';
 
             $mform->addElement('html',$headers);
@@ -122,22 +120,25 @@ class timetracker_reports_form  extends moodleform {
                 $row='<tr>';
                 $row.='<td>'.userdate($pending->timein,get_string('datetimeformat','block_timetracker')).'</td>';
 
+                $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
+                $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".sesskey().'&pendingid='.$pending->id;
+                $deleteurl = new moodle_url($baseurl.'/deletepending.php'.$paramstring);
+                $deleteicon = new pix_icon('t/delete', get_string('delete'));
+                $deleteaction = $OUTPUT->action_icon(
+                    $deleteurl, $deleteicon, 
+                    new confirm_action('Are you sure you want to delete this pending work unit?'));
+
+                $actions = $deleteaction; 
+
                 if($canmanage){
-                    $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
-                    $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".sesskey().'&pendingid='.$pending->id;
     
                     $editurl = new moodle_url($baseurl.'/editpending.php'.$paramstring);
                     $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
+                    $actions .= $editaction; 
         
-                    $deleteurl = new moodle_url($baseurl.'/deletepending.php'.$paramstring);
-                    $deleteicon = new pix_icon('t/delete', get_string('delete'));
-                    $deleteaction = $OUTPUT->action_icon(
-                        $deleteurl, $deleteicon, 
-                        new confirm_action('Are you sure you want to delete this pending work unit?'));
-    
-                    $row .= '<td style="text-align: center">'.$editaction . ' '.$deleteaction.'</td>';
-    
+                     
                 }
+                $row .= '<td style="text-align: center">'.$actions.'</td>';
                 $row .= '</tr>';
                 $mform->addElement('html',$row);
             }
