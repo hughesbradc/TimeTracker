@@ -28,7 +28,8 @@ require('timetracker_updateworkerinfo_form.php');
 
 require_login();
 
-$worker = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id));
+$worker = $DB->get_record('block_timetracker_workerinfo', array('mdluserid'=>$USER->id));
+
 if($worker){
     $ttuserid = $worker->id;
 }
@@ -59,7 +60,6 @@ $mform = new timetracker_updateworkerinfo_form($context, $courseid);
 if ($mform->is_cancelled()){ //user clicked cancel
 
 } else if ($formdata=$mform->get_data()){
-	$worker = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$courseid));
     if(!$worker){
         unset($formdata->id);
         $ttuserid = $DB->insert_record('block_timetracker_workerinfo', $formdata);

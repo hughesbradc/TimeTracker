@@ -57,6 +57,20 @@ function xmldb_block_timetracker_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2011030902, 'timetracker');
     }
 
+    if ($oldversion < 2011030903) {
+
+        // Rename field userid on table block_timetracker_workerinfo to mdluserid
+        $table = new xmldb_table('block_timetracker_workerinfo');
+        $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            XMLDB_NOTNULL, null, '0', 'id');
+
+        // Launch rename field userid
+        $dbman->rename_field($table, $field, 'mdluserid');
+
+        // timetracker savepoint reached
+        upgrade_block_savepoint(true, 2011030903, 'timetracker');
+    }
+
 
     return true;
 }
