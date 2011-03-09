@@ -57,9 +57,9 @@
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
             $this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';
         } else {
-	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
+	        $recordexists = $DB->record_exists('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
 
-            if ($numrecords == 0){
+            if ($recordexists){
                 $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id;
                 $action = null; 
                 $this->content->text = '<center>';
@@ -74,12 +74,11 @@
                     //die;
                 }           
             
-
             // Implement Icons - Timeclock Method
-            if($worker->block_timetracker_trackermethod == 0){
+            if($worker->timetrackermethod == 0){
                 $ttuserid = $worker->id;
 
-            $pendingrecord = $DB->count_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+            $pendingrecord = $DB->record_exists('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
             if($pendingrecord == 0){ 
                 //$action = null;
                 $urlparams['userid']=$ttuserid;
@@ -135,7 +134,7 @@
 
 
             // Implement Icons - Hourlog Method
-            if($worker->block_timetracker_trackermethod == 1){
+            if($worker->timetrackermethod == 1){
                 $ttuserid = $worker->id;
 
                 $urlparams['userid']=$ttuserid;
@@ -161,7 +160,7 @@
             }
 
 
-           if($numrecords != 0){     
+           if(!$recordexists){     
                 if($this->config->block_timetracker_show_month_hours ||
                 $this->config->block_timetracker_show_term_hours ||
                 $this->config->block_timetracker_show_ytd_hours ||
@@ -233,7 +232,7 @@
                     
                     if($clockin == 1){
                     //protect against refreshing a 'clockin' screen
-                    $pendingrecord= $DB->count_records('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
+                    $pendingrecord= $DB->record_exists('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
                         if(!$pendingrecord){
                             $cin = new stdClass();
                             $cin->userid = $ttuserid;
