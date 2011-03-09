@@ -66,9 +66,7 @@
                 $this->content->text .= '</center>';
             } else {
                   
-                $workerrecord = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
-                
-                if($workerrecord->active == 0){
+                if($worker->active == 0){
                     $this->content->text = get_string('notactiveerror','block_timetracker');
                     //echo $OUTPUT->footer();
                     return $this->content;
@@ -77,7 +75,7 @@
             
 
             // Implement Icons - Timeclock Method
-            if($this->config->block_timetracker_trackermethod == 0){
+            if($worker->block_timetracker_trackermethod == 0){
                 $ttuserid = $worker->id;
 
             $pendingrecord = $DB->count_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
@@ -136,7 +134,7 @@
 
 
             // Implement Icons - Hourlog Method
-            if($this->config->block_timetracker_trackermethod == 1){
+            if($worker->block_timetracker_trackermethod == 1){
                 $ttuserid = $worker->id;
 
                 $urlparams['userid']=$ttuserid;
