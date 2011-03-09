@@ -66,11 +66,9 @@ if(!$workerrecord){
 }
 
 if($workerrecord->active == 0){
-    print_error('notactiveerror','block_timetracker');
-    //echo '<br />';
-    //echo $OUTPUT->footer();
-    die;
+    $status = get_string('notactiveerror','block_timetracker');
 } else if($clockin == 1){
+        $status = 'Clock in successful';
         //protect against refreshing a 'clockin' screen
         $pendingrecord= $DB->count_records('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
         if(!$pendingrecord){
@@ -82,6 +80,7 @@ if($workerrecord->active == 0){
         }
 
 } else if ($clockout == 1){
+    $status = 'Clock out successful';
     $cin = $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
     if($cin){
         $cin->payrate = $workerrecord->currpayrate;
@@ -104,76 +103,4 @@ if($workerrecord->active == 0){
     }
 } 
 
-redirect($index);
-
-/*
-
-$pendingrecord= $DB->count_records('block_timetracker_pending', 
-    array('userid'=>$ttuserid,'courseid'=>$courseid));
-if($pendingrecord == 0){ 
-    $action = null;
-    //$link = '/blocks/timetracker/timeclock.php';
-    $urlparams['clockin']=1;
-    $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
-    
-    //echo '<b>';
-    //echo print_string('clockedout','block_timetracker');
-    //echo '<br />';
-    //echo '</b>';
-    //echo $OUTPUT->action_link($link, get_string('clockinlink', 'block_timetracker'), $action);
-    //echo '<br />';
-} else {
-    $action = null;
-    $urlparams['clockout']=1;
-    $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
-    
-    echo '<b>';
-    print_string('clockedin','block_timetracker');
-    echo '<br />';
-    print_string('pendingtimestamp','block_timetracker');
-    echo '</b>';
-    $pendingtimestamp= $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
-    echo 'Clock in:
-        '.userdate($pendingtimestamp->timein,get_string('datetimeformat','block_timetracker')).'<br />';
-    echo $OUTPUT->action_link($link, get_string('clockoutlink', 'block_timetracker'), $action);
-    echo '<br />';
-}
-
-$numrecords = $DB->count_records('block_timetracker_workunit', 
-    array('userid'=>$ttuserid,'courseid'=>$courseid));
-if($numrecords == 0){
-    //DB CALL - No previous punches, show message.
-    echo '<br />';
-    echo '<hr>';
-    echo '<b>';
-    print_string('previousentries','block_timetracker');
-    echo '</b><br />';
-    print_string('noprevious','block_timetracker'); 
-
-} else {
-    
-    echo '<br />';
-    echo '<hr>';
-    echo '<b>';
-    print_string('previousentries','block_timetracker');
-    echo '</b><br />';
-    $last10workunits = $DB->get_records('block_timetracker_workunit', array('userid'=>$ttuserid), 'timeout DESC','*',0,10);
-    
-    $str = '<table><tr><th>Clock in</th><th>Clock out</th><th>Elapsed</th></tr>';
-    foreach($last10workunits as $workunit){
-        $str .= '<tr>'; 
-        $str .= '<td>'.userdate($workunit->timein, get_string('datetimeformat','block_timetracker')).'</td>';
-        $str .= '<td>'.userdate($workunit->timeout, get_string('datetimeformat','block_timetracker')).'</td>';
-        $str .= '<td>'.format_elapsed_time($workunit->timeout - $workunit->timein).'</td>';
-        //$str .= '<td>'.userdate($workunit->timeout, get_string('strftimedatetimeshort','langconfig')).'</td>';
-        $str .= '</tr>'; 
-    }
-    $str .='</table>';
-    echo $str;
-
-
-}
-
-echo $OUTPUT->footer();
-*/
-
+redirect($index,$status,2);
