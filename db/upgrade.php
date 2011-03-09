@@ -33,44 +33,28 @@ function xmldb_block_timetracker_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2011030901) {
+    if ($oldversion < 2011030902) {
 
-        // Define table block_timetracker_workerinfo to be created
-        $table = new xmldb_table('block_timetracker_workerinfo');
+        // Define table block_timetracker_config to be created
+        $table = new xmldb_table('block_timetracker_config');
 
-        // Adding fields to table block_timetracker_workerinfo
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, 
+        // Adding fields to table block_timetracker_config
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL,
             XMLDB_SEQUENCE, null);
-        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, 
-            null, '0');
-        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, 
-            null, '0');
-        $table->add_field('firstname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('lastname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('email', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('address', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('phonenumber', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('position', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('currpayrate', XMLDB_TYPE_NUMBER, '10, 3', null, XMLDB_NOTNULL, 
-            null, '0');
-        $table->add_field('timetrackermethod', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, 
-            null, '0');
-        $table->add_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('dept', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('idnum', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('comments', XMLDB_TYPE_CHAR, '1000', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, '0');
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('value', XMLDB_TYPE_TEXT, 'small', null, XMLDB_NOTNULL, null, null);
 
-        // Adding keys to table block_timetracker_workerinfo
+        // Adding keys to table block_timetracker_config
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
-        // Conditionally launch create table for block_timetracker_workerinfo
+        // Conditionally launch create table for block_timetracker_config
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
         // timetracker savepoint reached
-        upgrade_block_savepoint(true, 2011030901, 'timetracker');
-
+        upgrade_block_savepoint(true, 2011030902, 'timetracker');
     }
 
 
