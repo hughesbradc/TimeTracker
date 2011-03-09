@@ -43,6 +43,7 @@
         }
 
         $this->content = new stdClass;
+        //echo $this->config->block_timetracker_default_max_earnings;
         if(!isset($this->config)){
             if (has_capability('block/timetracker:manageworkers', $this->context)) {
                 $this->content->text='TimeTracker block must be configured before used.';
@@ -286,61 +287,17 @@
     }
 
     function instance_allow_config() {
-        return false;
+        return true;
     }
    
    /**
-     * cron - goes through all feeds and retrieves them with the cache
-     * duration set to 0 in order to force the retrieval of the item and
-     * refresh the cache
-     *
+     * do we need to do anything here?
      * @return boolean true if all feeds were retrieved succesfully
      */
     function cron() {
-        global $CFG, $DB, $USER;
-   /**     require_once($CFG->libdir.'/simplepie/moodle_simplepie.php');
+        //global $CFG, $DB, $USER;
 
-        // We are going to measure execution times
-        $starttime =  microtime();
-
-        // And we have one initial $status
-        $status = true;
-
-        // Fetch all site feeds.
-        $rs = $DB->get_recordset('block_timetracker');
-        $counter = 0;
-        mtrace('');
-        foreach ($rs as $rec) {
-            mtrace('    ' . $rec->url . ' ', '');
-            // Fetch the rss feed, using standard simplepie caching
-            // so feeds will be renewed only if cache has expired
-            @set_time_limit(60);
-
-            $feed =  new moodle_simplepie();
-            // set timeout for longer than normal to be agressive at
-            // fetching feeds if possible..
-            $feed->set_timeout(40);
-            $feed->set_cache_duration(0);
-            $feed->set_feed_url($rec->url);
-            $feed->init();
-
-            if ($feed->error()) {
-                mtrace ('error');
-                mtrace ('SimplePie failed with error:'.$feed->error());
-                $status = false;
-            } else {
-                mtrace ('ok');
-            }
-            $counter ++;
-        }
-        $rs->close();
-
-        // Show times
-        mtrace($counter . ' feeds refreshed (took ' . microtime_diff($starttime, microtime()) . ' seconds)');
-
-        // And return $status
-        return $status;
-        */
+        //what would we need to do? Send reminders if last day of month?
 
     }
 }
