@@ -26,14 +26,15 @@
 require_once("$CFG->libdir/formslib.php");
 
 class timetracker_updateworkerinfo_form extends moodleform {
-   function timetracker_updateworkerinfo_form($context,$courseid){
+   function timetracker_updateworkerinfo_form($context,$courseid,$mdluserid){
        $this->context = $context;
        $this->courseid = $courseid;
+       $this->mdluserid = $mdluserid;
        parent::__construct();
    }
 
     function definition() {
-        global $CFG, $USER, $DB, $COURSE;
+        global $CFG, $DB, $COURSE;
 
         $mform =& $this->_form;
 
@@ -46,6 +47,11 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $maxearnings = 750;
         $trackermethod = 0;
 
+        $canmanage = false;
+        if (has_capability('block/timetracker:manageworkers', $this->context)) {
+            $canmanage = true;
+        }
+
         $config = $DB->get_records_sql($sql);
         if($config){        
             $payrate = $config['block_timetracker_curr_pay_rate']->value;
@@ -53,24 +59,31 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $trackermethod = $config['block_timetracker_trackermethod']->value;
         }
 
-        $mform->addElement('hidden','mdluserid', $USER->id);
+        $mform->addElement('hidden','mdluserid', $this->mdluserid);
         $mform->addElement('hidden','id', $this->courseid);
         $mform->addElement('hidden','courseid', $this->courseid);
         $mform->addElement('hidden','maxearnings',$maxearnings);
         
 
-        //$worker = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid));
-        //if(!$worker){
-            $worker = $DB->get_record('user',array('id'=>$USER->id));
-        //}
+        $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$this->mdluserid));
+        if(!$worker){
+            $worker = $DB->get_record('user',array('id'=>$this->mdluserid));
+        } else {
+            $mform->addElement('hidden','userid',$worker->id);
+        }
 
-        $mform->addElement('text','firstname',get_string('firstname','block_timetracker'), 'readonly="readonly"');
+        $opstring='readonly="readonly"';
+        if($canmanage){
+            $opstring = '';
+        }
+
+        $mform->addElement('text','firstname',get_string('firstname','block_timetracker'), $opstring);
         $mform->setDefault('firstname',$worker->firstname);
 
-        $mform->addElement('text','lastname',get_string('lastname','block_timetracker'), 'readonly="readonly"');
+        $mform->addElement('text','lastname',get_string('lastname','block_timetracker'), $opstring);
         $mform->setDefault('lastname',$worker->lastname);
         
-        $mform->addElement('text','email',get_string('email','block_timetracker'), 'readonly="readonly"');
+        $mform->addElement('text','email',get_string('email','block_timetracker'), $opstring);
         $mform->setDefault('email',$worker->email);
 
         $mform->addElement('text','address',get_string('address','block_timetracker'));
@@ -78,14 +91,12 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $mform->setDefault('address', $worker->address);
         $mform->addElement('text','phone',get_string('phone','block_timetracker'));
    
-        if (has_capability('block/timetracker:manageworkers', $this->context)) {
-
+        if ($canmanage){
             $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'));
             $mform->setDefault('currpayrate',$payrate);
 
             $mform->addElement('select','timetrackermethod','Tracking Method',array(0=>'TimeClock',1=>'Hourlog'));
             $mform->setDefault('timetrackermethod',$trackermethod);
-
         } else {
             $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'), 'readonly="readonly"');
             $mform->setDefault('currpayrate',$payrate);

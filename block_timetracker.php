@@ -60,7 +60,7 @@
 	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
             if ($numrecords == 0){
-                $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id;
+                $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id.'&mdluserid='.$USER->id;
                 $action = null; 
                 $this->content->text = '<center>';
                 $this->content->text .= $OUTPUT->action_link($link, get_string('registerinfo', 'block_timetracker'), $action);
