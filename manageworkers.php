@@ -92,7 +92,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 
 } else {
     echo $OUTPUT->header();
-    echo $OUTPUT->heading($strtitle, 2);
+    //echo $OUTPUT->heading($strtitle, 2);
     #$PAGE->print_header('Manage worker info', 'Manage worker info');
     $mform->display();
     echo $OUTPUT->footer();

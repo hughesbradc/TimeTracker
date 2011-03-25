@@ -39,6 +39,13 @@ $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
 
+$canmanage = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+    $canmanage = true;
+    $urlparams['userid']=0;
+}
+
+
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
 $PAGE->set_url($index);
@@ -50,10 +57,6 @@ $PAGE->set_heading($strtitle);
 
 $PAGE->set_pagelayout('course');
 
-$canmanage = false;
-if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
-    $canmanage = true;
-}
 
 $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id));
 

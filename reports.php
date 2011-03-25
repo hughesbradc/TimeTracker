@@ -47,13 +47,22 @@ $reportsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $u
 $PAGE->set_url($reportsurl);
 $PAGE->set_pagelayout('course');
 $strtitle = 'TimeTracker : Reports';
+
+if( $userid != 0){
+    $w = $DB->get_record('block_timetracker_workerinfo',array('id'=>$userid));
+    if($w){
+        $strtitle .= ' for '.$w->firstname.' '.$w->lastname;
+    }
+} else {
+    $strtitle .= ' for all workers';
+}
+
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $index);
+$PAGE->navbar->add($strtitle);
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
-
-$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $index);
-$PAGE->navbar->add($strtitle);
 
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
@@ -62,19 +71,22 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 
 $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id));
 
-echo $OUTPUT->header();
 $maintabs[] = new tabobject('home', $index, 'Main');
 $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+
 if($worker && $worker->timetrackermethod==1){
     $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
 }
+
 
 if($canmanage){
     $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
 }
 
 $tabs = array($maintabs);
-print_tabs($tabs, 'reports');
+
+
+
 
 
 $mform = new timetracker_reports_form($PAGE->context,$userid,$courseid,$reportstart,$reportend);
@@ -93,6 +105,9 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 
 } else {
     //echo $OUTPUT->heading($strtitle, 2);
+    echo $OUTPUT->header();
+
+    print_tabs($tabs, 'reports');
     $mform->display();
     echo $OUTPUT->footer();
 }
