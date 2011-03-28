@@ -62,20 +62,10 @@ $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparam
 if($USER->id != $workerrecord->userid && !$canmanage){
     print_error('You do not have permissions to add hours for this user');
 } else if(!$canmanage && $workerrecord->timetrackermethod==0){
-    redirect($index);
+    redirect($index,$status,2);
 }
 
 
-echo $OUTPUT->header();
-$maintabs[] = new tabobject('home', $index, 'Main');
-$maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
-$maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
-if($canmanage){
-    $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
-}
-
-$tabs = array($maintabs);
-print_tabs($tabs, 'hourlog');
 
 
 
@@ -96,6 +86,7 @@ $mform = new timetracker_hourlog_form($context, $userid, $courseid);
 
 
 if($workerrecord->active == 0){
+    echo $OUTPUT->header();
     print_string('notactiveerror','block_timetracker');
     echo '<br />';
     echo $OUTPUT->footer();
@@ -111,12 +102,22 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $formdata->lastedited = time();
         $formdata->lasteditedby = $formdata->editedby;
         $DB->insert_record('block_timetracker_workunit', $formdata);
-    
-    redirect($index);
+    $status = 'Hourlog entry saved successfully.'; 
+    redirect($index,$status,2);
 
 } else {
     //form is shown for the first time
-    //echo $OUTPUT->header();
+    echo $OUTPUT->header();
+    $maintabs[] = new tabobject('home', $index, 'Main');
+    $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+    $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
+    if($canmanage){
+        $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+    }
+    
+    $tabs = array($maintabs);
+    print_tabs($tabs, 'hourlog');
+
     $mform->display();
     echo $OUTPUT->footer();
 }

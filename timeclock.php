@@ -70,7 +70,7 @@ if($workerrecord->active == 0){
 } else if($clockin == 1){
         $status = 'Clock in successful';
         //protect against refreshing a 'clockin' screen
-        $pendingrecord= $DB->count_records('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
+        $pendingrecord= $DB->record_exists('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
         if(!$pendingrecord){
             $cin = new stdClass();
             $cin->userid = $ttuserid;

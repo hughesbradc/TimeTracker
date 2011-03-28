@@ -86,10 +86,10 @@
             $this->content->text .='</ul>';
 
         } else {
-	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
+	        $recordexists = $DB->record_exists('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
 
-            if ($numrecords == 0){
-                $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id.'&mdluserid='.$USER->id;
+            if (!$recordexists){
+                $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id;
                 $action = null; 
                 $this->content->text = '<center>';
                 $this->content->text .= $OUTPUT->action_link($link, get_string('registerinfo', 'block_timetracker'), $action);
@@ -103,13 +103,12 @@
                     //die;
                 }           
             
-
             // Implement Icons - Timeclock Method
-            if($worker->block_timetracker_trackermethod == 0){
+            if($worker->timetrackermethod == 0){
                 $ttuserid = $worker->id;
 
-            $pendingrecord = $DB->count_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
-            if($pendingrecord == 0){ 
+            $pendingrecord = $DB->record_exists('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+            if(!$pendingrecord){ 
                 //$action = null;
                 $urlparams['userid']=$ttuserid;
                 $urlparams['id']=$courseid;
@@ -132,7 +131,7 @@
                 }
 
 
-            if($pendingrecord != 0){ 
+            if($pendingrecord){ 
                 //$action = null;
                 $urlparams['userid']=$ttuserid;
                 $urlparams['id']=$courseid;
@@ -164,7 +163,7 @@
 
 
             // Implement Icons - Hourlog Method
-            if($worker->block_timetracker_trackermethod == 1){
+            if($worker->timetrackermethod == 1){
                 $ttuserid = $worker->id;
 
                 $urlparams['userid']=$ttuserid;
@@ -190,7 +189,7 @@
             }
 
 
-           if($numrecords != 0){     
+           if($recordexists){     
                 if($this->config->block_timetracker_show_month_hours ||
                 $this->config->block_timetracker_show_term_hours ||
                 $this->config->block_timetracker_show_ytd_hours ||
@@ -262,7 +261,7 @@
                     
                     if($clockin == 1){
                     //protect against refreshing a 'clockin' screen
-                    $pendingrecord= $DB->count_records('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
+                    $pendingrecord= $DB->record_exists('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
                         if(!$pendingrecord){
                             $cin = new stdClass();
                             $cin->userid = $ttuserid;
