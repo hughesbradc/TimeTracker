@@ -55,7 +55,36 @@
 
         } 
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
-            $this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';
+            //$this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';
+            $indexparams['id'] = $courseid;
+            $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
+            $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
+            $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
+    
+            $this->content->text .= $timeclockdataaction.'<br />';
+
+            //show anyone who has a pending:
+            $pendingunits = $DB->get_records('block_timetracker_pending', array('courseid'=>$courseid));
+            $this->content->text .= "<br />Current Workers:";
+            $this->content->text .='<ul>';
+            if(!$pendingunits){ 
+                $this->content->text .= '<li>None</li>';
+            } else {
+                $workers = $DB->get_records('block_timetracker_workerinfo');
+                foreach ($pendingunits as $pending){
+                    $this->content->text .='<li><a href="'.
+                        $CFG->wwwroot.'/blocks/timetracker/reports.php?id='.$courseid.
+                        '&userid='.$pending->userid.'">'.
+                        $workers[$pending->userid]->lastname.', '.
+                        $workers[$pending->userid]->firstname.' '.
+                        '</a>'.
+                        userdate($pending->timein,get_string('timeformat','block_timetracker')).
+                        '</li>'."\n";
+                }
+                
+            }
+            $this->content->text .='</ul>';
+
         } else {
 	        $numrecords = $DB->count_records('block_timetracker_workerinfo', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
