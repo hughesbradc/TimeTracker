@@ -32,6 +32,12 @@ $format_calendar_inout =& $workbook->add_format();
 $format_calendar_inout->set_align('right');
 $format_calendar_inout->set_size(8);
 
+$format_footer =& $workbook->add_format();
+$format_footer->set_bottom(1);
+$format_footer->set_top(1);
+$format_footer->set_left(1);
+$format_footer->set_right(1);
+
 $format_timesheet_header =& $workbook->add_format();
 $format_timesheet_header->set_bold();
 $format_timesheet_header->set_align('center');
@@ -102,9 +108,9 @@ $worksheet[1]->set_row(11,105);
 $worksheet[1]->set_row(12,105);
 
 foreach (range(0,7) as $i)
-    $worksheet[1]->write_blank(12,$i, $format_timesheet_header);
-    $worksheet[1]->write_blank(14,$i, $format_timesheet_header);
-    $worksheet[1]->write_blank(16,$i, $format_timesheet_header);
+    $worksheet[1]->write_blank(12,$i, $format_footer);
+    $worksheet[1]->write_blank(14,$i, $format_footer);
+    $worksheet[1]->write_blank(16,$i, $format_footer);
 
 // Footer
 $worksheet[1]->write_string(13,0,'Pay Rate or Stipend Amount',$format_bold);

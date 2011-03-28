@@ -86,7 +86,7 @@
             $this->content->text .='</ul>';
 
         } else {
-	        $recordexists = $DB->record_exists('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$COURSE->id));
+	        $recordexists = $DB->record_exists('block_timetracker_workerinfo', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
             if (!$recordexists){
                 $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id;
