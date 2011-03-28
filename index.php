@@ -61,6 +61,7 @@ $PAGE->set_pagelayout('course');
 $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id));
 
 echo $OUTPUT->header();
+
 $maintabs[] = new tabobject('home', $index, 'Main');
 $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
 if($worker && $worker->timetrackermethod==1){
@@ -103,7 +104,9 @@ if ($canmanage) { //supervisor
     } else {
         foreach($last10units as $unit){
                 $row='<tr>';
-                $row.='<td style="text-align: center">'.$unit->firstname. ' '.$unit->lastname.'</td>';
+                $row.='<td style="text-align: center"><a href="'.
+                    $CFG->wwwroot.'/blocks/timetracker/reports.php?id='.$courseid.'&userid='.$unit->userid.'">'.
+                    $unit->firstname. ' '.$unit->lastname.'</a></td>';
                 $row.='<td style="text-align: center">'.userdate($unit->timein,get_string('datetimeformat','block_timetracker')).'</td>';
                 $row.='<td style="text-align: center">'.userdate($unit->timeout,get_string('datetimeformat','block_timetracker')).'</td>';
                 $currelapsed = $unit->timeout - $unit->timein;  
