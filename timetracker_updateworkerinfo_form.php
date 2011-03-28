@@ -39,7 +39,7 @@
 
          $mform->addElement('header','general',get_string('updateformheadertitle','block_timetracker'));
 
-         $config = $DB->get_records('block_timetracker_config','courseid'=>$this->courseid);
+         $config = $DB->get_records('block_timetracker_config',array('courseid'=>$this->courseid));
 
          $mform->addElement('hidden','userid', $USER->id);
          $mform->addElement('hidden','id', $this->courseid);
