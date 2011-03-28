@@ -30,7 +30,7 @@ require_once('lib.php');
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
-$userid = optional_param('userid',$USER->id, PARAM_INTEGER);
+$userid = optional_param('userid',0, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
@@ -38,6 +38,13 @@ $urlparams['userid'] = $userid;
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
+
+$canmanage = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+    $canmanage = true;
+    $urlparams['userid']=0;
+}
+
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
@@ -50,14 +57,11 @@ $PAGE->set_heading($strtitle);
 
 $PAGE->set_pagelayout('course');
 
-$canmanage = false;
-if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
-    $canmanage = true;
-}
 
-$worker = $DB->get_record('block_timetracker_workerinfo',array('userid'=>$USER->id));
+$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id));
 
 echo $OUTPUT->header();
+
 $maintabs[] = new tabobject('home', $index, 'Main');
 $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
 if($worker && $worker->timetrackermethod==1){
@@ -100,7 +104,9 @@ if ($canmanage) { //supervisor
     } else {
         foreach($last10units as $unit){
                 $row='<tr>';
-                $row.='<td style="text-align: center">'.$unit->firstname. ' '.$unit->lastname.'</td>';
+                $row.='<td style="text-align: center"><a href="'.
+                    $CFG->wwwroot.'/blocks/timetracker/reports.php?id='.$courseid.'&userid='.$unit->userid.'">'.
+                    $unit->firstname. ' '.$unit->lastname.'</a></td>';
                 $row.='<td style="text-align: center">'.userdate($unit->timein,get_string('datetimeformat','block_timetracker')).'</td>';
                 $row.='<td style="text-align: center">'.userdate($unit->timeout,get_string('datetimeformat','block_timetracker')).'</td>';
                 $currelapsed = $unit->timeout - $unit->timein;  

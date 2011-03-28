@@ -6,9 +6,9 @@
   <TABLES>
     <TABLE NAME="block_timetracker_workerinfo" COMMENT="Holds worker demographic information." NEXT="block_timetracker_pending">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="firstname"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="mdluserid"/>
+        <FIELD NAME="mdluserid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Moodle userid" PREVIOUS="id" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="mdluserid" NEXT="firstname"/>
         <FIELD NAME="firstname" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="courseid" NEXT="lastname"/>
         <FIELD NAME="lastname" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="firstname" NEXT="email"/>
         <FIELD NAME="email" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastname" NEXT="address"/>

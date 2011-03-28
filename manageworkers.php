@@ -31,6 +31,7 @@ require_login();
 $courseid = required_param('id', PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -41,6 +42,15 @@ if($courseid){
     $context = get_context_instance(CONTEXT_SYSTEM);
     $PAGE->set_context($context);
 }
+
+
+if (!has_capability('block/timetracker:manageworkers', $context)) {
+    print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
+}
+
+$maintabs[] = new tabobject('home', $index, 'Main');
+$maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+$maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
 
 $manageworkerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
@@ -84,7 +94,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     }
 
     echo $OUTPUT->header();
-    echo $OUTPUT->heading($strtitle, 2);
+    //echo $OUTPUT->heading($strtitle, 2);
     //content goes here
     echo 'Changes saved successfully<br />';
     echo '<a href="'.$manageworkerurl.'">Manage Workers</a>';
@@ -92,7 +102,9 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 
 } else {
     echo $OUTPUT->header();
-    echo $OUTPUT->heading($strtitle, 2);
+    $tabs = array($maintabs);
+    print_tabs($tabs, 'manage');
+    //echo $OUTPUT->heading($strtitle, 2);
     #$PAGE->print_header('Manage worker info', 'Manage worker info');
     $mform->display();
     echo $OUTPUT->footer();

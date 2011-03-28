@@ -19,6 +19,7 @@
  * http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['datetimeformat']='%m/%d/%y, %I:%M %p';
+$string['timeformat']='%I:%M %p';
 
 $string['couldnotclockout'] = 'Error adding clock out'; 
 $string['trackermethod'] = 'Which timetracking method would you like to use?';
@@ -26,10 +27,6 @@ $string['pluginname'] = 'TimeTracker';
 $string['timetracker:manageworkers'] = 'Manage Workers';
 $string['notactiveerror'] = 'You are not authorized to work.  Please contact your supervisor.';
 $string['defaultworkerconfig'] = 'Default Worker Configuration';
-
-
-
-
 
 //Strings for Block Settings
 $string['workerdisplaysettings'] = 'Worker Display Settings';
@@ -143,14 +140,3 @@ $string['updateformheadertitle'] = 'Update Worker Information';
 $string['manageworkertitle'] = 'Manage Workers';
 $string['notpermissible'] = 'You do not have permissions to perform this action';
 $string['errordeleting'] = 'Invalid session key or user id';
-
-// SQL SECTION 
-/* bad bad! 
-$string['last10forallworkers']= 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.$CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.'block_timetracker_workunit.* FROM '.$CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.$CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.$CFG->prefix.'block_timetracker_workunit.courseid={$a} ORDER BY '.$CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
-
-$string['last10']= 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.$CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.'block_timetracker_workunit.* FROM '.$CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.$CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.$CFG->prefix.'block_timetracker_workerinfo.id={$a} '.$CFG->prefix.'block_timetracker_workunit.courseid={$b} ORDER BY '.$CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
-
-$string['last10inrange']= 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.$CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.'block_timetracker_workunit.* FROM '.$CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE timein BETWEEN {$a} AND {$b} '.$CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.$CFG->prefix.'block_timetracker_workerinfo.id={$c} '.$CFG->prefix.'block_timetracker_workunit.courseid={$d} ORDER BY '.$CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
-
-$string['allunits']= 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.$CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.'block_timetracker_workunit.* FROM '.$CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.$CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.$CFG->prefix.'block_timetracker_workerinfo.id={$a} '.$CFG->prefix.'block_timetracker_workunit.courseid={$b} ORDER BY '.$CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
-*/

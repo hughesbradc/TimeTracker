@@ -28,19 +28,39 @@ require('timetracker_updateworkerinfo_form.php');
 
 require_login();
 
-$worker = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id));
-if($worker){
-    $ttuserid = $worker->id;
-}
-
-
 $courseid = required_param('id', PARAM_INTEGER);
+$mdluserid = required_param('mdluserid', PARAM_INTEGER);
 
-$urlparams['id'] = $courseid;
+$userid = optional_param('userid', -1, PARAM_INTEGER);
+
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
+
+$canmanage = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+    $canmanage = true;
+}
+
+$urlparams['id'] = $courseid;
+$urlparams['mdluserid'] = $mdluserid;
+$urlparams['userid'] = $userid;
+$indexurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+
+
+$worker = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid));
+
+if($worker){
+    $userid=$worker->id;
+    $indexurl->params(array('userid'=>$userid));
+
+    $ttuserid = $worker->id;
+    if($USER->id != $worker->mdluserid && !$canmanage){
+        print_error('notpermissible', 'block_timetracker',$indexurl);
+    }
+}
+
 
 $PAGE->set_url(new moodle_url($CFG->wwwroot.'/blocks/timetracker/updateworkerinfo.php',$urlparams));
 $PAGE->set_pagelayout('base');
@@ -48,22 +68,22 @@ $PAGE->set_pagelayout('base');
 $strtitle = get_string('updateformheadertitle','block_timetracker'); 
 $PAGE->set_title($strtitle);
 
-$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
-
 $PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
+$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $indexurl);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_updateworkerinfo_form($context, $courseid);
+$mform = new timetracker_updateworkerinfo_form($context, $courseid, $mdluserid);
 
 if ($mform->is_cancelled()){ //user clicked cancel
 
 } else if ($formdata=$mform->get_data()){
-	$worker = $DB->get_record('block_timetracker_workerinfo', array('userid'=>$USER->id,'courseid'=>$courseid));
+
     if(!$worker){
+        //adding
         unset($formdata->id);
         $ttuserid = $DB->insert_record('block_timetracker_workerinfo', $formdata);
     } else {
+        //updating
         $formdata->id = $worker->id;
         $DB->update_record('block_timetracker_workerinfo', $formdata);
     }

@@ -63,11 +63,11 @@ $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
-$worker = $DB->get_record('block_timetracker_workerinfo',array('userid'=>$USER->id));
+$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id));
 
 //$PAGE->print_header('Delete TimeTracker Worker', 'Delete Worker');
 
-if ($USER->id != $worker->userid && !$canmanage){
+if ($USER->id != $worker->mdluserid && !$canmanage){
     print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 } else {
     if($userid && $courseid && $pendingid && confirm_sesskey()){

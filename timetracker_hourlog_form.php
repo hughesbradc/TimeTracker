@@ -45,13 +45,20 @@ class timetracker_hourlog_form  extends moodleform {
         if(has_capability('block/timetracker:manageworkers',$this->context)){
             $canmanage = true;
         }
-
+        
 
         $userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid));
+
         if(!$userinfo){
             print_error('Worker info does not exist for workerinfo id of '.$this->userid);
             return;
         }
+
+        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',array('id'=>$this->courseid,'userid'=>$this->userid);
+        if(!$canmanage && $USER->id != $userinfo->mdluserid){
+            redirect($index,'No permission to add hours',2);
+        }
+        
 
         $mform->addElement('header', 'general', get_string('hourlogtitle','block_timetracker', 
             $userinfo->firstname.' '.$userinfo->lastname));
