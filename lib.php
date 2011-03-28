@@ -51,6 +51,7 @@ function get_hours($totalsecs=0){
     return ($totalsecs/3600);
 }
 
+
 /**
 * returns the $totalsecs as 'xx hour(s) xx minute(s)', rounded to the nearest 15 min
 */
