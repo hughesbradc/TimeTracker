@@ -13,14 +13,18 @@ $workbook->send('hourlog.xls');
 $format_bold =& $workbook->add_format();
 $format_bold->set_bold();
 
-$format_center =& $workbook->add_format();
-$format_center->set_align('center');
+$format_cal_block =& $workbook->add_format();
+$format_cal_block->set_border(1);
+$format_cal_block->set_text_wrap();
+$format_cal_block->set_v_align('Top');
+$format_cal_block->set_size(8);
 
 $format_calendar_days =& $workbook->add_format();
 $format_calendar_days->set_bold();
 $format_calendar_days->set_align('center');
 $format_calendar_days->set_size(8);
 $format_calendar_days->set_fg_color(22);
+$format_calendar_days->set_border(1);
 
 $format_calendar_header =& $workbook->add_format();
 $format_calendar_header->set_bold();
@@ -28,15 +32,19 @@ $format_calendar_header->set_align('center');
 $format_calendar_header->set_bottom(1);
 $format_calendar_header->set_size(8);
 
-$format_calendar_inout =& $workbook->add_format();
-$format_calendar_inout->set_align('right');
-$format_calendar_inout->set_size(8);
+$format_center =& $workbook->add_format();
+$format_center->set_align('center');
 
 $format_footer =& $workbook->add_format();
+$format_footer->set_bold();
 $format_footer->set_bottom(1);
-$format_footer->set_top(1);
-$format_footer->set_left(1);
-$format_footer->set_right(1);
+$format_footer->set_v_align('Top');
+
+$format_footer_block =& $workbook->add_format();
+$format_footer_block->set_bottom(1);
+$format_footer_block->set_top(1);
+$format_footer_block->set_left(1);
+$format_footer_block->set_right(1);
 
 $format_timesheet_header =& $workbook->add_format();
 $format_timesheet_header->set_bold();
@@ -61,7 +69,7 @@ $headers = array('First Name','Last Name','Time In','Time Out','Elapsed Time');
 $worksheet[1] =& $workbook->add_worksheet('First worksheet');
 
 // Set column widths
-$worksheet[1]->set_column(0,8,9.29);
+$worksheet[1]->set_column(0,8,10.57);
 
 // Write data to spreadsheet
 $worksheet[1]->write_string(0,0,'Mars Hill College', $format_title);
@@ -70,8 +78,9 @@ $worksheet[1]->write_string(1,0,'Timesheet', $format_timesheet_header);
 $worksheet[1]->merge_cells(1, 0, 1, 7);
 
 // Creates separator line under 'Timesheet'
-foreach (range(1,7) as $i)
+foreach (range(1,7) as $i){
     $worksheet[1]->write_blank(1,$i, $format_timesheet_header);
+}
 
 // Header Data
 $worksheet[1]->write_string(2,0,"$headers[1], $headers[0]", $format_bold);
@@ -101,32 +110,36 @@ $worksheet[1]->write_string(7,4,'Thursday',$format_calendar_days);
 $worksheet[1]->write_string(7,5,'Friday',$format_calendar_days);
 $worksheet[1]->write_string(7,6,'Saturday',$format_calendar_days);
 $worksheet[1]->write_string(7,7,'Total Hours',$format_calendar_days);
-$worksheet[1]->set_row(8,105);
-$worksheet[1]->set_row(9,105);
-$worksheet[1]->set_row(10,105);
-$worksheet[1]->set_row(11,105);
-$worksheet[1]->set_row(12,105);
+$worksheet[1]->set_row(8,98);
+$worksheet[1]->set_row(9,98);
+$worksheet[1]->set_row(10,98);
+$worksheet[1]->set_row(11,98);
+$worksheet[1]->set_row(12,98);
 
-foreach (range(0,7) as $i)
-    $worksheet[1]->write_blank(12,$i, $format_footer);
-    $worksheet[1]->write_blank(14,$i, $format_footer);
-    $worksheet[1]->write_blank(16,$i, $format_footer);
+foreach (range(0,7) as $i){
+    $worksheet[1]->write_blank(8,$i, $format_cal_block);
+    $worksheet[1]->write_blank(9,$i, $format_cal_block);
+    $worksheet[1]->write_blank(10,$i, $format_cal_block);
+    $worksheet[1]->write_blank(11,$i, $format_cal_block);
+    $worksheet[1]->write_blank(12,$i, $format_cal_block);
+}
 
 // Footer
-$worksheet[1]->write_string(13,0,'Pay Rate or Stipend Amount',$format_bold);
+foreach (range(0,7) as $i){
+    $worksheet[1]->write_blank(13,$i, $format_footer_block);
+    $worksheet[1]->write_blank(14,$i, $format_footer_block);
+}
+
+$worksheet[1]->write_string(13,0,'Pay Rate or Stipend Amount',$format_footer);
 $worksheet[1]->merge_cells(13,0,13,3);
-$worksheet[1]->write_string(13,4,'Total Hours for November:',$format_bold);
+$worksheet[1]->write_string(13,4,'Total Hours for <<MONTH>>:',$format_footer);
 $worksheet[1]->merge_cells(13,4,13,7);
-$worksheet[1]->write_string(15,0,'Supervisor Signature/Date',$format_bold);
-$worksheet[1]->merge_cells(15,0,15,3);
-$worksheet[1]->write_string(15,4,'Worker Signature/Date',$format_bold);
-$worksheet[1]->merge_cells(15,4,15,7);
-$worksheet[1]->set_row(13,15);
-$worksheet[1]->set_row(14,15);
-$worksheet[1]->set_row(15,15);
-$worksheet[1]->set_row(16,15);
-
-
+$worksheet[1]->write_string(14,0,'Supervisor Signature/Date',$format_footer);
+$worksheet[1]->merge_cells(14,0,14,3);
+$worksheet[1]->write_string(14,4,'Worker Signature/Date',$format_footer);
+$worksheet[1]->merge_cells(14,4,14,7);
+$worksheet[1]->set_row(13,30);
+$worksheet[1]->set_row(14,30);
 
 // Creating worksheets
 /*
