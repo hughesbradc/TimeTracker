@@ -146,6 +146,30 @@ function get_earnings_this_month($userid,$courseid){
     return round($earnings,2);
 }
 
+/**
+* @param $time time of first day of 
+* @return array of values
+    $monthinfo['firstdaytimestamp'] <= unix time of midnight of first day
+    $monthinfo['lastdaytimestamp'] <= unix time of 23:59:59 of last day
+    $monthinfo['dayofweek'] <= the index of day of week of first day
+    $monthinfo['lastday'] <= the last day of this month
+*/
+function get_month_info($month,$year){
+    $monthinfo = array();
+    
+    $timestamp = make_timestamp($year,$month); //timestamp of midnight, first day of $month
+    $monthinfo['firstdaytimestamp'] = $timestamp;
+    $monthinfo['lastday'] = date('t',strtotime($timestamp));
+
+    $thistime = usergetdate($timestamp);
+    $monthinfo['dayofweek'] = $thistime['wday'];
+
+    $timestamp = make_timestamp($year,$month,$monthinfo['lastday'],23,59,59);
+    $monthinfo['lastdaytimestamp'] = $timestamp; //23:59:59pm
+
+    return $monthinfo;
+}
+
 
 /**
 * @return hours (in decimal) for this month
