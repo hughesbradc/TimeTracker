@@ -5,6 +5,11 @@ require_once("$CFG->libdir/excellib.class.php");
 
 global $CFG;
 
+$month = 3;
+$year = 2011;
+$userid;
+$courseid;
+
 $workbook = new MoodleExcelWorkbook('-');
 $workbook->send('hourlog.xls');
 
@@ -14,10 +19,19 @@ $format_bold =& $workbook->add_format();
 $format_bold->set_bold();
 
 $format_cal_block =& $workbook->add_format();
-$format_cal_block->set_border(1);
+$format_cal_block->set_left(1);
+$format_cal_block->set_right(1);
+$format_cal_block->set_bottom(1);
 $format_cal_block->set_text_wrap();
 $format_cal_block->set_v_align('Top');
 $format_cal_block->set_size(8);
+
+$format_calendar_dates =& $workbook->add_format();
+$format_calendar_dates->set_bold();
+$format_calendar_dates->set_align('center');
+$format_calendar_dates->set_size(8);
+$format_calendar_dates->set_left(1);
+$format_calendar_dates->set_right(1);
 
 $format_calendar_days =& $workbook->add_format();
 $format_calendar_days->set_bold();
@@ -110,103 +124,50 @@ $worksheet[1]->write_string(7,4,'Thursday',$format_calendar_days);
 $worksheet[1]->write_string(7,5,'Friday',$format_calendar_days);
 $worksheet[1]->write_string(7,6,'Saturday',$format_calendar_days);
 $worksheet[1]->write_string(7,7,'Total Hours',$format_calendar_days);
-$worksheet[1]->set_row(8,98);
-$worksheet[1]->set_row(9,98);
-$worksheet[1]->set_row(10,98);
-$worksheet[1]->set_row(11,98);
-$worksheet[1]->set_row(12,98);
+$worksheet[1]->set_row(9,69);
+$worksheet[1]->set_row(11,69);
+$worksheet[1]->set_row(13,69);
+$worksheet[1]->set_row(15,69);
+$worksheet[1]->set_row(17,69);
+$worksheet[1]->set_row(19,69);
+$worksheet[1]->set_row(8,11.25);
+$worksheet[1]->set_row(10,11.25);
+$worksheet[1]->set_row(12,11.25);
+$worksheet[1]->set_row(14,11.25);
+$worksheet[1]->set_row(16,11.25);
+$worksheet[1]->set_row(18,11.25);
 
 foreach (range(0,7) as $i){
-    $worksheet[1]->write_blank(8,$i, $format_cal_block);
+    $worksheet[1]->write_blank(8,$i, $format_calendar_dates);
     $worksheet[1]->write_blank(9,$i, $format_cal_block);
-    $worksheet[1]->write_blank(10,$i, $format_cal_block);
+    $worksheet[1]->write_blank(10,$i, $format_calendar_dates);
     $worksheet[1]->write_blank(11,$i, $format_cal_block);
-    $worksheet[1]->write_blank(12,$i, $format_cal_block);
+    $worksheet[1]->write_blank(12,$i, $format_calendar_dates);
+    $worksheet[1]->write_blank(13,$i, $format_cal_block);
+    $worksheet[1]->write_blank(14,$i, $format_calendar_dates);
+    $worksheet[1]->write_blank(15,$i, $format_cal_block);
+    $worksheet[1]->write_blank(16,$i, $format_calendar_dates);
+    $worksheet[1]->write_blank(17,$i, $format_cal_block);
+    $worksheet[1]->write_blank(18,$i, $format_calendar_dates);
+    $worksheet[1]->write_blank(19,$i, $format_cal_block);
 }
 
 // Footer
 foreach (range(0,7) as $i){
-    $worksheet[1]->write_blank(13,$i, $format_footer_block);
-    $worksheet[1]->write_blank(14,$i, $format_footer_block);
+    $worksheet[1]->write_blank(20,$i, $format_footer_block);
+    $worksheet[1]->write_blank(21,$i, $format_footer_block);
 }
 
-$worksheet[1]->write_string(13,0,'Pay Rate or Stipend Amount',$format_footer);
-$worksheet[1]->merge_cells(13,0,13,3);
-$worksheet[1]->write_string(13,4,'Total Hours for <<MONTH>>:',$format_footer);
-$worksheet[1]->merge_cells(13,4,13,7);
-$worksheet[1]->write_string(14,0,'Supervisor Signature/Date',$format_footer);
-$worksheet[1]->merge_cells(14,0,14,3);
-$worksheet[1]->write_string(14,4,'Worker Signature/Date',$format_footer);
-$worksheet[1]->merge_cells(14,4,14,7);
-$worksheet[1]->set_row(13,30);
-$worksheet[1]->set_row(14,30);
-
-// Creating worksheets
-/*
-for ($wsnumber = 1; $wsnumber <= $nroPages; $wsnumber++) {
-    $sheettitle = get_string('logs').' '.$wsnumber.'-'.$nroPages;
-    $worksheet[$wsnumber] =& $workbook->add_worksheet($sheettitle);
-    $worksheet[$wsnumber]->set_column(1, 1, 30);
-    $worksheet[$wsnumber]->write_string(0, 0, get_string('savedat').
-                                userdate(time(), $strftimedatetime));
-    $col = 0;
-    foreach ($headers as $item) {
-        $worksheet[$wsnumber]->write(FIRSTUSEDEXCELROW-1,$col,$item,'');
-        $col++;
-    }
-}
-*/
-/*
-if (empty($logs['logs'])) {
-    $workbook->close();
-    return true;
-}
-
-$formatDate =& $workbook->add_format();
-$formatDate->set_num_format(get_string('log_excel_date_format'));
-
-$row = FIRSTUSEDEXCELROW;
-$wsnumber = 1;
-$myxls =& $worksheet[$wsnumber];
-foreach ($logs['logs'] as $log) {
-    if (isset($ldcache[$log->module][$log->action])) {
-        $ld = $ldcache[$log->module][$log->action];
-    } else {
-        $ld = $DB->get_record('log_display', array('module'=>$log->module, 'action'=>$log->action));
-        $ldcache[$log->module][$log->action] = $ld;
-    }
-    if ($ld && !empty($log->info)) {
-        // ugly hack to make sure fullname is shown correctly
-        if (($ld->mtable == 'user') and ($ld->field == $DB->sql_concat('firstname', "' '" , 'lastname'))) {
-            $log->info = fullname($DB->get_record($ld->mtable, array('id'=>$log->info)), true);
-        } else {
-            $log->info = $DB->get_field($ld->mtable, $ld->field, array('id'=>$log->info));
-        }
-    }
-
-    // Filter log->info
-    $log->info = format_string($log->info);
-    $log->info = strip_tags(urldecode($log->info));  // Some XSS protection
-
-    if ($nroPages>1) {
-        if ($row > EXCELROWS) {
-            $wsnumber++;
-            $myxls =& $worksheet[$wsnumber];
-            $row = FIRSTUSEDEXCELROW;
-        }
-    }
-
-    $myxls->write($row, 0, $courses[$log->course], '');
-    $myxls->write_date($row, 1, $log->time, $formatDate); // write_date() does conversion/timezone support. MDL-14934
-    $myxls->write($row, 2, $log->ip, '');
-    $fullname = fullname($log, has_capability('moodle/site:viewfullnames', get_context_instance(CONTEXT_COURSE, $course->id)));
-    $myxls->write($row, 3, $fullname, '');
-    $myxls->write($row, 4, $log->module.' '.$log->action, '');
-    $myxls->write($row, 5, $log->info, '');
-
-    $row++;
-}
-*/
+$worksheet[1]->write_string(20,0,'Pay Rate or Stipend Amount',$format_footer);
+$worksheet[1]->merge_cells(20,0,20,3);
+$worksheet[1]->write_string(20,4,'Total Hours for <<MONTH>>:',$format_footer);
+$worksheet[1]->merge_cells(20,4,20,7);
+$worksheet[1]->write_string(21,0,'Supervisor Signature/Date',$format_footer);
+$worksheet[1]->merge_cells(21,0,21,3);
+$worksheet[1]->write_string(21,4,'Worker Signature/Date',$format_footer);
+$worksheet[1]->merge_cells(21,4,21,7);
+$worksheet[1]->set_row(20,30);
+$worksheet[1]->set_row(21,30);
 
 $workbook->close();
 return true;
