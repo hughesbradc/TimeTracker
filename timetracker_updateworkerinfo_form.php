@@ -42,7 +42,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
 
         $sql = "SELECT name,value FROM {$CFG->prefix}block_timetracker_config WHERE courseid=$this->courseid";
 
-        //Defaults - Shouldn't need these
+        //defaults -- shouldn't need these, because config should always be set.
         $payrate = 7.50;
         $maxearnings = 750;
         $trackermethod = 0;
@@ -104,54 +104,6 @@ class timetracker_updateworkerinfo_form extends moodleform {
         }
         $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
     }
-
-     function definition() {
-         global $CFG, $USER, $DB, $COURSE;
-
-         $mform =& $this->_form;
-
-         $mform->addElement('header','general',get_string('updateformheadertitle','block_timetracker'));
-
-         $config = $DB->get_records('block_timetracker_config',array('courseid'=>$this->courseid));
-
-         $mform->addElement('hidden','userid', $USER->id);
-         $mform->addElement('hidden','id', $this->courseid);
-         $mform->addElement('hidden','courseid', $this->courseid);
-         //if($config && $config['config_block_timetracker_curr_pay_rate']
-         $mform->addElement('hidden','maxearnings','750');
-         
-
-         //$worker = $DB->get_record('block_timetracker_workerinfo',array('id'=>$USER->id));
-         $worker = $DB->get_record('user',array('id'=>$USER->id));
-
-         $mform->addElement('text','firstname',get_string('firstname','block_timetracker'), 'readonly="readonly"');
-         $mform->setDefault('firstname',$worker->firstname);
-
-         $mform->addElement('text','lastname',get_string('lastname','block_timetracker'), 'readonly="readonly"');
-         $mform->setDefault('lastname',$worker->lastname);
-         
-         $mform->addElement('text','email',get_string('email','block_timetracker'), 'readonly="readonly"');
-         $mform->setDefault('email',$worker->email);
-
-         $mform->addElement('text','address',get_string('address','block_timetracker'));
-         $mform->addRule('address', null, 'required', null, 'client', 'false');
-         $mform->setDefault('address', $worker->address);
-         $mform->addElement('text','phone',get_string('phone','block_timetracker'));
-    
-         if (has_capability('block/timetracker:manageworkers', $this->context)) {
-             $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'));
-             //$mform->setDefault('currpayrate',$CFG->block_timetracker_curr_pay_rate);
-             //TODO
-             $mform->setDefault('currpayrate','7.75');
-
-         } else {
-             $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'), 'readonly="readonly"');
-             //$mform->setDefault('currpayrate',$CFG->block_timetracker_curr_pay_rate);
-             //TODO
-             $mform->setDefault('currpayrate','7.75');
-         }
-         $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
-     }
 
      function validation($data) {
 
