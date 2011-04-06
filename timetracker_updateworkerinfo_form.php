@@ -42,7 +42,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
 
         $sql = "SELECT name,value FROM {$CFG->prefix}block_timetracker_config WHERE courseid=$this->courseid";
 
-        //defaults
+        //Defaults - Shouldn't need these
         $payrate = 7.50;
         $maxearnings = 750;
         $trackermethod = 0;

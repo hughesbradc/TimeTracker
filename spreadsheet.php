@@ -2,16 +2,20 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once("$CFG->libdir/excellib.class.php");
+require_once('lib.php');
+require_once('../../lib/moodlelib.php');
 
 global $CFG;
 
-$month = 3;
-$year = 2011;
+$month = gmstrftime('%m'); 
+$year = gmstrftime('%G'); 
 $userid;
 $courseid;
 
+$monthinfo = get_month_info($month,$year);
+
 $workbook = new MoodleExcelWorkbook('-');
-$workbook->send('hourlog.xls');
+$workbook->send('timesheet'.$year.'_'.$month.'.xls');
 
 
 // Formatting
@@ -103,7 +107,7 @@ $worksheet[1]->write_string(3,0,'Student ID#', $format_bold);
 $worksheet[1]->merge_cells(3,0,3,3);
 $worksheet[1]->write_string(4,0,'Address');
 $worksheet[1]->merge_cells(4,0,4,3);
-$worksheet[1]->write_string(5,0,'Month of: <<MONTH>>');
+$worksheet[1]->write_string(5,0,$monthinfo['monthname'].', '.$year, $format_bold);
 $worksheet[1]->merge_cells(5,0,5,3);
 $worksheet[1]->write_string(2,4,'Supervisor');
 $worksheet[1]->merge_cells(2,4,2,7);
@@ -160,7 +164,7 @@ foreach (range(0,7) as $i){
 
 $worksheet[1]->write_string(20,0,'Pay Rate or Stipend Amount',$format_footer);
 $worksheet[1]->merge_cells(20,0,20,3);
-$worksheet[1]->write_string(20,4,'Total Hours for <<MONTH>>:',$format_footer);
+$worksheet[1]->write_string(20,4,'Total Hours for '.$monthinfo['monthname'].', '.$year.':',$format_footer);
 $worksheet[1]->merge_cells(20,4,20,7);
 $worksheet[1]->write_string(21,0,'Supervisor Signature/Date',$format_footer);
 $worksheet[1]->merge_cells(21,0,21,3);
@@ -168,6 +172,19 @@ $worksheet[1]->write_string(21,4,'Worker Signature/Date',$format_footer);
 $worksheet[1]->merge_cells(21,4,21,7);
 $worksheet[1]->set_row(20,30);
 $worksheet[1]->set_row(21,30);
+
+// Number the Days
+$date = 1;
+$dayofweek = $monthinfo['dayofweek']; 
+for($currentrow = 8; $currentrow < 20; $currentrow += 2){
+    //echo "inside for loop <br />";
+    $dayofweek = $dayofweek % 7;
+    do{
+        $worksheet[1]->write_string($currentrow, $dayofweek, $date, $format_calendar_dates);
+        $dayofweek ++; $date++;
+    } while ($date <= $monthinfo['lastday'] && $dayofweek % 7 != 0);
+    if($date >= $monthinfo['lastday']) break; 
+}
 
 $workbook->close();
 return true;
