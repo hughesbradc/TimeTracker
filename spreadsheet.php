@@ -7,12 +7,12 @@ require_once('../../lib/moodlelib.php');
 
 global $CFG;
 
-$month = gmstrftime('%m'); 
-$year = gmstrftime('%G'); 
-$userid;
-$courseid;
+$month = 3;
+$year = 2011;
+$userid = 1;
+$courseid = 2;
 
-$monthinfo = get_month_info($month,$year);
+$monthinfo = get_month_info($month, $year);
 
 $workbook = new MoodleExcelWorkbook('-');
 $workbook->send('timesheet'.$year.'_'.$month.'.xls');
@@ -173,7 +173,14 @@ $worksheet[1]->merge_cells(21,4,21,7);
 $worksheet[1]->set_row(20,30);
 $worksheet[1]->set_row(21,30);
 
-// Number the Days
+// Number the Days and add data
+
+$sql = 'SELECT * from ' .$CFG->prefix.'block_timetracker_workunit '. 'WHERE userid='.$userid.
+    ' AND courseid='.$courseid.' AND timein BETWEEN '. $monthinfo['firstdaytimestamp'] .' AND '.
+    $monthinfo['lastdaytimestamp']. ' ORDER BY timein';
+
+$units = $DB->get_recordset_sql($sql);
+
 $date = 1;
 $dayofweek = $monthinfo['dayofweek']; 
 for($currentrow = 8; $currentrow < 20; $currentrow += 2){
@@ -181,6 +188,33 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
     $dayofweek = $dayofweek % 7;
     do{
         $worksheet[1]->write_string($currentrow, $dayofweek, $date, $format_calendar_dates);
+        
+        
+        //begin of print work units
+        
+        // Print the data in the correct date blocks
+        $wustr = "";
+        $mid = (86400 * ($date -1)) + $monthinfo['firstdaytimestamp'];
+        $eod = (86400 * ($date -1)) + ($monthinfo['firstdaytimestamp'] + 86399);
+
+        foreach($units as $unit){
+            if($unit->timein < $eod && $unit->timein > $mid){
+                error_log($unit->timein . ' eod ' .$eod. ' mid '.$mid);
+                $in = userdate($unit->timein,get_string('timeformat','block_timetracker'));
+                $out = userdate($unit->timeout,get_string('timeformat','block_timetracker'));
+                $wustr .= "In: $in\n\rOut: $out\n\r";
+                //unset($units[$key]);
+            } else {
+                break;
+            }
+        }
+        
+        $worksheet[1]->write_string($currentrow +1, $dayofweek, $wustr, $format_cal_block);
+        //end of print work units
+        
+        
+        
+        
         $dayofweek ++; $date++;
     } while ($date <= $monthinfo['lastday'] && $dayofweek % 7 != 0);
     if($date >= $monthinfo['lastday']) break; 
