@@ -57,6 +57,7 @@ $format_footer =& $workbook->add_format();
 $format_footer->set_bold();
 $format_footer->set_bottom(1);
 $format_footer->set_v_align('Top');
+$format_footer->set_text_wrap();
 
 $format_footer_block =& $workbook->add_format();
 $format_footer_block->set_bottom(1);
@@ -80,9 +81,12 @@ $format_week_header->set_bold();
 $format_week_header->set_align('center');
 $format_week_header->set_size(8);
 
+// Collect Data
+$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
+$mdluser= $DB->get_record('user', array('id'=>$workerrecord->mdluserid));
+$conf = get_timetracker_config($courseid);
 
 $worksheet = array();
-$headers = array('First Name','Last Name','Time In','Time Out','Elapsed Time');
 
 $worksheet[1] =& $workbook->add_worksheet('First worksheet');
 
@@ -92,7 +96,7 @@ $worksheet[1]->set_column(0,8,10.57);
 // Write data to spreadsheet
 $worksheet[1]->write_string(0,0,'Mars Hill College', $format_title);
 $worksheet[1]->merge_cells(0, 0, 0, 7);
-$worksheet[1]->write_string(1,0,'Timesheet', $format_timesheet_header);
+$worksheet[1]->write_string(1,0,'Timesheet - '.$monthinfo['monthname'].', '.$year, $format_timesheet_header);
 $worksheet[1]->merge_cells(1, 0, 1, 7);
 
 // Creates separator line under 'Timesheet'
@@ -101,21 +105,21 @@ foreach (range(1,7) as $i){
 }
 
 // Header Data
-$worksheet[1]->write_string(2,0,"$headers[1], $headers[0]", $format_bold);
+$worksheet[1]->write_string(2,0,"$workerrecord->lastname, $workerrecord->firstname", $format_bold);
 $worksheet[1]->merge_cells(2,0,2,3);
-$worksheet[1]->write_string(3,0,'Student ID#', $format_bold);
+$worksheet[1]->write_string(3,0,"$mdluser->username", $format_bold);
 $worksheet[1]->merge_cells(3,0,3,3);
-$worksheet[1]->write_string(4,0,'Address');
+$worksheet[1]->write_string(4,0,"$workerrecord->address", $format_bold);
 $worksheet[1]->merge_cells(4,0,4,3);
-$worksheet[1]->write_string(5,0,$monthinfo['monthname'].', '.$year, $format_bold);
+$worksheet[1]->write_string(5,0,'YTD Earnings: $'.get_earnings_this_year($userid,$courseid), $format_bold);
 $worksheet[1]->merge_cells(5,0,5,3);
-$worksheet[1]->write_string(2,4,'Supervisor');
+$worksheet[1]->write_string(2,4,$conf['supname'], $format_bold);
 $worksheet[1]->merge_cells(2,4,2,7);
-$worksheet[1]->write_string(3,4,'Department');
+$worksheet[1]->write_string(3,4,$conf['department'], $format_bold);
 $worksheet[1]->merge_cells(3,4,3,7);
-$worksheet[1]->write_string(4,4,'Position');
+$worksheet[1]->write_string(4,4,$conf['position'], $format_bold);
 $worksheet[1]->merge_cells(4,4,4,7);
-$worksheet[1]->write_string(5,4,'Budget #');
+$worksheet[1]->write_string(5,4,$conf['budget'], $format_bold);
 $worksheet[1]->merge_cells(5,4,5,7);
 
 
@@ -162,7 +166,7 @@ foreach (range(0,7) as $i){
     $worksheet[1]->write_blank(21,$i, $format_footer_block);
 }
 
-$worksheet[1]->write_string(20,0,'Pay Rate or Stipend Amount',$format_footer);
+$worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n\r" .'$'.$workerrecord->currpayrate,$format_footer);
 $worksheet[1]->merge_cells(20,0,20,3);
 $worksheet[1]->write_string(20,4,'Total Hours for '.$monthinfo['monthname'].', '.$year.':',$format_footer);
 $worksheet[1]->merge_cells(20,4,20,7);
@@ -199,7 +203,6 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
 
         foreach($units as $unit){
             if($unit->timein < $eod && $unit->timein > $mid){
-                error_log($unit->timein . ' eod ' .$eod. ' mid '.$mid);
                 $in = userdate($unit->timein,get_string('timeformat','block_timetracker'));
                 $out = userdate($unit->timeout,get_string('timeformat','block_timetracker'));
                 $wustr .= "In: $in\n\rOut: $out\n\r";

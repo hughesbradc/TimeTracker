@@ -54,7 +54,7 @@ class timetracker_hourlog_form  extends moodleform {
             return;
         }
 
-        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',array('id'=>$this->courseid,'userid'=>$this->userid);
+        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',array('id'=>$this->courseid,'userid'=>$this->userid));
         if(!$canmanage && $USER->id != $userinfo->mdluserid){
             redirect($index,'No permission to add hours',2);
         }

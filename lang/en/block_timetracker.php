@@ -38,6 +38,11 @@ $string['showmonthearnings'] = 'Show earnings this month';
 $string['showtermearnings'] = 'Show earnings this term';
 $string['showytdearnings'] = 'Show year to date earnings';
 $string['showtotalearnings'] = 'Show total earnings';
+$string['department'] = 'Department';
+$string['position'] = 'Position';
+$string['budget'] = 'Budget Number';
+$string['institution'] = 'Institution Name';
+$string['supname'] = 'Supervisor(s) Name(s)';
 
 // Strings for Page Tabs
 $string['home'] = 'Home';

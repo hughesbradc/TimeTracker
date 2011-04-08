@@ -296,3 +296,19 @@ function get_worker_stats($userid,$courseid){
     return $stats; 
 
 }
+
+
+/**
+* @return an array of config items for this course;
+*/
+function get_timetracker_config($courseid){
+    global $DB;
+    $config = array();
+    $confs = $DB->get_records('block_timetracker_config',array('courseid'=>$courseid));
+    foreach ($confs as $conf){
+        $key = preg_replace('/block\_timetracker\_/','',$conf->name);
+        $config[$key] = $conf->value;
+    }
+
+    return $config;
+}
