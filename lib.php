@@ -147,7 +147,8 @@ function get_earnings_this_month($userid,$courseid){
 }
 
 /**
-* @param $time time of first day of 
+* @param $month The month (1-12) that you're inspecting
+* @param $year The year (yyyy) that you're inspecting
 * @return array of values
     $monthinfo['firstdaytimestamp'] <= unix time of midnight of first day
     $monthinfo['lastdaytimestamp'] <= unix time of 23:59:59 of last day
@@ -292,5 +293,4 @@ function get_worker_stats($userid,$courseid){
     $stats['termearnings'] = $stats['yearearnings'];
 
     return $stats; 
-
 }
