@@ -59,7 +59,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
-if($USER->id != $workerrecord->userid && !$canmanage){
+if($USER->id != $workerrecord->mdluserid && !$canmanage){
     print_error('You do not have permissions to add hours for this user');
 } else if(!$canmanage && $workerrecord->timetrackermethod==0){
     redirect($index,$status,2);
