@@ -65,7 +65,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $mform->addElement('hidden','maxearnings',$maxearnings);
         
 
-        $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$this->mdluserid));
+        $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$this->mdluserid,'courseid'=>$this->courseid));
         if(!$worker){
             $worker = $DB->get_record('user',array('id'=>$this->mdluserid));
         } else {
