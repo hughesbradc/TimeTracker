@@ -106,14 +106,14 @@ class timetracker_reports_form  extends moodleform {
         } else if ($this->userid==0 && $this->courseid!=0){ //see all workers, this course
 
             $sql .= 'AND courseid='. $this->courseid;
-            $pendingunits = $DB->get_records_sql($sql);
 
         } else { //if ($this->userid != 0) //specific user, this course
             
             $sql .= 'AND userid='.$this->userid. ' AND courseid='. $this->courseid;
-            $pendingunits = $DB->get_records_sql($sql);
 
         }
+        $sql .= ' ORDER BY timein DESC';
+        $pendingunits = $DB->get_records_sql($sql);
 
         $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
 
@@ -175,13 +175,12 @@ class timetracker_reports_form  extends moodleform {
             $units = $DB->get_records_sql($sql);
         } else if ($this->userid==0 && $this->courseid!=0){ //see all workers, this course
             $sql .= 'AND courseid='.$this->courseid;
-            $units =
-                $DB->get_records_sql($sql);
         } else { //specific user, this course
             $sql .= ' AND courseid='.$this->courseid.' AND userid='.$this->userid;
-            $units = $DB->get_records_sql($sql);
         }
 
+        $sql .= ' ORDER BY timein DESC';
+        $units = $DB->get_records_sql($sql);
 
         $mform->addElement('header', 'general', 'Completed work units');
         if(!$units){ //if they don't have them.

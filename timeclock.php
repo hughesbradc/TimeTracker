@@ -81,24 +81,52 @@ if($workerrecord->active == 0){
 
 } else if ($clockout == 1){
     $status = 'Clock out successful';
+
     $cin = $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
     if($cin){
-        $cin->payrate = $workerrecord->currpayrate;
-        $cin->timeout = time();
-        $cin->lastedited = time();
-        $cin->lasteditedby = $ttuserid;
+        $nowtime = time();
 
+        $timein = usergetdate($cin->timein);
+        $timeout = usergetdate($nowtime);
+
+        //timein && timeout are same day
+        $cin->lastedited = $nowtime;
+        $cin->lasteditedby = $ttuserid;
+        $cin->payrate = $workerrecord->currpayrate;
         unset($cin->id);
 
-        $worked = $DB->insert_record('block_timetracker_workunit',$cin);
-        if($worked){
+        if($timein['year'] == $timeout['year'] && 
+            $timein['month'] == $timeout['month'] &&
+            $timein['mday'] == $timeout['mday']){
+
+            $cin->timeout = $nowtime;
+
+            $worked = $DB->insert_record('block_timetracker_workunit',$cin);
+            if($worked){
+                $DB->delete_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+            } else {
+                print_error('couldnotclockout', 'block_timetracker', 
+                    $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.$courseid.'&userid='.$ttuserid);
+            }
+        } else { //spans multiple days
+            $tomidnight = 86400 + usergetmidnight($cin->timein) - 1 - ($cin->timein);
+            $currcheckin = $cin->timein;
+            while ($currcheckin < $nowtime){
+                $cin->timeout = $currcheckin + $tomidnight;
+                $worked = $DB->insert_record('block_timetracker_workunit', $cin);
+                if(!$worked){
+                    print_error('couldnotclockout', 'block_timetracker', 
+                        $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.$courseid.'&userid='.$ttuserid);
+                    return;
+                }
+
+                $currcheckin += $tomidnight + 1;
+                $tomidnight = 86400 + (usergetmidnight($currcheckin)-1)- ($currcheckin);
+                if(($currcheckin+$tomidnight) > $nowtime){
+                    $tomidnight = $nowtime - $currcheckin;
+                } 
+            }
             $DB->delete_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
-
-        } else {
-
-            print_error('couldnotclockout', 'block_timetracker', 
-                $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.$courseid.'&userid='.$ttuserid);
-
         }
     }
 } 
