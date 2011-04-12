@@ -67,7 +67,7 @@ $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USE
 
 //$PAGE->print_header('Delete TimeTracker Worker', 'Delete Worker');
 
-if ($USER->id != $worker->mdluserid && !$canmanage){
+if (!$canmanage && $$USER->id != $worker->mdluserid){
     print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 } else {
     if($userid && $courseid && $pendingid && confirm_sesskey()){

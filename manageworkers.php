@@ -80,7 +80,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 } else if($formdata = $mform->get_data()){
     //print_object($formdata);
 
-    $workers = $DB->get_records('block_timetracker_workerinfo');
+    $workers = $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$COURSE->id));
     //print_object($workers);
 
     foreach($formdata->workerid as $idx){
@@ -93,12 +93,9 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
          }
     }
 
-    echo $OUTPUT->header();
     //echo $OUTPUT->heading($strtitle, 2);
     //content goes here
-    echo 'Changes saved successfully<br />';
-    echo '<a href="'.$manageworkerurl.'">Manage Workers</a>';
-    echo $OUTPUT->footer();
+    redirect($manageworkerurl,'Changes saved successfully',2);
 
 } else {
     echo $OUTPUT->header();
@@ -108,6 +105,5 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     #$PAGE->print_header('Manage worker info', 'Manage worker info');
     $mform->display();
     echo $OUTPUT->footer();
-    die;
 }
 
