@@ -15,8 +15,8 @@ $courseid = 2;
 $monthinfo = get_month_info($month, $year);
 
 $workbook = new MoodleExcelWorkbook('-');
-$workbook->send('timesheet'.$year.'_'.$month.'.xls');
-
+//$workbook->send('timesheet'.$year.'_'.$month.'.xls');
+$workbook->send('Timesheet_'.$year.'_'.$monthinfo['monthname'].'.xls');
 
 // Formatting
 $format_bold =& $workbook->add_format();
@@ -29,6 +29,14 @@ $format_cal_block->set_bottom(1);
 $format_cal_block->set_text_wrap();
 $format_cal_block->set_v_align('Top');
 $format_cal_block->set_size(8);
+
+$format_cal_total =& $workbook->add_format();
+$format_cal_total->set_align('center');
+$format_cal_total->set_bold();
+$format_cal_total->set_size(12);
+$format_cal_total->set_left(1);
+$format_cal_total->set_right(1);
+$format_cal_total->set_bottom(1);
 
 $format_calendar_dates =& $workbook->add_format();
 $format_calendar_dates->set_bold();
@@ -166,16 +174,6 @@ foreach (range(0,7) as $i){
     $worksheet[1]->write_blank(21,$i, $format_footer_block);
 }
 
-$worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n\r" .'$'.$workerrecord->currpayrate,$format_footer);
-$worksheet[1]->merge_cells(20,0,20,3);
-$worksheet[1]->write_string(20,4,'Total Hours for '.$monthinfo['monthname'].', '.$year.':',$format_footer);
-$worksheet[1]->merge_cells(20,4,20,7);
-$worksheet[1]->write_string(21,0,'Supervisor Signature/Date',$format_footer);
-$worksheet[1]->merge_cells(21,0,21,3);
-$worksheet[1]->write_string(21,4,'Worker Signature/Date',$format_footer);
-$worksheet[1]->merge_cells(21,4,21,7);
-$worksheet[1]->set_row(20,30);
-$worksheet[1]->set_row(21,30);
 
 // Number the Days and add data
 
@@ -187,6 +185,10 @@ $units = $DB->get_recordset_sql($sql);
 
 $date = 1;
 $dayofweek = $monthinfo['dayofweek']; 
+
+$weeksum = 0;
+$monthsum = 0;
+
 for($currentrow = 8; $currentrow < 20; $currentrow += 2){
     //echo "inside for loop <br />";
     $dayofweek = $dayofweek % 7;
@@ -207,16 +209,29 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
                 $out = userdate($unit->timeout,get_string('timeformat','block_timetracker'));
                 $wustr .= "In: $in\n\rOut: $out\n\r";
                 //unset($units[$key]);
+                $weeksum += get_hours(($unit->timeout - $unit->timein));
+                //error_log($weeksum);
             } else {
                 break;
             }
         }
         
         $worksheet[1]->write_string($currentrow +1, $dayofweek, $wustr, $format_cal_block);
+        
         //end of print work units
         
-    //if day of week = 7, copy value over and reset weekly sum to 0.        
-        
+        //if day of week = 7, copy value over and reset weekly sum to 0.        
+      
+        // Calculate total hours
+
+        if($dayofweek == 6){
+            //Add week sum to monthly sum
+            //Print value in weekly totals column 
+            //clear weekly sum
+            $monthsum = $monthsum + $weeksum;
+            $worksheet[1]->write_string($currentrow +1, 7, $weeksum, $format_cal_total);
+            $weeksum = 0;
+        }
         
         $dayofweek ++; $date++;
     } while ($date <= $monthinfo['lastday'] && $dayofweek % 7 != 0);
@@ -224,7 +239,17 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
     
 }
 
-// Print monthly total 
+// Write footer data
+$worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n\r" .'$'.$workerrecord->currpayrate,$format_footer);
+$worksheet[1]->merge_cells(20,0,20,3);
+$worksheet[1]->write_string(20,4,'Total Hours for '.$monthinfo['monthname'].', '.$year.":\n\r".$monthsum,$format_footer);
+$worksheet[1]->merge_cells(20,4,20,7);
+$worksheet[1]->write_string(21,0,'Supervisor Signature/Date',$format_footer);
+$worksheet[1]->merge_cells(21,0,21,3);
+$worksheet[1]->write_string(21,4,'Worker Signature/Date',$format_footer);
+$worksheet[1]->merge_cells(21,4,21,7);
+$worksheet[1]->set_row(20,30);
+$worksheet[1]->set_row(21,42);
 
 $workbook->close();
 return true;

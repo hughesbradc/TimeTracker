@@ -69,7 +69,8 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
-$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id));
+$worker =
+    $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id,'courseid'=>$courseid));
 
 $maintabs[] = new tabobject('home', $index, 'Main');
 $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');

@@ -56,7 +56,7 @@ class timetracker_reports_form  extends moodleform {
         if($this->userid == 0 && $canmanage){
             //supervisor -- show all!
             $workers =
-            $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$this->courseid);
+            $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$this->courseid));
             if(!$workers){
                $mform->addElement('html','No workers found'); 
                return;
