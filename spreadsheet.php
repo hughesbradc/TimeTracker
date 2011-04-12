@@ -215,13 +215,16 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
         $worksheet[1]->write_string($currentrow +1, $dayofweek, $wustr, $format_cal_block);
         //end of print work units
         
-        
+    //if day of week = 7, copy value over and reset weekly sum to 0.        
         
         
         $dayofweek ++; $date++;
     } while ($date <= $monthinfo['lastday'] && $dayofweek % 7 != 0);
     if($date >= $monthinfo['lastday']) break; 
+    
 }
+
+// Print monthly total 
 
 $workbook->close();
 return true;

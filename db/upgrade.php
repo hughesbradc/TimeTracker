@@ -71,6 +71,65 @@ function xmldb_block_timetracker_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2011030903, 'timetracker');
     }
 
+    if ($oldversion < 2011041114) {
+
+        // Define field budget to be added to block_timetracker_workerinfo
+        $table = new xmldb_table('block_timetracker_workerinfo');
+        $field = new xmldb_field('budget', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '0','dept');
+
+        // Conditionally launch add field budget
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field supervisor to be added to block_timetracker_workerinfo
+        $table = new xmldb_table('block_timetracker_workerinfo');
+        $field = new xmldb_field('supervisor', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '0', 'budget');
+
+        // Conditionally launch add field supervisor
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+    // Define field institution to be added to block_timetracker_workerinfo
+        $table = new xmldb_table('block_timetracker_workerinfo');
+        $field = new xmldb_field('institution', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '0', 'supervisor');
+
+        // Conditionally launch add field institution
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Changing type of field currpayrate on table block_timetracker_workerinfo to number
+        $table = new xmldb_table('block_timetracker_workerinfo');
+        $field = new xmldb_field('currpayrate', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0', 'position');
+
+        // Launch change of type for field currpayrate
+        $dbman->change_field_type($table, $field);
+
+         // Define field maxtermearnings to be added to block_timetracker_workerinfo
+        $table = new xmldb_table('block_timetracker_workerinfo');
+        $field = new xmldb_field('maxtermearnings', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0', 'comments');
+
+        // Conditionally launch add field maxtermearnings
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+         // Changing type of field payrate on table block_timetracker_workunit to number
+        $table = new xmldb_table('block_timetracker_workunit');
+        $field = new xmldb_field('payrate', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, null, 'timeout');
+
+        // Launch change of type for field payrate
+        $dbman->change_field_type($table, $field);
+    
+
+        // timetracker savepoint reached
+        upgrade_block_savepoint(true, 2011041114, 'timetracker');
+ 
+        }
+
+
 
     return true;
 }
