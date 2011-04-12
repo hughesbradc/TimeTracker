@@ -36,7 +36,7 @@
         $clockin = optional_param('clockin', 0,PARAM_INTEGER);
         $clockout = optional_param('clockout',0, PARAM_INTEGER);
         $courseid = $COURSE->id;
-        $worker = $DB->get_record('block_timetracker_workerinfo', array('mdluserid'=>$USER->id));
+        $worker = $DB->get_record('block_timetracker_workerinfo', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -89,7 +89,8 @@
 	        $recordexists = $DB->record_exists('block_timetracker_workerinfo', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
             if (!$recordexists){
-                $link = '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id;
+                $link =
+                '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id.'&mdluserid='.$USER->id;
                 $action = null; 
                 $this->content->text = '<center>';
                 $this->content->text .= $OUTPUT->action_link($link, get_string('registerinfo', 'block_timetracker'), $action);

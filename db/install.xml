@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/timetracker/db" VERSION="20110309" COMMENT="XMLDB file for Moodle Timetracker block"
+<XMLDB PATH="blocks/timetracker/db" VERSION="20110411" COMMENT="XMLDB file for Moodle Timetracker block"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -15,12 +15,16 @@
         <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="email" NEXT="phonenumber"/>
         <FIELD NAME="phonenumber" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="address" NEXT="position"/>
         <FIELD NAME="position" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="phonenumber" NEXT="currpayrate"/>
-        <FIELD NAME="currpayrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" DECIMALS="3" PREVIOUS="position" NEXT="timetrackermethod"/>
+        <FIELD NAME="currpayrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" DECIMALS="2" PREVIOUS="position" NEXT="timetrackermethod"/>
         <FIELD NAME="timetrackermethod" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="currpayrate" NEXT="active"/>
         <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="timetrackermethod" NEXT="dept"/>
-        <FIELD NAME="dept" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="active" NEXT="idnum"/>
-        <FIELD NAME="idnum" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="dept" NEXT="comments"/>
-        <FIELD NAME="comments" TYPE="char" LENGTH="1000" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="idnum"/>
+        <FIELD NAME="dept" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="active" NEXT="budget"/>
+        <FIELD NAME="budget" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="dept" NEXT="supervisor"/>
+        <FIELD NAME="supervisor" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="budget" NEXT="institution"/>
+        <FIELD NAME="institution" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="supervisor" NEXT="idnum"/>
+        <FIELD NAME="idnum" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="institution" NEXT="comments"/>
+        <FIELD NAME="comments" TYPE="char" LENGTH="1000" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="idnum" NEXT="maxtermearnings"/>
+        <FIELD NAME="maxtermearnings" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" DECIMALS="2" PREVIOUS="comments"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -44,7 +48,7 @@
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="timein"/>
         <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="courseid" NEXT="timeout"/>
         <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="timein" NEXT="payrate"/>
-        <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" DECIMALS="3" PREVIOUS="timeout" NEXT="lastedited"/>
+        <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" PREVIOUS="timeout" NEXT="lastedited"/>
         <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="payrate" NEXT="lasteditedby"/>
         <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited"/>
       </FIELDS>

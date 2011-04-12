@@ -65,6 +65,21 @@ class block_timetracker_edit_form extends block_edit_form {
         $mform->addElement('selectyesno', 'config_block_timetracker_show_total_earnings', get_string('showtotalearnings', 'block_timetracker'));
         $mform->setDefault('config_block_timetracker_show_total_earnings', 1);
 
+        $mform->addElement('text','config_block_timetracker_department',get_string('department','block_timetracker'));
+        $mform->addRule('config_block_timetracker_department', null, 'required', null, 'client', 'false');
+    
+        $mform->addElement('text','config_block_timetracker_position',get_string('position','block_timetracker'));
+        $mform->addRule('config_block_timetracker_position', null, 'required', null, 'client', 'false');
+    
+        $mform->addElement('text','config_block_timetracker_budget',get_string('budget','block_timetracker'));
+        $mform->addRule('config_block_timetracker_budget', null, 'required', null, 'client', 'false');
+
+        $mform->addElement('text','config_block_timetracker_institution',get_string('institution','block_timetracker'));
+        $mform->addRule('config_block_timetracker_institution', null, 'required', null, 'client', 'false');
+    
+        $mform->addElement('text','config_block_timetracker_supname',get_string('supname','block_timetracker'));
+        $mform->addRule('config_block_timetracker_supname', null, 'required', null, 'client', 'false');
+    
     }
 
     function validation ($data){

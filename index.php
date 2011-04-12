@@ -58,7 +58,8 @@ $PAGE->set_heading($strtitle);
 $PAGE->set_pagelayout('course');
 
 
-$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id));
+$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id,
+'courseid'=>$course->id));
 
 echo $OUTPUT->header();
 
@@ -159,7 +160,7 @@ if ($canmanage) { //supervisor
         echo $OUTPUT->box_start('generalbox boxaligncenter');
         echo '<h2>';
         echo $clockinaction;
-        echo ' Clock in?</h2>';
+        echo 'Add Hours?</h2>';
         echo "Would you like to add some hours now? Click the green clock above to add hours..<br />";
         echo $OUTPUT->box_end();
     }

@@ -75,6 +75,7 @@ $PAGE->navbar->add($strtitle);
 $mform = new timetracker_updateworkerinfo_form($context, $courseid, $mdluserid);
 
 if ($mform->is_cancelled()){ //user clicked cancel
+    redirect($CFG->wwwroot. '/course/view.php?id='.$COURSE->id);
 
 } else if ($formdata=$mform->get_data()){
 

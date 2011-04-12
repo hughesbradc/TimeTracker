@@ -154,6 +154,7 @@ function get_earnings_this_month($userid,$courseid){
     $monthinfo['lastdaytimestamp'] <= unix time of 23:59:59 of last day
     $monthinfo['dayofweek'] <= the index of day of week of first day
     $monthinfo['lastday'] <= the last day of this month
+    $monthinfo['monthname'] <= the name of this month
 */
 function get_month_info($month,$year){
     $monthinfo = array();
@@ -164,6 +165,7 @@ function get_month_info($month,$year){
 
     $thistime = usergetdate($timestamp);
     $monthinfo['dayofweek'] = $thistime['wday'];
+    $monthinfo['monthname'] = $thistime['month'];
 
     $timestamp = make_timestamp($year,$month,$monthinfo['lastday'],23,59,59);
     $monthinfo['lastdaytimestamp'] = $timestamp; //23:59:59pm
@@ -293,4 +295,20 @@ function get_worker_stats($userid,$courseid){
     $stats['termearnings'] = $stats['yearearnings'];
 
     return $stats; 
+}
+
+
+/**
+* @return an array of config items for this course;
+*/
+function get_timetracker_config($courseid){
+    global $DB;
+    $config = array();
+    $confs = $DB->get_records('block_timetracker_config',array('courseid'=>$courseid));
+    foreach ($confs as $conf){
+        $key = preg_replace('/block\_timetracker\_/','',$conf->name);
+        $config[$key] = $conf->value;
+    }
+
+    return $config;
 }
