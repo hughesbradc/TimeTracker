@@ -63,7 +63,8 @@ $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
-$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id));
+$worker =
+    $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id,'courseid'=>$courseid));
 
 //$PAGE->print_header('Delete TimeTracker Worker', 'Delete Worker');
 

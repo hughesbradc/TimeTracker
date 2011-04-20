@@ -143,5 +143,8 @@ $string['noworkers'] = 'No workers listed';
 $string['updateformheadertitle'] = 'Update Worker Information';
 
 $string['manageworkertitle'] = 'Manage Workers';
+
+//Error Codes
 $string['notpermissible'] = 'You do not have permissions to perform this action';
 $string['errordeleting'] = 'Invalid session key or user id';
+$string['usernotexist'] = 'User does not exist';

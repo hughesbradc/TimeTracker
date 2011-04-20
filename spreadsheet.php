@@ -1,4 +1,27 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * This block will display a summary of hours and earnings for the worker.
+ *
+ * @package    Block
+ * @subpackage TimeTracker
+ * @copyright  2011 Marty Gilbert & Brad Hughes
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ */
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once("$CFG->libdir/excellib.class.php");
@@ -7,12 +30,31 @@ require_once('../../lib/moodlelib.php');
 
 global $CFG;
 
-$month = 3;
-$year = 2011;
-$userid = 1;
-$courseid = 2;
+$month = required_param('month', PARAM_INTEGER);
+$year = required_param('year', PARAM_INTEGER);
+$userid = required_param('userid', PARAM_INTEGER);
+$courseid = required_param('id', PARAM_INTEGER);
 
 $monthinfo = get_month_info($month, $year);
+
+
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+$PAGE->set_course($course);
+$context = $PAGE->context;
+
+$canmanage = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+    $canmanage = true;
+}
+
+$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
+
+if(!$workerrecord){
+    print_error('usernotexist', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
+}
+if(!$canmanage && $USER->id != $workerrecord->mdluserid){
+    print_error('notpermissible', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
+}
 
 $workbook = new MoodleExcelWorkbook('-');
 //$workbook->send('timesheet'.$year.'_'.$month.'.xls');
@@ -90,7 +132,6 @@ $format_week_header->set_align('center');
 $format_week_header->set_size(8);
 
 // Collect Data
-$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
 $mdluser= $DB->get_record('user', array('id'=>$workerrecord->mdluserid));
 $conf = get_timetracker_config($courseid);
 

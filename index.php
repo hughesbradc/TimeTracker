@@ -142,27 +142,31 @@ if ($canmanage) { //supervisor
     $userPending = $DB->get_records('block_timetracker_pending', array('userid'=>$worker->id));
 
     //add clockin/clockout box
-    if(!$userPending && $worker->timetrackermethod==0){
-        $clockinicon = new pix_icon('clock_in_big','Clock in', 'block_timetracker');
-        $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',$urlparams);
-        $clockinurl->params(array('clockin'=>1));
-        $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
-        echo $OUTPUT->box_start('generalbox boxaligncenter');
-        echo '<h2>';
-        echo $clockinaction;
-        echo ' Clock in?</h2>';
-        echo "You are not currently clocked in. Click the green clock above to clock in now.<br />";
-        echo $OUTPUT->box_end();
-    } else if(!$userPending && $worker->timetrackermethod==1){
-        $clockinicon = new pix_icon('clock_in_big','Clock in', 'block_timetracker');
-        $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams);
-        $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
-        echo $OUTPUT->box_start('generalbox boxaligncenter');
-        echo '<h2>';
-        echo $clockinaction;
-        echo 'Add Hours?</h2>';
-        echo "Would you like to add some hours now? Click the green clock above to add hours..<br />";
-        echo $OUTPUT->box_end();
+    if($worker->active == 0){
+        echo get_string('notactiveerror','block_timetracker').'<br /><br />';
+    } else {
+        if(!$userPending && $worker->timetrackermethod==0){
+            $clockinicon = new pix_icon('clock_in_big','Clock in', 'block_timetracker');
+            $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',$urlparams);
+            $clockinurl->params(array('clockin'=>1));
+            $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
+            echo $OUTPUT->box_start('generalbox boxaligncenter');
+            echo '<h2>';
+            echo $clockinaction;
+            echo ' Clock in?</h2>';
+            echo "You are not currently clocked in. Click the green clock above to clock in now.<br />";
+            echo $OUTPUT->box_end();
+        } else if(!$userPending && $worker->timetrackermethod==1){
+            $clockinicon = new pix_icon('clock_in_big','Clock in', 'block_timetracker');
+            $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams);
+            $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
+            echo $OUTPUT->box_start('generalbox boxaligncenter');
+            echo '<h2>';
+            echo $clockinaction;
+            echo 'Add Hours?</h2>';
+            echo "Would you like to add some hours now? Click the green clock above to add hours..<br />";
+            echo $OUTPUT->box_end();
+        }
     }
 
     //summary data
@@ -259,7 +263,7 @@ if ($canmanage) { //supervisor
                 userdate($unit->timein,get_string('datetimeformat','block_timetracker')),
                 userdate($unit->timeout,get_string('datetimeformat','block_timetracker')),
                 format_elapsed_time($unit->timeout - $unit->timein),
-                    'Not implemented yet'));
+                    '&nbsp;'));
         }
 
         $table->print_html();
