@@ -31,14 +31,13 @@ require_login();
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
 $unitid = required_param('unitid', PARAM_INTEGER);
+$nextpage = optional_param('next',0,PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 
-
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    #print_object($course);
     $PAGE->set_course($course);
     $context = $PAGE->context;
 } else {
@@ -46,40 +45,20 @@ if($courseid){
     $PAGE->set_context($context);
 }
 
-
-$reportsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
-
-$PAGE->set_url($reportsurl);
-$PAGE->set_pagelayout('base');
-
-$strtitle = 'Delete Work Unit';
-
-$PAGE->set_title($strtitle);
-$PAGE->set_heading($strtitle);
-
-#print_object($urlparams);
-$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
-
-//$PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
-$PAGE->navbar->add('Reports', $reportsurl);
-$PAGE->navbar->add($strtitle);
-
-echo $OUTPUT->header();
-echo $OUTPUT->heading($strtitle, 2);
-
-
-//$PAGE->print_header('Delete TimeTracker Worker', 'Delete Worker');
+//assume we're coming from reports
+$nexturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
+if($nextpage!=0){
+    $nexturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+}
 
 if (!has_capability('block/timetracker:manageworkers', $context)) {
     print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 } else {
     if($unitid && confirm_sesskey()){
         $DB->delete_records('block_timetracker_workunit',array('id'=>$unitid));
-        echo '<span style="text-align: center">Work unit has been deleted</span>';
     } else {
         print_error('errordeleting','block_timetracker', $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
     }
 }
 
-echo $OUTPUT->footer();
+redirect($nexturl, 'Unit deleted', 1);
