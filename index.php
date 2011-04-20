@@ -114,7 +114,7 @@ if ($canmanage) { //supervisor
                 $row.='<td style="text-align: center">'.format_elapsed_time($currelapsed).'</td>';
 
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
-                $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".sesskey().'&unitid='.$unit->id;
+                $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".sesskey().'&unitid='.$unit->id.'&next=1';
     
                 $editurl = new moodle_url($baseurl.'/editworkunit.php'.$paramstring);
                 $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
