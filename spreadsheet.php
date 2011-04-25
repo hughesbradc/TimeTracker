@@ -52,6 +52,7 @@ $workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$use
 if(!$workerrecord){
     print_error('usernotexist', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
 }
+
 if(!$canmanage && $USER->id != $workerrecord->mdluserid){
     print_error('notpermissible', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
 }
