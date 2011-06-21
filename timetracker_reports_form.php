@@ -93,7 +93,6 @@ class timetracker_reports_form  extends moodleform {
         $mform->addElement('submit', 'datechange', 'Get work units');
 
 
-
         //************** PENDING WORK UNITS SECTION ****************//
         //which workers to see?
         $endtime = $this->reportend + ((60*60*23)+60*59); //23:59

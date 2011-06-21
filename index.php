@@ -222,6 +222,8 @@ if ($canmanage) { //supervisor
             $clockouticon = new pix_icon('clock_out','Clock out','block_timetracker');
             $clockoutaction = $OUTPUT->action_icon($clockouturl, $clockouticon);
 
+            $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
+            
             $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
             $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".sesskey().'&pendingid='.$pending->id;
             $deleteurl = new moodle_url($baseurl.'/deletepending.php'.$paramstring);
@@ -229,8 +231,9 @@ if ($canmanage) { //supervisor
             $deleteaction = $OUTPUT->action_icon(
                 $deleteurl, $deleteicon, 
                 new confirm_action('Are you sure you want to delete this pending work unit?'));
-
-            $table->add_data(array(userdate($pending->timein,get_string('datetimeformat','block_timetracker')),$clockoutaction.' '.$deleteaction));
+            $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
+            $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
+            $table->add_data(array(userdate($pending->timein,get_string('datetimeformat','block_timetracker')),$clockoutaction.' '.$deleteaction.' '.$alertaction));
         }
 
         $table->print_html();
@@ -242,6 +245,11 @@ if ($canmanage) { //supervisor
     }
 
     if($userUnits){
+
+        $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
+        $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
+        $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);        
+
         echo $OUTPUT->box_start('generalbox boxaligncenter');
         echo '<h2>Last 10 Work Units</h2>';
         $table = new flexible_table('timetracker-display-worker-index');
@@ -263,7 +271,7 @@ if ($canmanage) { //supervisor
                 userdate($unit->timein,get_string('datetimeformat','block_timetracker')),
                 userdate($unit->timeout,get_string('datetimeformat','block_timetracker')),
                 format_elapsed_time($unit->timeout - $unit->timein),
-                    '&nbsp;'));
+                    $alertaction));
         }
 
         $table->print_html();
