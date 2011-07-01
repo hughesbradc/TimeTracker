@@ -1,0 +1,157 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+* This block will display a summary of hours and earnings for the worker.
+*
+* @package    Block
+* @subpackage TimeTracker
+* @copyright  2011 Marty Gilbert & Brad Hughes
+* @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+*/
+
+require_once("$CFG->libdir/formslib.php");
+require_once('lib.php');
+
+class timetracker_updateworkerinfo_form extends moodleform {
+   function timetracker_updateworkerinfo_form($context,$courseid,$mdluserid){
+       $this->context = $context;
+       $this->courseid = $courseid;
+       $this->mdluserid = $mdluserid;
+       parent::__construct();
+   }
+
+    function definition() {
+        global $CFG, $DB, $COURSE;
+
+        $mform =& $this->_form;
+
+        $mform->addElement('header','general',get_string('updateformheadertitle','block_timetracker'));
+
+        //defaults -- shouldn't need these, because config should always be set.
+        $payrate = 7.50;
+        $maxearnings = 750;
+        $trackermethod = 0;
+
+        $canmanage = false;
+        if (has_capability('block/timetracker:manageworkers', $this->context)) {
+            $canmanage = true;
+        }
+         
+        $worker = $DB->get_record('block_timetracker_workerinfo',array('courseid'=>$this->courseid,'mdluserid'=>$this->mdluserid));
+        if(!$worker){ //set the config defaults from config table
+            $config = get_timetracker_config($this->courseid);
+            $payrate = $config['curr_pay_rate']->value;
+            $maxearnings = $config['default_max_earnings']->value;
+            $trackermethod = $config['trackermethod']->value;
+            $department= $config['department']->value;
+            $position= $config['position']->value;
+            $budget= $config['budget']->value;
+            $institution= $config['institution']->value;
+            $supname= $config['supervisor']->value;
+
+        } else {
+            $payrate = $worker->currpayrate;
+            $maxearnings = $worker->maxtermearnings;
+            $trackermethod = $worker->timetrackermethod;
+            $department = $worker->dept;
+            $position = $worker->position;
+            $budget = $worker->budget;
+            $institution = $worker->institution;
+            $supname = $worker->supervisor;
+        }
+
+        $mform->addElement('hidden','mdluserid', $this->mdluserid);
+        $mform->addElement('hidden','id', $this->courseid);
+        $mform->addElement('hidden','courseid', $this->courseid);
+        $mform->addElement('hidden','maxearnings',$maxearnings);
+        
+
+        if(!$worker){
+            $worker = $DB->get_record('user',array('id'=>$this->mdluserid));
+        } else {
+            $mform->addElement('hidden','userid',$worker->id);
+        }
+
+        $opstring='readonly="readonly"';
+        if($canmanage){
+            $opstring = '';
+        }
+
+        $mform->addElement('text','firstname',get_string('firstname','block_timetracker'), $opstring);
+        $mform->setDefault('firstname',$worker->firstname);
+		$mform->addHelpButton('block_timetracker_firstname','firstname','block_timetracker');
+
+        $mform->addElement('text','lastname',get_string('lastname','block_timetracker'), $opstring);
+        $mform->setDefault('lastname',$worker->lastname);
+		$mform->addHelpButton('block_timetracker_lastname','lastname','block_timetracker');
+        
+        $mform->addElement('text','email',get_string('email','block_timetracker'), $opstring);
+        $mform->setDefault('email',$worker->email);
+		$mform->addHelpButton('block_timetracker_email','email','block_timetracker');
+
+        $mform->addElement('text','address',get_string('address','block_timetracker'));
+        $mform->addRule('address', null, 'required', null, 'client', 'false');
+		$mform->addHelpButton('block_timetracker_address','address','block_timetracker');
+		
+        $mform->setDefault('address', $worker->address);
+        $mform->addElement('text','phone',get_string('phone','block_timetracker'));
+		$mform->addHelpButton('block_timetracker_phone','phone','block_timetracker');
+   
+        if ($canmanage){
+            $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'));
+            $mform->setDefault('currpayrate',$payrate);
+			$mform->addHelpButton('block_timetracker_currpayrate','currpayrate','block_timetracker');
+
+            $mform->addElement('select','timetrackermethod','Tracking Method',array(0=>'TimeClock',1=>'Hourlog'));
+            $mform->setDefault('timetrackermethod',$trackermethod);
+			$mform->addHelpButton('block_timetracker_trackermethod','trackermethod','block_timetracker');
+
+            $mform->addElement('text','institution',get_string('institution','block_timetracker'));
+            $mform->setDefault('institution',$institution);
+			$mform->addHelpButton('block_timetracker_institution','institution','block_timetracker');
+            
+            $mform->addElement('text','dept',get_string('department','block_timetracker'));
+            $mform->setDefault('dept',$department);
+			$mform->addHelpButton('block_timetracker_department','department','block_timetracker');
+        
+            $mform->addElement('text','position',get_string('position','block_timetracker'));
+            $mform->setDefault('position',$position);
+			$mform->addHelpButton('block_timetracker_position','position','block_timetracker');
+        
+            $mform->addElement('text','budget',get_string('budget','block_timetracker'));
+            $mform->setDefault('budget',$budget);
+			$mform->addHelpButton('block_timetracker_budget','budget','block_timetracker');
+            
+            $mform->addElement('text','supervisor',get_string('supervisor','block_timetracker'));
+            $mform->setDefault('supervisor',$supname);
+			$mform->addHelpButton('block_timetracker_supname','supname','block_timetracker');
+        } else {
+            $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'), 'readonly="readonly"');
+            $mform->addElement('text','dept',get_string('department','block_timetracker'), 'readonly="readonly"');
+            $mform->addElement('text','position',get_string('position','block_timetracker'), 'readonly="readonly"');
+            $mform->addElement('text','budget',get_string('budget','block_timetracker'), 'readonly="readonly"');
+            $mform->addElement('text','supervisor',get_string('supervisor','block_timetracker'), 'readonly="readonly"');
+            $mform->addElement('hidden','timetrackermethod', $trackermethod);
+        }
+        $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
+    }
+
+     function validation($data) {
+
+     }
+ }
+?>

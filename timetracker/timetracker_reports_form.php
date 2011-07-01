@@ -86,9 +86,11 @@ class timetracker_reports_form  extends moodleform {
 
         $mform->addElement('date_selector', 'reportstart', 'Report start date');
         $mform->setDefault('reportstart',$this->reportstart);
+		$mform->addHelpButton('block_timetracker_reportstart','reportstart','block_timetracker');
 
         $mform->addElement('date_selector', 'reportend', 'Report end date');
         $mform->setDefault('reportend',$this->reportend);
+		$mform->addHelpButton('block_timetracker_reportend','reportend','block_timetracker');
 
         $mform->addElement('submit', 'datechange', 'Get work units');
 
