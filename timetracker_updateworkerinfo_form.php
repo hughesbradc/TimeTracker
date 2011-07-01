@@ -93,52 +93,52 @@ class timetracker_updateworkerinfo_form extends moodleform {
 
         $mform->addElement('text','firstname',get_string('firstname','block_timetracker'), $opstring);
         $mform->setDefault('firstname',$worker->firstname);
-		$mform->addHelpButton('block_timetracker_firstname','firstname','block_timetracker');
+		$mform->addHelpButton('firstname','firstname','block_timetracker');
 
         $mform->addElement('text','lastname',get_string('lastname','block_timetracker'), $opstring);
         $mform->setDefault('lastname',$worker->lastname);
-		$mform->addHelpButton('block_timetracker_lastname','lastname','block_timetracker');
+		$mform->addHelpButton('lastname','lastname','block_timetracker');
         
         $mform->addElement('text','email',get_string('email','block_timetracker'), $opstring);
         $mform->setDefault('email',$worker->email);
-		$mform->addHelpButton('block_timetracker_email','email','block_timetracker');
+		$mform->addHelpButton('email','email','block_timetracker');
 
         $mform->addElement('text','address',get_string('address','block_timetracker'));
         $mform->addRule('address', null, 'required', null, 'client', 'false');
-		$mform->addHelpButton('block_timetracker_address','address','block_timetracker');
+		$mform->addHelpButton('address','address','block_timetracker');
 		
         $mform->setDefault('address', $worker->address);
         $mform->addElement('text','phone',get_string('phone','block_timetracker'));
-		$mform->addHelpButton('block_timetracker_phone','phone','block_timetracker');
+		$mform->addHelpButton('phone','phone','block_timetracker');
    
         if ($canmanage){
             $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'));
             $mform->setDefault('currpayrate',$payrate);
-			$mform->addHelpButton('block_timetracker_currpayrate','currpayrate','block_timetracker');
+			$mform->addHelpButton('currpayrate','currpayrate','block_timetracker');
 
-            $mform->addElement('select','timetrackermethod','Tracking Method',array(0=>'TimeClock',1=>'Hourlog'));
+            $mform->addElement('select','timetrackermethod',get_string('trackermethod','block_timetracker'),array(0=>get_string('timeclocktitle','block_timetracker'),1=>get_string('hourlogheader','block_timetracker')));
             $mform->setDefault('timetrackermethod',$trackermethod);
-			$mform->addHelpButton('block_timetracker_trackermethod','trackermethod','block_timetracker');
+			$mform->addHelpButton('timetrackermethod','trackermethod','block_timetracker');
 
             $mform->addElement('text','institution',get_string('institution','block_timetracker'));
             $mform->setDefault('institution',$institution);
-			$mform->addHelpButton('block_timetracker_institution','institution','block_timetracker');
+			$mform->addHelpButton('institution','institution','block_timetracker');
             
             $mform->addElement('text','dept',get_string('department','block_timetracker'));
             $mform->setDefault('dept',$department);
-			$mform->addHelpButton('block_timetracker_department','department','block_timetracker');
+			$mform->addHelpButton('dept','department','block_timetracker');
         
             $mform->addElement('text','position',get_string('position','block_timetracker'));
             $mform->setDefault('position',$position);
-			$mform->addHelpButton('block_timetracker_position','position','block_timetracker');
+			$mform->addHelpButton('position','position','block_timetracker');
         
             $mform->addElement('text','budget',get_string('budget','block_timetracker'));
             $mform->setDefault('budget',$budget);
-			$mform->addHelpButton('block_timetracker_budget','budget','block_timetracker');
+			$mform->addHelpButton('budget','budget','block_timetracker');
             
             $mform->addElement('text','supervisor',get_string('supervisor','block_timetracker'));
             $mform->setDefault('supervisor',$supname);
-			$mform->addHelpButton('block_timetracker_supname','supname','block_timetracker');
+			$mform->addHelpButton('supervisor','supname','block_timetracker');
         } else {
             $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'), 'readonly="readonly"');
             $mform->addElement('text','dept',get_string('department','block_timetracker'), 'readonly="readonly"');
