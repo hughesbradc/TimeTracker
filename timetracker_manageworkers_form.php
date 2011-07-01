@@ -40,7 +40,7 @@ class timetracker_manageworkers_form  extends moodleform {
         $mform =& $this->_form; // Don't forget the underscore! 
 
         $mform->addElement('header', 'general', get_string('manageworkers','block_timetracker')); 
-		$mform->addHelpButton('block_timetracker_general','general','block_timetracker');
+		$mform->addHelpButton('general','manageworkers','block_timetracker');
 
 
         $stractive = get_string('active', 'block_timetracker');
@@ -60,6 +60,7 @@ class timetracker_manageworkers_form  extends moodleform {
                 <th>'.get_string('action').'</th>
              </tr>');
 
+
         if(!$workers = $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$COURSE->id),'active DESC, lastname ASC')){
             $mform->addElement('html','<tr><td colspan="6" style="text-align: center">No workers registered</td></tr></table>');
         } else {
@@ -71,7 +72,6 @@ class timetracker_manageworkers_form  extends moodleform {
             foreach ($workers as $worker){ $mform->addElement('html','<tr><td>'); if($worker->active){
                     if($canactivate){
                         $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',array('checked="checked"'));
-						$mform->addHelpButton('activeid['.$worker->id.']','active','block_timetracker');
                     } else {
                         $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',array('checked="checked"','disabled="disabled"'));
                     }
@@ -129,7 +129,6 @@ class timetracker_manageworkers_form  extends moodleform {
     
                 $row.='</tr>';
                 $mform->addElement('html',$row);
-				$mform->addHelpButton('block_timetracker_$row','$row','block_timetracker');
     
                 $mform->addElement('hidden','workerid['.$worker->id.']', $worker->id);
             }
