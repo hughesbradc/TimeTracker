@@ -46,6 +46,19 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 }
 
 
+$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id, 'courseid'=>$course->id));
+
+if(!$canmanage && !$worker){
+    print_error('usernotexist', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
+}
+
+if(!$canmanage && $USER->id != $worker->mdluserid){
+    print_error('notpermissible', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
+}
+
+
+
+
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
 $PAGE->set_url($index);
@@ -58,8 +71,6 @@ $PAGE->set_heading($strtitle);
 $PAGE->set_pagelayout('course');
 
 
-$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id,
-'courseid'=>$course->id));
 
 echo $OUTPUT->header();
 
