@@ -71,7 +71,7 @@ class timetracker_manageworkers_form  extends moodleform {
             foreach ($workers as $worker){ $mform->addElement('html','<tr><td>'); if($worker->active){
                     if($canactivate){
                         $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',array('checked="checked"'));
-						$mform->addHelpButton('block_timetracker_activeid['.$worker->id.']','activeid['.$worker->id.']','block_timetracker');
+						$mform->addHelpButton('activeid['.$worker->id.']','active','block_timetracker');
                     } else {
                         $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',array('checked="checked"','disabled="disabled"'));
                     }
