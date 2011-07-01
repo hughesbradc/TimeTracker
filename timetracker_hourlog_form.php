@@ -75,9 +75,11 @@ class timetracker_hourlog_form  extends moodleform {
         $workunit = $DB->get_record('block_timetracker_workunit', array('id'=>$this->userid,'courseid'=>$this->courseid));
 
         $mform->addElement('date_time_selector','timein','Time In: ');
+		$mform->addHelpButton('block_timetracker_timein','timein','block_timetracker');
         
         $mform->addElement('date_time_selector','timeout','Time Out: ');
-
+		$mform->addHelpButton('block_timetracker_timeout','timeout','block_timetracker');
+		
         $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
     }
 
