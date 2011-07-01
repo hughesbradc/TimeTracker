@@ -181,8 +181,8 @@ $string['reportend_help'] = 'Select the end date to generate data for the desire
 //Update Worker Information (some pulled from Configuration page, specifically department, budget, position, insitution, and supervisor name)
 $string['firstname_help'] = 'The worker\'s first name.';
 $string['lastname_help'] = 'The worker\'s last name.';
-$string['email'] = 'The worker\'s email address.';
-$string['address'] = 'The worker\'s address.';
-$string['phone'] = 'The worker\'s phone number';
-$string['currpayrate'] = 'The worker\'s current rate of pay. <br />Enter $7.75 as 7.75';
-$string['trackermethod'] = 'The method the worker will use to track hours. <br /><br /> TimeClock has the worker clock in at the beginning of his or her shift and clock out at the conclusion of his or her shift. <br /> Hourlog has the worker choose the date and time he or she began the work shift and ended the work shift. <br /><br />This method is set automatically from the TimeTracker configuration page.  The Tracking Method can be changed for individual workers.';
+$string['email_help'] = 'The worker\'s email address.';
+$string['address_help'] = 'The worker\'s address.';
+$string['phone_help'] = 'The worker\'s phone number';
+$string['currpayrate_help'] = 'The worker\'s current rate of pay. <br />Enter $7.75 as 7.75';
+$string['trackermethod_help'] = 'The method the worker will use to track hours. <br /><br /> TimeClock has the worker clock in at the beginning of his or her shift and clock out at the conclusion of his or her shift. <br /> Hourlog has the worker choose the date and time he or she began the work shift and ended the work shift. <br /><br />This method is set automatically from the TimeTracker configuration page.  The Tracking Method can be changed for individual workers.';
