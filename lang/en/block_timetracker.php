@@ -186,3 +186,4 @@ $string['address'] = 'The worker\'s address.';
 $string['phone'] = 'The worker\'s phone number';
 $string['currpayrate'] = 'The worker\'s current rate of pay. <br />Enter $7.75 as 7.75';
 $string['trackermethod'] = 'The method the worker will use to track hours. <br /><br /> TimeClock has the worker clock in at the beginning of his or her shift and clock out at the conclusion of his or her shift. <br /> Hourlog has the worker choose the date and time he or she began the work shift and ended the work shift. <br /><br />This method is set automatically from the TimeTracker configuration page.  The Tracking Method can be changed for individual workers.';
+$string['editunittitle'] = 'Edit workunit for {$a}';

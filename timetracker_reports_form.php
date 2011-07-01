@@ -221,7 +221,8 @@ class timetracker_reports_form  extends moodleform {
                 if($canmanage){
                     $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".sesskey().'&unitid='.$unit->id;
     
-                    $editurl = new moodle_url($baseurl.'/editworkunit.php'.$paramstring);
+                    $editurl = new
+                    moodle_url($baseurl.'/editunit.php'.$paramstring);
                     $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
         
                     $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php'.$paramstring);

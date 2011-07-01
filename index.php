@@ -127,7 +127,7 @@ if ($canmanage) { //supervisor
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
                 $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".sesskey().'&unitid='.$unit->id.'&next=1';
     
-                $editurl = new moodle_url($baseurl.'/editworkunit.php'.$paramstring);
+                $editurl = new moodle_url($baseurl.'/editunit.php'.$paramstring);
                 $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
 
                 $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php'.$paramstring);
