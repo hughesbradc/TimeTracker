@@ -110,6 +110,9 @@ $string['headertimeout'] = 'Time Out';
 $string['headeredit'] = 'Edit';
 $string['headerdelete'] = 'Delete';
 
+
+$string['editunittitle'] = 'Editing workunit for {$a}';
+
 // Strings for Supervisor Reports Page
 $string['hourlogheader'] = 'Hourlog';
 $string['iemployee'] = 'Individual Employee';
