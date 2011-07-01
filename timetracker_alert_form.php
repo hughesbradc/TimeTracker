@@ -16,7 +16,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This form will allow the user to input the date, time, and duration of their workunit. 
+ * This form will allow the worker to submit an alert and correction to the supervisor of an error in a work unit.
+ * The supervisor will be able to approve or deny the correction.
  *
  * @package    TimeTracker
  * @copyright  Marty Gilbert & Brad Hughes
@@ -25,9 +26,9 @@
 
 require_once ($CFG->libdir.'/formslib.php');
 
-class timetracker_hourlog_form  extends moodleform {
+class timetracker_alert_form  extends moodleform {
 
-    function timetracker_hourlog_form($context, $userid, $courseid){
+    function timetracker_alert_form($context, $userid, $courseid){
         $this->context = $context;
         $this->userid = $userid;
         $this->courseid = $courseid;
@@ -60,40 +61,40 @@ class timetracker_hourlog_form  extends moodleform {
         }
         
 
-        $mform->addElement('header', 'general', get_string('hourlogtitle','block_timetracker', 
+        $mform->addElement('header', 'general', get_string('errortitle','block_timetracker', 
             $userinfo->firstname.' '.$userinfo->lastname));
 
         $mform->addElement('hidden','userid', $this->userid);
         $mform->addElement('hidden','id', $this->courseid);
 
         if($canmanage){
-            $mform->addElement('hidden','editedby', '0');
+        
         }else{
             $mform->addElement('hidden','editedby', $this->userid);
-        }
-
-        $workunit = $DB->get_record('block_timetracker_workunit', array('id'=>$this->userid,'courseid'=>$this->courseid));
-
-        $mform->addElement('date_time_selector','timein','Time In: ');
-		$mform->addHelpButton('timein','timein','block_timetracker');
         
+        //TODO Pull work unit to be fixed //$workunit = $DB->get_record('block_timetracker_workunit', array('id'=>$this->userid,'courseid'=>$this->courseid));
+        $mform->addElement('html', get_string('to','block_timetracker'));
+        $mform->addElement('html', '<br /><br />'); 
+        $mform->addElement('html', get_string('subject','block_timetracker',$userinfo->firstname.'
+        '.$userinfo->lastname));
+        $mform->addElement('html', '<br /><br />'); 
+        $mform->addElement('html', get_string('data','block_timetracker'));
+        $mform->addElement('html', '<blockquote><blockquote><blockquote><blockquote>');
+            $mform->addElement('html', get_string('date','block_timetracker'));
+            $mform->addElement('html', '<br /><br />'); 
+            $mform->addElement('html', get_string('timeinerror','block_timetracker'));
+        $mform->addElement('html', '</blockquote></blockquote></blockquote></blockquote>');
         $mform->addElement('date_time_selector','timeout','Time Out: ');
 		$mform->addHelpButton('timeout','timeout','block_timetracker');
-		
-        $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
-    }
+	
+        $mform->addElement('textarea', 'message', get_string('messageforerror','block_timetracker'), 'wrap="virtual" rows="6" cols="75"');
+		$mform->addHelpButton('message','messageforerror','block_timetracker');
+
+        $this->add_action_buttons(true,get_string('sendbutton','block_timetracker'));
+        }
+    }   
 
     function validation ($data){
-        $errors = array();
-        if($data['timein'] > $data['timeout']){
-            $errors['timein'] = 'Time in cannot be before time out';    
-        }
-
-        if($data['timein'] > time() || $data['timeout'] > time()){
-            $errors['timein'] = 'Time cannot be set in the future';    
-        }
-
-        return $errors;
         
     }
 }
