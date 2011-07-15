@@ -35,12 +35,14 @@ $userid = required_param('userid', PARAM_INTEGER);
 $unitid = required_param('unitid', PARAM_INTEGER);
 $start = optional_param('start', 0, PARAM_INTEGER);
 $end = optional_param('end', 0, PARAM_INTEGER);
+$ispending = optional_param('ispending',false,PARAM_BOOL);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 $urlparams['unitid'] = $unitid;
 $urlparams['start'] = $start;
 $urlparams['end'] = $end;
+$urlparams['ispending'] = $ispending;
 
 $hourlogurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams);
 
@@ -71,7 +73,9 @@ if($USER->id != $workerrecord->mdluserid && !$canmanage){
     redirect($index,$status,2);
 }
 
-$strtitle = get_string('editunittitle','block_timetracker',$workerrecord->firstname.' '.$workerrecord->lastname); 
+$strtitle = get_string('editunittitle','block_timetracker',
+    $workerrecord->firstname.' '.$workerrecord->lastname); 
+
 $PAGE->set_title($strtitle);
 
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
@@ -84,7 +88,8 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_editunit_form($context, $userid, $courseid,$unitid,$start,$end);
+$mform = new timetracker_editunit_form($context, $userid,
+    $courseid, $unitid, $start, $end, $ispending);
 
 if($workerrecord->active == 0){
     echo $OUTPUT->header();
@@ -115,11 +120,15 @@ if ($mform->is_cancelled()){ //user clicked cancel
     //form is shown for the first time
     echo $OUTPUT->header();
     $maintabs[] = new tabobject('home', $index, 'Main');
-    $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
-    $maintabs[] = new tabobject('editunit', new moodle_url($CFG->wwwroot.'/blocks/timetracker/editunit.php',$urlparams), 'Edit Workunit');
+    $maintabs[] = new tabobject('reports', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+    $maintabs[] = new tabobject('editunit', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/editunit.php',$urlparams), 'Edit Workunit');
 
     if($canmanage){
-        $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+        $maintabs[] = new tabobject('manage', 
+            new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 
+            'Manage Workers');
     }
     
     $tabs = array($maintabs);

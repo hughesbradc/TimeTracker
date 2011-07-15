@@ -24,16 +24,18 @@
  */
 
 require_once ($CFG->libdir.'/formslib.php');
+require_once ('lib.php');
 
 class timetracker_editunit_form extends moodleform {
 
-    function timetracker_editunit_form($context, $userid, $courseid, $unitid, $start=0, $end=0){
+    function timetracker_editunit_form($context, $userid, $courseid, $unitid, $start=0, $end=0,$ispending=false){
         $this->context = $context;
         $this->userid = $userid;
         $this->unitid = $unitid;
         $this->courseid = $courseid;
         $this->start = $start;
         $this->end = $end;
+        $this->ispending=$ispending;
         parent::__construct();
     }
 
@@ -52,14 +54,26 @@ class timetracker_editunit_form extends moodleform {
         $canmanage = true;
 
         $userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid));
-        $workunit = $DB->get_record('block_timetracker_workunit',array('id'=>$this->unitid));
 
         if(!$userinfo){
             print_error('Worker info does not exist for workerinfo id of '.$this->userid);
             return;
+
         }
 
-        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',array('id'=>$this->courseid,'userid'=>$this->userid));
+        if($this->ispending){
+            $unit = $DB->get_record('block_timetracker_pending',array('id'=>$this->unitid));
+        } else {
+            $unit = $DB->get_record('block_timetracker_workunit',array('id'=>$this->unitid));
+        }
+
+        if(!$unit){
+            print_error('Unit does not exist');
+            return;
+        }
+
+        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
+            array('id'=>$this->courseid,'userid'=>$this->userid));
         if(!$canmanage && $USER->id != $userinfo->mdluserid){
             redirect($index,'No permission to add hours',2);
         }
@@ -67,27 +81,46 @@ class timetracker_editunit_form extends moodleform {
         $mform->addElement('header', 'general', get_string('editunittitle','block_timetracker', 
             $userinfo->firstname.' '.$userinfo->lastname));
 
+        /** HIDDEN FIELDS **/
         $mform->addElement('hidden','userid', $this->userid);
         $mform->addElement('hidden','unitid', $this->unitid);
         $mform->addElement('hidden','id', $this->courseid);
-
         //edited by supervisor
         $mform->addElement('hidden','editedby', '0');
+        /** END HIDDEN FIELDS **/
+        
 
-        $mform->addElement('date_time_selector','timein','Time In: ',array('optional'=>false,'step'=>1));
+        /** EXISTING DATA **/
+        $mform->addElement('html','<p>Existing clock-in: '.userdate($unit->timein, 
+            get_string('datetimeformat','block_timetracker')));
+        if(!$this->ispending){
+            $mform->addElement('html','<br />Existing clock-out: '.userdate($unit->timeout, 
+                get_string('datetimeformat','block_timetracker')));
+            $mform->addElement('html','<br />Elapsed time:
+                '.format_elapsed_time($unit->timeout - $unit->timein));
+        }
+        $mform->addElement('html','</p>');
+        /** END EXISTING DATA **/
+
+
+        $mform->addElement('date_time_selector','timein','Time In: ',
+            array('optional'=>false,'step'=>1));
 		$mform->addHelpButton('timein','timein','block_timetracker');
         if($this->start!=0){
             $mform->setDefault('timein',$this->start);
         } else {
-            $mform->setDefault('timein',$workunit->timein);
+            $mform->setDefault('timein',$unit->timein);
         }
         
-        $mform->addElement('date_time_selector','timeout','Time Out: ',array('optional'=>false,'step'=>1));
-		$mform->addHelpButton('timeout','timeout','block_timetracker');
-        if($this->end!=0){
-            $mform->setDefault('timeout',$this->end);
-        } else {
-            $mform->setDefault('timeout',$workunit->timeout);
+        if(!$this->ispending){
+            $mform->addElement('date_time_selector','timeout','Time Out: ',
+                array('optional'=>false,'step'=>1));
+		    $mform->addHelpButton('timeout','timeout','block_timetracker');
+            if($this->end!=0){
+                $mform->setDefault('timeout',$this->end);
+            } else {
+                $mform->setDefault('timeout',$unit->timeout);
+            }
         }
 		
         $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
