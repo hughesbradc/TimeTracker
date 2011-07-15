@@ -91,15 +91,20 @@ class timetracker_editunit_form extends moodleform {
         
 
         /** EXISTING DATA **/
-        $mform->addElement('html','<p>Existing clock-in: '.userdate($unit->timein, 
-            get_string('datetimeformat','block_timetracker')));
+        $mform->addElement('html',get_string('existingunit','block_timetracker'));
+        $mform->addElement('html','<blockquote><b>');
+        $mform->addElement('html', get_string('existingtimein','block_timetracker',
+            userdate($unit->timein, get_string('datetimeformat','block_timetracker'))));
+
         if(!$this->ispending){
-            $mform->addElement('html','<br />Existing clock-out: '.userdate($unit->timeout, 
-                get_string('datetimeformat','block_timetracker')));
-            $mform->addElement('html','<br />Elapsed time:
-                '.format_elapsed_time($unit->timeout - $unit->timein));
+            $mform->addElement('html','<br /><b>');
+            $mform->addElement('html',get_string('existingtimein','block_timetracker',
+                userdate($unit->timeout, get_string('datetimeformat','block_timetracker'))));
+            $mform->addElement('html','<br /><b>');
+            $mform->addElement('html',get_string('existingduration','block_timetracker',
+                format_elapsed_time($unit->timeout - $unit->timein)));
         }
-        $mform->addElement('html','</p>');
+        $mform->addElement('html','</blockquote>');
         /** END EXISTING DATA **/
 
 
