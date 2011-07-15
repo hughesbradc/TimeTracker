@@ -50,7 +50,8 @@ class timetracker_reports_form  extends moodleform {
         }
 
         if($this->userid==0 && !$canmanage){
-            print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
+            print_error('notpermissible','block_timetracker',
+                $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
         }
 
         if($this->userid == 0 && $canmanage){
@@ -67,7 +68,8 @@ class timetracker_reports_form  extends moodleform {
             $usersid = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid), 'id');
 
             if(!$usersid && $usersid->id != $this->userid && !$canmanage){
-                print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
+                print_error('notpermissible','block_timetracker',
+                    $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
             }
         }
 
@@ -123,7 +125,8 @@ class timetracker_reports_form  extends moodleform {
         if(!$pendingunits){ //if they don't have them.
             $mform->addElement('html','No pending work units<br />');
         } else { //if they do have pending
-            $mform->addElement('html', '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">');
+            $mform->addElement('html', 
+                '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">');
         
             $headers = '<tr>';
             if($this->userid == 0) $headers .= '<th>Name</th>';
@@ -138,12 +141,15 @@ class timetracker_reports_form  extends moodleform {
                 $row='<tr>';
                 if($this->userid == 0){
                     $row .='<td><a href="'.$baseurl.
-                        '/reports.php?id='.$this->courseid.'&userid='.$pending->userid.'">'.$workers[$pending->userid]->lastname.', '.
+                        '/reports.php?id='.$this->courseid.'&userid='.
+                            $pending->userid.'">'.$workers[$pending->userid]->lastname.', '.
                         $workers[$pending->userid]->firstname.'</a></td>';
                 }
-                $row.='<td>'.userdate($pending->timein,get_string('datetimeformat','block_timetracker')).'</td>';
+                $row.='<td>'.userdate($pending->timein,
+                    get_string('datetimeformat','block_timetracker')).'</td>';
 
-                $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".sesskey().'&pendingid='.$pending->id;
+                $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".sesskey().
+                    '&unitid='.$pending->id;
                 $deleteurl = new moodle_url($baseurl.'/deletepending.php'.$paramstring);
                 $deleteicon = new pix_icon('t/delete', get_string('delete'));
                 $deleteaction = $OUTPUT->action_icon(
@@ -153,9 +159,10 @@ class timetracker_reports_form  extends moodleform {
                 $actions = $deleteaction; 
 
                 if($canmanage){
-    
-                    $editurl = new moodle_url($baseurl.'/editpending.php'.$paramstring);
-                    $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
+                    $paramstring .= "&unitid=$pending->id";
+                    $editurl = new moodle_url($baseurl.'/editunit.php'.$paramstring);
+                    $editaction = $OUTPUT->action_icon($editurl, 
+                        new pix_icon('t/edit', get_string('edit')));
                     $actions .= $editaction; 
         
                      
@@ -188,7 +195,8 @@ class timetracker_reports_form  extends moodleform {
         if(!$units){ //if they don't have them.
             $mform->addElement('html','No completed work units<br />');
         } else { //if they do have some
-            $mform->addElement('html', '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">');
+            $mform->addElement('html', '
+                <table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">');
         
             $headers = 
                 '<tr>
@@ -209,21 +217,26 @@ class timetracker_reports_form  extends moodleform {
                 $row='<tr>';
                 if($this->userid == 0){
                     $row .='<td><a href="'.$baseurl.
-                        '/reports.php?id='.$this->courseid.'&userid='.$unit->userid.'">'.$workers[$unit->userid]->lastname.', '.
+                        '/reports.php?id='.$this->courseid.'&userid='.$unit->userid.'">'.
+                        $workers[$unit->userid]->lastname.', '.
                         $workers[$unit->userid]->firstname.'</a></td>';
                 }
-                $row.='<td style="text-align: center">'.userdate($unit->timein,get_string('datetimeformat','block_timetracker')).'</td>';
-                $row.='<td style="text-align: center">'.userdate($unit->timeout,get_string('datetimeformat','block_timetracker')).'</td>';
+                $row.='<td style="text-align: center">'.
+                    userdate($unit->timein,get_string('datetimeformat','block_timetracker')).'</td>';
+                $row.='<td style="text-align: center">'.
+                    userdate($unit->timeout,get_string('datetimeformat','block_timetracker')).'</td>';
                 $currelapsed = $unit->timeout - $unit->timein;  
                 $total += round_time($currelapsed);
                 $row.='<td style="text-align: center">'.format_elapsed_time($currelapsed).'</td>';
 
                 if($canmanage){
-                    $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".sesskey().'&unitid='.$unit->id;
+                    $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".
+                        sesskey().'&unitid='.$unit->id;
     
                     $editurl = new
-                    moodle_url($baseurl.'/editunit.php'.$paramstring);
-                    $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
+                        moodle_url($baseurl.'/editunit.php'.$paramstring);
+                    $editaction = $OUTPUT->action_icon($editurl, 
+                        new pix_icon('t/edit', get_string('edit')));
         
                     $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php'.$paramstring);
                     $deleteicon = new pix_icon('t/delete', get_string('delete'));
@@ -237,21 +250,14 @@ class timetracker_reports_form  extends moodleform {
                 $row .= '</tr>';
                 $mform->addElement('html',$row);
             }
-            $mform->addElement('html','<tr><td colspan="4" style="text-align: right">Total: '.format_elapsed_time($total).'</td></tr></table>');
+            $mform->addElement('html',
+                '<tr><td colspan="4" style="text-align: right">Total: '.
+                format_elapsed_time($total).'</td></tr></table>');
 
         } 
     
     
     }
-
-    /*
-    function definition_after_data(){
-        //$mform =& $this->_form;
-        //echo ("in def after data");
-        //$this->reportstart = $mform->getElementValue('reportstart');
-        //$this->reportend = $mform->getElementValue('reportend');
-    }
-    */
 
     function validation ($data){
         $errors = array();

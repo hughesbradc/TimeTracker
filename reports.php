@@ -73,15 +73,18 @@ $worker =
     $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id,'courseid'=>$courseid));
 
 $maintabs[] = new tabobject('home', $index, 'Main');
-$maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+$maintabs[] = new tabobject('reports', 
+    new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
 
 if($worker && $worker->timetrackermethod==1){
-    $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
+    $maintabs[] = new tabobject('hourlog', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
 }
 
 
 if($canmanage){
-    $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+    $maintabs[] = new tabobject('manage', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
 }
 
 $tabs = array($maintabs);

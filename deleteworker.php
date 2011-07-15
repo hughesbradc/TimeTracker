@@ -69,7 +69,8 @@ echo $OUTPUT->heading($strtitle, 2);
 //$PAGE->print_header('Delete TimeTracker Worker', 'Delete Worker');
 
 if (!has_capability('block/timetracker:manageworkers', $context)) {
-    print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
+    print_error('notpermissible','block_timetracker',
+        $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 } else {
     if($userid && confirm_sesskey()){
         //purge them from the db
@@ -79,7 +80,8 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
         $DB->delete_records('block_timetracker_pending',array('userid'=>$userid));    
         echo 'Worker and all data have been deleted';
     } else {
-        print_error('errordeleting','block_timetracker', $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
+        print_error('errordeleting','block_timetracker', 
+            $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
     }
 }
 

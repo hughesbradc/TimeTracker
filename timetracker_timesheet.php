@@ -45,7 +45,8 @@ class timetracker_timesheet_form  extends moodleform {
         }
 
         if($this->userid==0 && !$canmanage){
-            print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
+            print_error('notpermissible','block_timetracker',
+                $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
         }
 
         if($this->userid == 0 && $canmanage){
@@ -68,11 +69,13 @@ class timetracker_timesheet_form  extends moodleform {
             $mform->addElement('hidden','userid', $userid->id);
             
             if(!$usersid && $usersid->id != $this->userid && !$canmanage){
-                print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
+                print_error('notpermissible','block_timetracker',
+                    $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
             }
         }
 
-        $mform->addElement('select', 'calendar_month', 'Month', array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'));
+        $mform->addElement('select', 'calendar_month', 'Month', 
+            array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'));
         //TODO Will eventually look at the earliest record in the database and generate year from that
         //record to the current year
         $mform->addElement('select', 'calendar_year', 'Year', array('2011'));

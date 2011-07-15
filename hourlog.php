@@ -45,7 +45,8 @@ $context = $PAGE->context;
 $PAGE->set_url($hourlogurl);
 $PAGE->set_pagelayout('course');
 
-$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
+$workerrecord = $DB->get_record('block_timetracker_workerinfo', 
+    array('id'=>$userid,'courseid'=>$courseid));
 
 if(!$workerrecord){
     echo "NO WORKER FOUND!";
@@ -70,7 +71,8 @@ if($USER->id != $workerrecord->mdluserid && !$canmanage){
 
 
 
-$strtitle = get_string('hourlogtitle','block_timetracker',$workerrecord->firstname.' '.$workerrecord->lastname); 
+$strtitle = get_string('hourlogtitle','block_timetracker',
+    $workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
 
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
@@ -110,10 +112,13 @@ if ($mform->is_cancelled()){ //user clicked cancel
     //form is shown for the first time
     echo $OUTPUT->header();
     $maintabs[] = new tabobject('home', $index, 'Main');
-    $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
-    $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
+    $maintabs[] = new tabobject('reports', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+    $maintabs[] = new tabobject('hourlog', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
     if($canmanage){
-        $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+        $maintabs[] = new tabobject('manage', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
     }
     
     $tabs = array($maintabs);

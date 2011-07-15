@@ -29,7 +29,7 @@ require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
-$pendingid = required_param('pendingid', PARAM_INTEGER);
+$pendingid = required_param('unitid', PARAM_INTEGER);
 $nextpage = optional_param('next',0,PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
@@ -49,15 +49,19 @@ $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
-$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id,'courseid'=>$courseid));
+$worker = $DB->get_record('block_timetracker_workerinfo',
+    array('mdluserid'=>$USER->id,'courseid'=>$courseid));
 
 if (!$canmanage && $USER->id != $worker->mdluserid){
-    print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
+    print_error('notpermissible','block_timetracker',
+        $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 } else {
     if($userid && $courseid && $pendingid && confirm_sesskey()){
         $DB->delete_records('block_timetracker_pending',array('id'=>$pendingid));
     } else {
-        print_error('errordeleting','block_timetracker', $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
+        print_error('errordeleting','block_timetracker', 
+            $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
     }
 }
+
 redirect($nexturl,'Pending work unit has been deleted', 1);

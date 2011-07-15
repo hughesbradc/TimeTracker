@@ -36,7 +36,8 @@
         $clockin = optional_param('clockin', 0,PARAM_INTEGER);
         $clockout = optional_param('clockout',0, PARAM_INTEGER);
         $courseid = $COURSE->id;
-        $worker = $DB->get_record('block_timetracker_workerinfo', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
+        $worker = $DB->get_record('block_timetracker_workerinfo', 
+            array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -55,7 +56,6 @@
 
         } 
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
-            //$this->content->text  = '<a href="'.$CFG->wwwroot.'/blocks/timetracker/manageworkers.php?id='.$COURSE->id.'">Manage Workers</a>';
             $indexparams['id'] = $courseid;
             $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
             
@@ -90,88 +90,87 @@
             $this->content->text .='</ul>';
 
         } else {
-	        $recordexists = $DB->record_exists('block_timetracker_workerinfo', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
+	        $recordexists = $DB->record_exists('block_timetracker_workerinfo', 
+                array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
             if (!$recordexists){
                 $link =
                 '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id.'&mdluserid='.$USER->id;
                 $action = null; 
                 $this->content->text = '<center>';
-                $this->content->text .= $OUTPUT->action_link($link, get_string('registerinfo', 'block_timetracker'), $action);
+                $this->content->text .= $OUTPUT->action_link($link, 
+                    get_string('registerinfo', 'block_timetracker'), $action);
                 $this->content->text .= '</center>';
             } else {
                   
                 if($worker->active == 0){
                     $this->content->text = get_string('notactiveerror','block_timetracker');
-                    //echo $OUTPUT->footer();
                     return $this->content;
-                    //die;
                 }           
             
             // Implement Icons - Timeclock Method
             if($worker->timetrackermethod == 0){
                 $ttuserid = $worker->id;
 
-            $pendingrecord = $DB->record_exists('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
-            if(!$pendingrecord){ 
-                //$action = null;
-                $urlparams['userid']=$ttuserid;
-                $urlparams['id']=$courseid;
-                $urlparams['clockin']=1;
-                $indexparams['userid'] = $ttuserid;
-                $indexparams['id'] = $courseid;
-                $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
-                $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
+                $pendingrecord = $DB->record_exists('block_timetracker_pending', 
+                    array('userid'=>$ttuserid,'courseid'=>$courseid));
 
-                // Clock In Icon
-                $this->content->text .= '<div style="text-align: center">';
-                $clockinicon = new pix_icon('clock_in','Clock in', 'block_timetracker');
-                $clockinaction = $OUTPUT->action_icon($link, $clockinicon);
+                if(!$pendingrecord){ 
+                    $urlparams['userid']=$ttuserid;
+                    $urlparams['id']=$courseid;
+                    $urlparams['clockin']=1;
+                    $indexparams['userid'] = $ttuserid;
+                    $indexparams['id'] = $courseid;
+                    $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
+                    $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
     
-                $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
-                $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
-    
-                $this->content->text .= $clockinaction. $timeclockdataaction.'<br />';
-                $this->content->text .= '</div>';
+                    // Clock In Icon
+                    $this->content->text .= '<div style="text-align: center">';
+                    $clockinicon = new pix_icon('clock_in','Clock in', 'block_timetracker');
+                    $clockinaction = $OUTPUT->action_icon($link, $clockinicon);
+        
+                    $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
+                    $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
+        
+                    $this->content->text .= $clockinaction. $timeclockdataaction.'<br />';
+                    $this->content->text .= '</div>';
                 }
-
-
-            if($pendingrecord){ 
-                //$action = null;
-                $urlparams['userid']=$ttuserid;
-                $urlparams['id']=$courseid;
-                $urlparams['clockout']=1;
-                $indexparams['userid'] = $ttuserid;
-                $indexparams['id'] = $courseid;
-                $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
-                $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
-                $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
     
-                $this->content->text .= '<div style="text-align: center">';
-                
-                $clockouticon = new pix_icon('clock_out','Clock out','block_timetracker');
-                $clockoutaction = $OUTPUT->action_icon($link, $clockouticon);
-                
-                $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
-                $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
-                
-                $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
-                $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
-                
-                $this->content->text .= $clockoutaction. $timeclockdataaction. $alertaction. '<br />';
-
-                $this->content->text .= '<b>';
-                //$this->content->text .= get_string('pendingtimestamp','block_timetracker');
-                $this->content->text .= '</b>';
-                $pendingtimestamp= $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
-                $this->content->text .= 'Clock in: '.userdate($pendingtimestamp->timein,get_string('datetimeformat','block_timetracker')).'<br />';
-                $this->content->text .= '<br />';
-                $this->content->text .= '</div>';
-                $this->content->text .= '<hr>';
-}
-
-   }
-
+    
+                if($pendingrecord){ 
+                    $urlparams['userid']=$ttuserid;
+                    $urlparams['id']=$courseid;
+                    $urlparams['clockout']=1;
+                    $indexparams['userid'] = $ttuserid;
+                    $indexparams['id'] = $courseid;
+                    $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
+                    $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
+                    $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
+        
+                    $this->content->text .= '<div style="text-align: center">';
+                    
+                    $clockouticon = new pix_icon('clock_out','Clock out','block_timetracker');
+                    $clockoutaction = $OUTPUT->action_icon($link, $clockouticon);
+                    
+                    $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
+                    $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
+                    
+                    $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
+                    $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
+                    
+                    $this->content->text .= $clockoutaction. $timeclockdataaction. $alertaction. '<br />';
+    
+                    $this->content->text .= '<b>';
+                    $this->content->text .= '</b>';
+                    $pendingtimestamp= $DB->get_record('block_timetracker_pending', 
+                        array('userid'=>$ttuserid,'courseid'=>$courseid));
+                    $this->content->text .= 'Clock in: '.userdate($pendingtimestamp->timein,
+                        get_string('datetimeformat','block_timetracker')).'<br />';
+                    $this->content->text .= '<br />';
+                    $this->content->text .= '</div>';
+                    $this->content->text .= '<hr>';
+                }
+            }
 
             // Implement Icons - Hourlog Method
             if($worker->timetrackermethod == 1){
@@ -205,21 +204,21 @@
             }
 
 
-           if($recordexists){     
+            if($recordexists){     
                 if($this->config->block_timetracker_show_month_hours ||
-                $this->config->block_timetracker_show_term_hours ||
-                $this->config->block_timetracker_show_ytd_hours ||
-                $this->config->block_timetracker_show_total_hours) {
+                    $this->config->block_timetracker_show_term_hours ||
+                    $this->config->block_timetracker_show_ytd_hours ||
+                    $this->config->block_timetracker_show_total_hours) {
 
-			        $this->content->text .= '<span style=font-weight:bold; ">'.get_string('hourstitle','block_timetracker').'</span>';
+                    $this->content->text .= '<span style=font-weight:bold; ">'.
+                        get_string('hourstitle','block_timetracker').'</span>';
 
-                    $stats = get_worker_stats($ttuserid,$COURSE->id);
+                    $stats = get_worker_stats($ttuserid, $COURSE->id);
 
 					if ($this->config->block_timetracker_show_month_hours){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalmonth', 'block_timetracker');
                         $this->content->text .= $stats['monthhours'];
-                        
 					}
 					
                     if ($this->config->block_timetracker_show_term_hours){
@@ -242,11 +241,13 @@
                 }
       
 				if ($this->config->block_timetracker_show_month_earnings ||
-				$this->config->block_timetracker_show_term_earnings ||
-				$this->config->block_timetracker_show_ytd_earnings ||
-				$this->config->block_timetracker_show_total_earnings) {
+				    $this->config->block_timetracker_show_term_earnings ||
+				    $this->config->block_timetracker_show_ytd_earnings ||
+				    $this->config->block_timetracker_show_total_earnings) {
+
 					$this->content->text .= '<br />';
-					$this->content->text .= '<span style="font-weight:bold; ">'.get_string('earningstitle','block_timetracker').'</span>';
+					$this->content->text .= '<span style="font-weight:bold; ">'.
+                        get_string('earningstitle','block_timetracker').'</span>';
 
 					if ($this->config->block_timetracker_show_month_earnings){
 						$this->content->text .= '<br />';
@@ -273,11 +274,13 @@
 					}
 				}
 
-                    $ttuserid = $worker->id;
+                $ttuserid = $worker->id;
                     
-                    if($clockin == 1){
+                if($clockin == 1){
                     //protect against refreshing a 'clockin' screen
-                    $pendingrecord= $DB->record_exists('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
+                    $pendingrecord= $DB->record_exists('block_timetracker_pending',
+                        array('userid'=>$ttuserid,'courseid'=>$courseid));
+
                         if(!$pendingrecord){
                             $cin = new stdClass();
                             $cin->userid = $ttuserid;
@@ -287,7 +290,8 @@
                         }
 
                     } else if ($clockout == 1){
-                        $cin = $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+                        $cin = $DB->get_record('block_timetracker_pending', 
+                            array('userid'=>$ttuserid,'courseid'=>$courseid));
                         if($cin){
 
                             $cin->timeout = time();
@@ -298,25 +302,16 @@
 
                             $worked = $DB->insert_record('block_timetracker_workunit',$cin);
                             if($worked){
-                                $DB->delete_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
-
+                                $DB->delete_records('block_timetracker_pending', 
+                                    array('userid'=>$ttuserid,'courseid'=>$courseid));
                             } else {
-
-                                print_error('couldnotclockout', 'block_timetracker', $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.$courseid.'&userid='.$ttuserid);
-
+                                print_error('couldnotclockout', 'block_timetracker', $
+                                    CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.
+                                    $courseid.'&userid='.$ttuserid);
                             }
                         }
                     }
-        }
-                /* 
-                $this->content->text .= '<div style="text-align: center">';
-                $this->content->text .= '<br />'; 
-                $this->content->text .= '<a href="'.$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id.'">';
-                $this->content->text .= get_string('manage','block_timetracker');
-				$this->content->text .= '</a>';
-				$this->content->text .= '</div>';
-                */
-			}
+            }
 		}
 	    return $this->content;
     }
@@ -352,7 +347,8 @@
         parent::instance_config_save($data, $nolongerused);
         global $DB, $COURSE;
         foreach ($data as $name => $value){
-            $rec = $DB->get_record('block_timetracker_config',array('courseid'=>$COURSE->id,'name'=>$name));
+            $rec = $DB->get_record('block_timetracker_config',
+                array('courseid'=>$COURSE->id,'name'=>$name));
 
             $conf = new stdClass;
             $conf->name = $name;

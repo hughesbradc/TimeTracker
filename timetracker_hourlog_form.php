@@ -54,7 +54,8 @@ class timetracker_hourlog_form  extends moodleform {
             return;
         }
 
-        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',array('id'=>$this->courseid,'userid'=>$this->userid));
+        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
+            array('id'=>$this->courseid,'userid'=>$this->userid));
         if(!$canmanage && $USER->id != $userinfo->mdluserid){
             redirect($index,'No permission to add hours',2);
         }
@@ -72,7 +73,8 @@ class timetracker_hourlog_form  extends moodleform {
             $mform->addElement('hidden','editedby', $this->userid);
         }
 
-        $workunit = $DB->get_record('block_timetracker_workunit', array('id'=>$this->userid,'courseid'=>$this->courseid));
+        $workunit = $DB->get_record('block_timetracker_workunit', 
+            array('id'=>$this->userid,'courseid'=>$this->courseid));
 
         $mform->addElement('date_time_selector','timein','Time In: ');
 		$mform->addHelpButton('timein','timein','block_timetracker');

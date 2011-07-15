@@ -47,14 +47,17 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
-$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
+$workerrecord = $DB->get_record('block_timetracker_workerinfo', 
+    array('id'=>$userid,'courseid'=>$courseid));
 
 if(!$workerrecord){
-    print_error('usernotexist', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
+    print_error('usernotexist', 'block_timetracker',
+        $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
 }
 
 if(!$canmanage && $USER->id != $workerrecord->mdluserid){
-    print_error('notpermissible', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
+    print_error('notpermissible', 'block_timetracker',
+        $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
 }
 
 $workbook = new MoodleExcelWorkbook('-');
@@ -146,7 +149,8 @@ $worksheet[1]->set_column(0,8,10.57);
 // Write data to spreadsheet
 $worksheet[1]->write_string(0,0,'Mars Hill College', $format_title);
 $worksheet[1]->merge_cells(0, 0, 0, 7);
-$worksheet[1]->write_string(1,0,'Timesheet - '.$monthinfo['monthname'].', '.$year, $format_timesheet_header);
+$worksheet[1]->write_string(1,0,'Timesheet - '.$monthinfo['monthname'].', '.
+    $year, $format_timesheet_header);
 $worksheet[1]->merge_cells(1, 0, 1, 7);
 
 // Creates separator line under 'Timesheet'
@@ -282,9 +286,11 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
 }
 
 // Write footer data
-$worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n\r" .'$'.$workerrecord->currpayrate,$format_footer);
+$worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n\r" .'$'.
+    $workerrecord->currpayrate,$format_footer);
 $worksheet[1]->merge_cells(20,0,20,3);
-$worksheet[1]->write_string(20,4,'Total Hours for '.$monthinfo['monthname'].', '.$year.":\n\r".$monthsum,$format_footer);
+$worksheet[1]->write_string(20,4,'Total Hours for '.$monthinfo['monthname'].', '.
+    $year.":\n\r".$monthsum,$format_footer);
 $worksheet[1]->merge_cells(20,4,20,7);
 $worksheet[1]->write_string(21,0,'Supervisor Signature/Date',$format_footer);
 $worksheet[1]->merge_cells(21,0,21,3);

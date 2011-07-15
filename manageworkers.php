@@ -45,12 +45,15 @@ if($courseid){
 
 
 if (!has_capability('block/timetracker:manageworkers', $context)) {
-    print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
+    print_error('notpermissible','block_timetracker',
+        $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 }
 
 $maintabs[] = new tabobject('home', $index, 'Main');
-$maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
-$maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+$maintabs[] = new tabobject('reports', 
+    new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+$maintabs[] = new tabobject('manage', 
+    new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
 
 $manageworkerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 

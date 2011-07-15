@@ -45,20 +45,8 @@ $context = $PAGE->context;
 $timeclockurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',$urlparams);
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
-//$PAGE->set_url($timeclockurl);
-//$PAGE->set_pagelayout('base');
-
-
-//$strtitle = get_string('timeclocktitle','block_timetracker'); 
-//$PAGE->set_title($strtitle);
-
-//$PAGE->navbar->add(get_string('blocks'));
-//$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
-//$PAGE->navbar->add($strtitle);
-
-//echo $OUTPUT->header();
-//
-$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$ttuserid,'courseid'=>$courseid));
+$workerrecord = $DB->get_record('block_timetracker_workerinfo', 
+    array('id'=>$ttuserid,'courseid'=>$courseid));
 
 if(!$workerrecord){
     print_error("NO WORKER FOUND!");
@@ -70,7 +58,8 @@ if($workerrecord->active == 0){
 } else if($clockin == 1){
         $status = 'Clock in successful';
         //protect against refreshing a 'clockin' screen
-        $pendingrecord= $DB->record_exists('block_timetracker_pending',array('userid'=>$ttuserid,'courseid'=>$courseid));
+        $pendingrecord= $DB->record_exists('block_timetracker_pending',
+            array('userid'=>$ttuserid,'courseid'=>$courseid));
         if(!$pendingrecord){
             $cin = new stdClass();
             $cin->userid = $ttuserid;
@@ -82,7 +71,8 @@ if($workerrecord->active == 0){
 } else if ($clockout == 1){
     $status = 'Clock out successful';
 
-    $cin = $DB->get_record('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+    $cin = $DB->get_record('block_timetracker_pending', 
+        array('userid'=>$ttuserid,'courseid'=>$courseid));
     if($cin){
         $nowtime = time();
 
@@ -103,7 +93,8 @@ if($workerrecord->active == 0){
 
             $worked = $DB->insert_record('block_timetracker_workunit',$cin);
             if($worked){
-                $DB->delete_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+                $DB->delete_records('block_timetracker_pending', 
+                    array('userid'=>$ttuserid,'courseid'=>$courseid));
             } else {
                 print_error('couldnotclockout', 'block_timetracker', 
                     $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.$courseid.'&userid='.$ttuserid);
@@ -116,7 +107,8 @@ if($workerrecord->active == 0){
                 $worked = $DB->insert_record('block_timetracker_workunit', $cin);
                 if(!$worked){
                     print_error('couldnotclockout', 'block_timetracker', 
-                        $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.$courseid.'&userid='.$ttuserid);
+                        $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.
+                            $courseid.'&userid='.$ttuserid);
                     return;
                 }
 
@@ -126,7 +118,8 @@ if($workerrecord->active == 0){
                     $tomidnight = $nowtime - $currcheckin;
                 } 
             }
-            $DB->delete_records('block_timetracker_pending', array('userid'=>$ttuserid,'courseid'=>$courseid));
+            $DB->delete_records('block_timetracker_pending', 
+                array('userid'=>$ttuserid,'courseid'=>$courseid));
         }
     }
 } 

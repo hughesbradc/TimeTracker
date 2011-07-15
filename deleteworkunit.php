@@ -52,12 +52,14 @@ if($nextpage!=0){
 }
 
 if (!has_capability('block/timetracker:manageworkers', $context)) {
-    print_error('notpermissible','block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
+    print_error('notpermissible','block_timetracker',
+        $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 } else {
     if($unitid && confirm_sesskey()){
         $DB->delete_records('block_timetracker_workunit',array('id'=>$unitid));
     } else {
-        print_error('errordeleting','block_timetracker', $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
+        print_error('errordeleting','block_timetracker', 
+            $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
     }
 }
 
