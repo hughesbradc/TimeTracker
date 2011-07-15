@@ -200,7 +200,6 @@
                 $this->content->text .= '</div>';
                 $this->content->text .= '<hr>';
                 }
-
             }
 
 
@@ -276,7 +275,7 @@
 
                 $ttuserid = $worker->id;
                     
-                if($clockin == 1){
+                if($clockin == 1) {
                     //protect against refreshing a 'clockin' screen
                     $pendingrecord= $DB->record_exists('block_timetracker_pending',
                         array('userid'=>$ttuserid,'courseid'=>$courseid));
@@ -311,8 +310,9 @@
                             }
                         }
                     }
-            }
-		}
+                }
+		    }
+        }
 	    return $this->content;
     }
 
