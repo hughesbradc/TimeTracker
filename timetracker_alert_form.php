@@ -61,8 +61,7 @@ class timetracker_alert_form  extends moodleform {
         }
         
 
-        $mform->addElement('header', 'general', get_string('errortitle','block_timetracker', 
-            $userinfo->firstname.' '.$userinfo->lastname));
+        $mform->addElement('header', 'general', get_string('errortitle','block_timetracker', $userinfo->firstname.' '.$userinfo->lastname));
 
         $mform->addElement('hidden','userid', $this->userid);
         $mform->addElement('hidden','id', $this->courseid);
@@ -73,28 +72,66 @@ class timetracker_alert_form  extends moodleform {
             $mform->addElement('hidden','editedby', $this->userid);
         
         //TODO Pull work unit to be fixed //$workunit = $DB->get_record('block_timetracker_workunit', array('id'=>$this->userid,'courseid'=>$this->courseid));
+
+        $mform->addElement('html', '<b>'); 
         $mform->addElement('html', get_string('to','block_timetracker'));
-        $mform->addElement('html', '<br /><br />'); 
-        $mform->addElement('html', get_string('subject','block_timetracker',$userinfo->firstname.'
-        '.$userinfo->lastname));
-        $mform->addElement('html', '<br /><br />'); 
+        $mform->addElement('html', '</b>'); 
+
+        $teachers = get_users_by_capability($this->context, 'block/timetracker:manageworkers');
+        foreach ($teachers as $teacher) {
+            $mform->addElement('advcheckbox', 'teacherid['.$teacher->id.']', 
+                $teacher->firstname.' '.$teacher->lastname,  null, array('group' => 1, 'checked="checked"'));
+        }
+        
+        //$this->add_checkbox_controller(1, get_string('selectallnone'), array('style' => 'font-weight: bold;'), 1);
+        $this->add_checkbox_controller(1, null, null, 1);
+
+        $mform->addElement('html', '<br /><br /><b>'); 
+        $mform->addElement('html', get_string('subject','block_timetracker'));
+        $mform->addElement('html', '</b><blockquote><blockquote><blockquote><blockquote>'); 
+        $mform->addElement('html', get_string('subjecttext','block_timetracker',$userinfo->firstname.' '.$userinfo->lastname));
+        $mform->addElement('html', '<br /><br /></blockquote></blockquote></blockquote></blockquote><b>'); 
         $mform->addElement('html', get_string('data','block_timetracker'));
         $mform->addElement('html', '<blockquote><blockquote><blockquote><blockquote>');
-            $mform->addElement('html', get_string('date','block_timetracker'));
-            $mform->addElement('html', '<br /><br />'); 
-            $mform->addElement('html', get_string('timeinerror','block_timetracker'));
+        $mform->addElement('html', get_string('timeinerror','block_timetracker'));
         $mform->addElement('html', '</blockquote></blockquote></blockquote></blockquote>');
         $mform->addElement('date_time_selector','timeout','Time Out: ');
 		$mform->addHelpButton('timeout','timeout','block_timetracker');
 	
         $mform->addElement('textarea', 'message', get_string('messageforerror','block_timetracker'), 'wrap="virtual" rows="6" cols="75"');
 		$mform->addHelpButton('message','messageforerror','block_timetracker');
+        $mform->addRule('message', null, 'required', null, 'client', 'false');
 
         $this->add_action_buttons(true,get_string('sendbutton','block_timetracker'));
         }
     }   
 
     function validation ($data){
-        
+        $errors = array();
+
+        $teachers = $data['teacherid'];
+        $firstteach = -1;
+        foreach($teachers as $teacherid=>$selectedval){
+            //if($firstteach == -1) $firstteach = $teacherid; 
+            if($selectedval==1){ 
+                return $errors;
+            }
+            $firstteach = $teacherid;
+        }
+        //if it gets here, we had no teachers selected. Use the first teacherid value to
+        //place the error
+        $errors['teacherid['.$firstteach.']'] = 'You must select at least one supervisor.';
+
+        if($data['timeout'] > time()){
+            $errors['timeout'] = 'Time cannot be set in the future.';
+        }
+
+        /*
+        if($data['timein'] > $data['timeout']){
+            $errors['timein'] = 'Your time out cannot be before you clocked in.';
+        }
+        */
+
+        return $errors;
     }
 }

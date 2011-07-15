@@ -60,16 +60,6 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
-if($USER->id != $workerrecord->mdluserid && !$canmanage){
-    print_error('You do not have permissions to add hours for this user');
-} else if(!$canmanage && $workerrecord->timetrackermethod==0){
-    redirect($index,$status,2);
-}
-
-
-
-
-
 $strtitle = get_string('errortitle','block_timetracker',$workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
 
@@ -94,27 +84,33 @@ if($workerrecord->active == 0){
     die;
 }
 
-if ($mform->is_cancelled()){ //user clicked cancel
+if ($mform->is_cancelled()){ 
+    //user clicked cancel
+    redirect($index);
 
 } else if ($formdata=$mform->get_data()){
-        $formdata->courseid = $formdata->id;
-        unset($formdata->id);
-        $formdata->payrate = $workerrecord->currpayrate;
-        $formdata->lastedited = time();
-        $formdata->lasteditedby = $formdata->editedby;
-        $DB->insert_record('block_timetracker_workunit', $formdata);
-    $status = 'Hourlog entry saved successfully.'; 
-    redirect($index,$status,2);
+    print('Successfully submitted');
 
 } else {
     //form is shown for the first time
-    echo $OUTPUT->header();
-    $maintabs[] = new tabobject('home', $index, 'Main');
-    $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
-    $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
-    $maintabs[] = new tabobject('alert', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Alert Supervisor');
-    if($canmanage){
-        $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+    
+    if($workerrecord->timetrackermethod==0){
+        echo $OUTPUT->header();
+        $maintabs[] = new tabobject('home', $index, 'Main');
+        $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+        $maintabs[] = new tabobject('alert', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Alert Supervisor');
+        if($canmanage){
+            $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+        }
+    } else {
+        echo $OUTPUT->header();
+        $maintabs[] = new tabobject('home', $index, 'Main');
+        $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+        $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
+        $maintabs[] = new tabobject('alert', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Alert Supervisor');
+        if($canmanage){
+            $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+        }
     }
     
     $tabs = array($maintabs);

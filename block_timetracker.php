@@ -158,7 +158,7 @@
                 $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
                 $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
                 
-                $this->content->text .= $clockoutaction. $timeclockdataaction.'<br />';
+                $this->content->text .= $clockoutaction. $timeclockdataaction. $alertaction. '<br />';
 
                 $this->content->text .= '<b>';
                 //$this->content->text .= get_string('pendingtimestamp','block_timetracker');
