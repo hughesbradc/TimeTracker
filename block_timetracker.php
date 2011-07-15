@@ -305,8 +305,8 @@
                                 $DB->delete_records('block_timetracker_pending', 
                                     array('userid'=>$ttuserid,'courseid'=>$courseid));
                             } else {
-                                print_error('couldnotclockout', 'block_timetracker', $
-                                    CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.
+                                print_error('couldnotclockout', 'block_timetracker', 
+                                    $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.
                                     $courseid.'&userid='.$ttuserid);
                             }
                         }

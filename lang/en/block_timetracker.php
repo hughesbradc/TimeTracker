@@ -163,7 +163,8 @@ $string['existingtimein'] = 'Existing Time In:</b>  {$a}';
 $string['existingtimeout'] = 'Existing Time Out:</b>  {$a}';
 $string['existingduration'] = 'Duration:</b>  {$a}';
 
-
+$string['emessagetext'] = '{$a} has sent an error alert request.  Please review the following data';
+$string['emessagehtml'] = '';
 
 //Error Codes
 $string['notpermissible'] = 'You do not have permissions to perform this action';
@@ -173,16 +174,26 @@ $string['usernotexist'] = 'User does not exist';
 
 //Context-Sensitive Help
 //Configuration Page
-$string['maxtermearnings_help'] = 'The maximum hours the worker is allowed to work per term. <br /> Enter decimal hours (example: 750.00) or zero (0) for unlimited.';
-$string['currpayrate_help'] = 'The hourly rate of pay the worker will receive. <br /> Enter decimal currency (Example: 7.50).';
-$string['showtotalhours_help'] = 'Shows the worker the overall total number of hours worked. <br /> Yes = Enabled <br /> No = Disabled';
-$string['showtermhours_help'] = 'Shows the worker the total number of hours worked for the current term. <br /> Yes = Enabled <br /> No = Disabled';
-$string['showmonthhours_help'] = 'Shows the worker the total number of hours worked for the current month. <br /> Yes = Enabled <br /> No = Disabled';
-$string['showytdhours_help'] = 'Shows the worker the total number of hours worked year to date. <br /> Yes = Enabled <br /> No = Disabled';
-$string['showmonthearnings_help'] = 'Shows the worker the total amount earned for the current month. <br /> Yes = Enabled <br /> No = Disabled';
-$string['showtermearnings_help'] = 'Shows the worker the total amount earned for the current term. <br /> Yes = Enabled <br /> No = Disabled';
-$string['showytdearnings_help'] = 'Shows the worker the total amount earned year to date. <br /> Yes = Enabled <br /> No = Disabled';
-$string['showtotalearnings_help'] = 'Shows the worker the overall total amount earned. <br /> Yes = Enabled <br /> No = Disabled';
+$string['maxtermearnings_help'] = 'The maximum hours the worker is allowed to work per term. <br /> 
+    Enter decimal hours (example: 750.00) or zero (0) for unlimited.';
+$string['currpayrate_help'] = 'The hourly rate of pay the worker will receive. <br /> Enter decimal currency 
+    (Example: 7.50).';
+$string['showtotalhours_help'] = 'Shows the worker the overall total number of hours worked. <br />
+    Yes = Enabled <br /> No = Disabled';
+$string['showtermhours_help'] = 'Shows the worker the total number of hours worked for the current term. 
+    <br /> Yes = Enabled <br /> No = Disabled';
+$string['showmonthhours_help'] = 'Shows the worker the total number of hours worked for the current month. 
+    <br /> Yes = Enabled <br /> No = Disabled';
+$string['showytdhours_help'] = 'Shows the worker the total number of hours worked year to date. <br /> 
+    Yes = Enabled <br /> No = Disabled';
+$string['showmonthearnings_help'] = 'Shows the worker the total amount earned for the current month. <br /> 
+    Yes = Enabled <br /> No = Disabled';
+$string['showtermearnings_help'] = 'Shows the worker the total amount earned for the current term. <br />
+    Yes = Enabled <br /> No = Disabled';
+$string['showytdearnings_help'] = 'Shows the worker the total amount earned year to date. <br /> Yes = Enabled
+    <br /> No = Disabled';
+$string['showtotalearnings_help'] = 'Shows the worker the overall total amount earned. <br /> Yes = Enabled <
+    br /> No = Disabled';
 $string['department_help'] = 'The name of the department that employs the worker.';
 $string['position_help'] = 'The worker\'s position title.';
 $string['budget_help'] = 'The budget number that the worker\'s paycheck will be drafted from.';

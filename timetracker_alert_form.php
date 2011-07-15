@@ -71,24 +71,23 @@ class timetracker_alert_form  extends moodleform {
             return;
         }
 
-        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',array('id'=>$this->courseid,'userid'=>$this->userid));
+        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
+            array('id'=>$this->courseid,'userid'=>$this->userid));
         if(!$canmanage && $USER->id != $userinfo->mdluserid){
             redirect($index,'No permission to add hours',2);
         }
-        
 
-        $mform->addElement('header', 'general', get_string('errortitle','block_timetracker', $userinfo->firstname.' '.$userinfo->lastname));
+        $mform->addElement('header', 'general', get_string('errortitle','block_timetracker', 
+            $userinfo->firstname.' '.$userinfo->lastname));
 
         $mform->addElement('hidden','userid', $this->userid);
         $mform->addElement('hidden','id', $this->courseid);
 
         if($canmanage){
         
-        }else{
+        } else {
             $mform->addElement('hidden','editedby', $this->userid);
         
-        //TODO Pull work unit to be fixed //$workunit = $DB->get_record('block_timetracker_workunit', array('id'=>$this->userid,'courseid'=>$this->courseid));
-
         $mform->addElement('html', '<b>'); 
         $mform->addElement('html', get_string('to','block_timetracker'));
         $mform->addElement('html', '</b>'); 
@@ -99,13 +98,13 @@ class timetracker_alert_form  extends moodleform {
                 $teacher->firstname.' '.$teacher->lastname,  null, array('group' => 1, 'checked="checked"'));
         }
         
-        //$this->add_checkbox_controller(1, get_string('selectallnone'), array('style' => 'font-weight: bold;'), 1);
         $this->add_checkbox_controller(1, null, null, 1);
 
         $mform->addElement('html', '<b>'); 
         $mform->addElement('html', get_string('subject','block_timetracker'));
         $mform->addElement('html', '</b>'); 
-        $mform->addElement('html', get_string('subjecttext','block_timetracker',$userinfo->firstname.' '.$userinfo->lastname));
+        $mform->addElement('html', get_string('subjecttext','block_timetracker',$userinfo->firstname.' '.
+            $userinfo->lastname));
         $mform->addElement('html', '<br /><br /><b>'); 
         $mform->addElement('html', get_string('existingunit','block_timetracker'));
         $mform->addElement('html', '<blockquote>'); 
