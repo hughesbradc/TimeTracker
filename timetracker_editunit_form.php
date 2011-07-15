@@ -75,7 +75,7 @@ class timetracker_editunit_form extends moodleform {
         $mform->addElement('hidden','editedby', '0');
 
         $mform->addElement('date_time_selector','timein','Time In: ',array('optional'=>false,'step'=>1));
-		$mform->addHelpButton('block_timetracker_timein','timein','block_timetracker');
+		$mform->addHelpButton('timein','timein','block_timetracker');
         if($this->start!=0){
             $mform->setDefault('timein',$this->start);
         } else {
@@ -83,7 +83,7 @@ class timetracker_editunit_form extends moodleform {
         }
         
         $mform->addElement('date_time_selector','timeout','Time Out: ',array('optional'=>false,'step'=>1));
-		$mform->addHelpButton('block_timetracker_timeout','timeout','block_timetracker');
+		$mform->addHelpButton('timeout','timeout','block_timetracker');
         if($this->end!=0){
             $mform->setDefault('timeout',$this->end);
         } else {

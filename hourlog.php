@@ -62,6 +62,7 @@ $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparam
 if($USER->id != $workerrecord->mdluserid && !$canmanage){
     print_error('You do not have permissions to add hours for this user');
 } else if(!$canmanage && $workerrecord->timetrackermethod==0){
+    $status = 'You are not authorized to use the hourlog interface.';
     redirect($index,$status,2);
 }
 

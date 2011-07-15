@@ -150,12 +150,13 @@ $string['manageworkertitle'] = 'Manage Workers';
 $string['errortitle'] = 'Error Alert for {$a}';
 $string['sendbutton'] = 'Send';
 $string['to'] = 'To:  '; 
-$string['subject'] = 'Subject:  Work Unit Error for {$a}'; 
+$string['subject'] = 'Subject:  '; 
+$string['subjecttext'] = 'Work Unit Error for {$a}'; 
 $string['data'] = 'Data:'; 
 $string['date'] = 'Date:  '; 
 $string['timeinerror'] = 'Time In:  '; 
 $string['messageforerror'] = 'Message:  '; 
-
+$string['selectallnone'] = 'Select all or none';
 
 //Error Codes
 $string['notpermissible'] = 'You do not have permissions to perform this action';

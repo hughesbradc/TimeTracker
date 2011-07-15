@@ -41,7 +41,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
 
         $mform->addElement('header','general',get_string('updateformheadertitle','block_timetracker'));
 
-        //defaults -- shouldn't need these, because config should always be set.
+        //TODO defaults -- shouldn't need these, because config should always be set.
         $payrate = 7.50;
         $maxearnings = 750;
         $trackermethod = 0;
