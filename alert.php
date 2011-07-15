@@ -33,9 +33,13 @@ require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
+$unitid = required_param('unitid', PARAM_INTEGER);
+$ispending = optional_param('ispending',false,PARAM_BOOL);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
+$urlparams['unitid'] = $unitid;
+$urlparams['ispending'] = $ispending;
 
 $alerturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php',$urlparams);
 
@@ -73,7 +77,8 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_alert_form($context, $userid, $courseid);
+$mform = new timetracker_alert_form($context, $userid, $courseid,
+    $unitid,$ispending);
 
 
 if($workerrecord->active == 0){
@@ -119,5 +124,3 @@ if ($mform->is_cancelled()){
     $mform->display();
     echo $OUTPUT->footer();
 }
-
-

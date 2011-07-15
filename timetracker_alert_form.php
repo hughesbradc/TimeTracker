@@ -25,13 +25,17 @@
  */
 
 require_once ($CFG->libdir.'/formslib.php');
+require_once ('lib.php');
 
 class timetracker_alert_form  extends moodleform {
 
-    function timetracker_alert_form($context, $userid, $courseid){
+    function timetracker_alert_form($context, $userid, $courseid, $unitid, $ispending=false){
+        
         $this->context = $context;
         $this->userid = $userid;
         $this->courseid = $courseid;
+        $this->unitid = $unitid;
+        $this->ispending = $ispending;
         parent::__construct();
     }
 
@@ -47,9 +51,21 @@ class timetracker_alert_form  extends moodleform {
             $canmanage = true;
         }
         
+        if($this->ispending){
+            //Get from pending table
+            $unit = $DB->get_record('block_timetracker_pending',array('id'=>$this->unitid));
+        } else {
+            //Get from workunit
+            $unit = $DB->get_record('block_timetracker_workunit',array('id'=>$this->unitid));
+        }
 
+        if(!$unit){
+            print_error('Unit does not exist for unit id of '.$this->unitid);
+            return;
+        }
+        
         $userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid));
-
+        
         if(!$userinfo){
             print_error('Worker info does not exist for workerinfo id of '.$this->userid);
             return;
@@ -86,19 +102,44 @@ class timetracker_alert_form  extends moodleform {
         //$this->add_checkbox_controller(1, get_string('selectallnone'), array('style' => 'font-weight: bold;'), 1);
         $this->add_checkbox_controller(1, null, null, 1);
 
-        $mform->addElement('html', '<br /><br /><b>'); 
+        $mform->addElement('html', '<b>'); 
         $mform->addElement('html', get_string('subject','block_timetracker'));
-        $mform->addElement('html', '</b><blockquote><blockquote><blockquote><blockquote>'); 
+        $mform->addElement('html', '</b>'); 
         $mform->addElement('html', get_string('subjecttext','block_timetracker',$userinfo->firstname.' '.$userinfo->lastname));
-        $mform->addElement('html', '<br /><br /></blockquote></blockquote></blockquote></blockquote><b>'); 
+        $mform->addElement('html', '<br /><br /><b>'); 
+        $mform->addElement('html', get_string('existingunit','block_timetracker'));
+        $mform->addElement('html', '<blockquote>'); 
+        $mform->addElement('html', get_string('existingtimein','block_timetracker',
+            userdate($unit->timein, get_string('datetimeformat','block_timetracker'))));
+        
+
+        if(!$this->ispending){
+            //Time out and elapsed time
+            $mform->addElement('html', '<br />'); 
+            $mform->addElement('html',get_string('existingtimeout','block_timetracker',
+                userdate($unit->timein, get_string('datetimeformat','block_timetracker'))));
+        
+            $mform->addElement('html', '<br />'); 
+            $mform->addElement('html',get_string('existingduration','block_timetracker',
+                format_elapsed_time($unit->timeout - $unit->timein)));
+        }
+
+        $mform->addElement('html', '</blockquote><b>'); 
         $mform->addElement('html', get_string('data','block_timetracker'));
-        $mform->addElement('html', '<blockquote><blockquote><blockquote><blockquote>');
-        $mform->addElement('html', get_string('timeinerror','block_timetracker'));
-        $mform->addElement('html', '</blockquote></blockquote></blockquote></blockquote>');
-        $mform->addElement('date_time_selector','timeout','Time Out: ');
-		$mform->addHelpButton('timeout','timeout','block_timetracker');
-	
-        $mform->addElement('textarea', 'message', get_string('messageforerror','block_timetracker'), 'wrap="virtual" rows="6" cols="75"');
+        $mform->addElement('date_time_selector','timeinerror','Time In: ');
+        $mform->setDefault('timeinerror',$unit->timein);
+		$mform->addHelpButton('timeinerror','timein','block_timetracker');
+        $mform->addElement('date_time_selector','timeouterror','Time Out: ');
+		$mform->addHelpButton('timeouterror','timeout','block_timetracker');
+
+        if(!$this->ispending){
+            $mform->setDefault('timeouterror',$unit->timeout);
+        } else {
+            $mform->setDefault('timeouterror',$unit->timein + (60 * 60 * 2));
+        }
+        
+        $mform->addElement('textarea', 'message', 
+            get_string('messageforerror','block_timetracker'), 'wrap="virtual" rows="6" cols="75"');
 		$mform->addHelpButton('message','messageforerror','block_timetracker');
         $mform->addRule('message', null, 'required', null, 'client', 'false');
 
