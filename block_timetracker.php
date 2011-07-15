@@ -200,7 +200,6 @@
                 $this->content->text .= '</div>';
                 $this->content->text .= '<hr>';
                 }
-
             }
 
 
@@ -276,7 +275,7 @@
 
                 $ttuserid = $worker->id;
                     
-                if($clockin == 1){
+                if($clockin == 1) {
                     //protect against refreshing a 'clockin' screen
                     $pendingrecord= $DB->record_exists('block_timetracker_pending',
                         array('userid'=>$ttuserid,'courseid'=>$courseid));
@@ -305,14 +304,15 @@
                                 $DB->delete_records('block_timetracker_pending', 
                                     array('userid'=>$ttuserid,'courseid'=>$courseid));
                             } else {
-                                print_error('couldnotclockout', 'block_timetracker', $
-                                    CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.
+                                print_error('couldnotclockout', 'block_timetracker', 
+                                    $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.
                                     $courseid.'&userid='.$ttuserid);
                             }
                         }
                     }
-            }
-		}
+                }
+		    }
+        }
 	    return $this->content;
     }
 
