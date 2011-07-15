@@ -152,11 +152,18 @@ $string['sendbutton'] = 'Send';
 $string['to'] = 'To:  '; 
 $string['subject'] = 'Subject:  '; 
 $string['subjecttext'] = 'Work Unit Error for {$a}'; 
-$string['data'] = 'Data:'; 
+$string['data'] = 'Change Work Unit Data to:  '; 
 $string['date'] = 'Date:  '; 
 $string['timeinerror'] = 'Time In:  '; 
+$string['timeouterror'] = 'Time Out:  '; 
 $string['messageforerror'] = 'Message:  '; 
 $string['selectallnone'] = 'Select all or none';
+$string['existingunit'] = 'Existing Work Unit Data:  ';
+$string['existingtimein'] = 'Existing Time In:</b>  {$a}';
+$string['existingtimeout'] = 'Existing Time Out:</b>  {$a}';
+$string['existingduration'] = 'Duration:</b>  {$a}';
+
+
 
 //Error Codes
 $string['notpermissible'] = 'You do not have permissions to perform this action';

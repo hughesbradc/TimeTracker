@@ -233,6 +233,9 @@ if ($canmanage) { //supervisor
             $clockouticon = new pix_icon('clock_out','Clock out','block_timetracker');
             $clockoutaction = $OUTPUT->action_icon($clockouturl, $clockouticon);
 
+            $urlparams['ispending']=true;
+            $urlparams['unitid'] = $pending->id;
+
             $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
             
             $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
@@ -246,7 +249,9 @@ if ($canmanage) { //supervisor
             $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
             $table->add_data(array(userdate($pending->timein,get_string('datetimeformat','block_timetracker')),$clockoutaction.' '.$deleteaction.' '.$alertaction));
         }
-
+        
+        unset($urlparams['ispending']);
+        unset($urlparams['unitid']);
         $table->print_html();
 
         echo $OUTPUT->box_end();
@@ -257,9 +262,6 @@ if ($canmanage) { //supervisor
 
     if($userUnits){
 
-        $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
-        $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
-        $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);        
 
         echo $OUTPUT->box_start('generalbox boxaligncenter');
         echo '<h2>Last 10 Work Units</h2>';
@@ -277,13 +279,18 @@ if ($canmanage) { //supervisor
         //$titlerow = new html_table_cell();
         //print_object($userUnits);
         foreach ($userUnits as $unit){
-
+            $urlparams['unitid'] = $unit->id;
+            $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
+            $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
+            $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);        
+    
             $table->add_data(array(
                 userdate($unit->timein,get_string('datetimeformat','block_timetracker')),
                 userdate($unit->timeout,get_string('datetimeformat','block_timetracker')),
                 format_elapsed_time($unit->timeout - $unit->timein),
                     $alertaction));
         }
+        unset($urlparams['unitid']);
 
         $table->print_html();
 
