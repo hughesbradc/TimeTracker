@@ -253,7 +253,7 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
             if($unit->timein < $eod && $unit->timein > $mid){
                 $in = userdate($unit->timein,get_string('timeformat','block_timetracker'));
                 $out = userdate($unit->timeout,get_string('timeformat','block_timetracker'));
-                $wustr .= "In: $in\n\rOut: $out\n\r";
+                $wustr .= "In: $in\nOut: $out\n";
                 //unset($units[$key]);
                 $weeksum += get_hours(($unit->timeout - $unit->timein));
                 //error_log($weeksum);
@@ -286,11 +286,11 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
 }
 
 // Write footer data
-$worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n\r" .'$'.
+$worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n" .'$'.
     $workerrecord->currpayrate,$format_footer);
 $worksheet[1]->merge_cells(20,0,20,3);
 $worksheet[1]->write_string(20,4,'Total Hours for '.$monthinfo['monthname'].', '.
-    $year.":\n\r".$monthsum,$format_footer);
+    $year.":\n".$monthsum,$format_footer);
 $worksheet[1]->merge_cells(20,4,20,7);
 $worksheet[1]->write_string(21,0,'Supervisor Signature/Date',$format_footer);
 $worksheet[1]->merge_cells(21,0,21,3);

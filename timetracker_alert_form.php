@@ -105,7 +105,7 @@ class timetracker_alert_form  extends moodleform {
         $mform->addElement('html', '</b>'); 
         $mform->addElement('html', get_string('subjecttext','block_timetracker',$userinfo->firstname.' '.
             $userinfo->lastname));
-        $mform->addElement('html', '<br /><br /><b>'); 
+        $mform->addElement('html', '<br /><br />'); 
         $mform->addElement('html', get_string('existingunit','block_timetracker'));
         $mform->addElement('html', '<blockquote>'); 
         $mform->addElement('html', get_string('existingtimein','block_timetracker',
@@ -137,10 +137,14 @@ class timetracker_alert_form  extends moodleform {
             $mform->setDefault('timeouterror',$unit->timein + (60 * 60 * 2));
         }
         
+        $mform->addElement('checkbox', 'deleteunit', get_string('deleteunit','block_timetracker'));
+        $mform->addHelpButton('deleteunit', 'deleteunit', 'block_timetracker');
+
         $mform->addElement('textarea', 'message', 
             get_string('messageforerror','block_timetracker'), 'wrap="virtual" rows="6" cols="75"');
 		$mform->addHelpButton('message','messageforerror','block_timetracker');
         $mform->addRule('message', null, 'required', null, 'client', 'false');
+        $mform->addElement('html', '</b>'); 
 
         $this->add_action_buttons(true,get_string('sendbutton','block_timetracker'));
         }

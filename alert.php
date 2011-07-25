@@ -89,21 +89,28 @@ if($workerrecord->active == 0){
     die;
 }
 
-$user = '';
-$from = '';
-$subject = '';
-$messagetext = get_string('emessagetext','block_timetracker');
-$messagehtml = get_string('emessagehtml','block_timetracker');
+
+
 
 if ($mform->is_cancelled()){ 
     //user clicked cancel
     redirect($index);
 
 } else if ($formdata=$mform->get_data()){
-    //print('Successfully submitted');
-    email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
+    // Data collection to send email to supervisor(s)
+    $from = $DB->get_record('user',array('id'=>$USER->id));
+    $subject = get_string('subjecttext','block_timteracker'); 
+    $messagetext = get_string('emessagetext','block_timetracker');
+    $messagehtml = get_string('emessagehtml','block_timetracker');
 
-} else {
+        foreach($formdata->teacherid as $tid){
+            if(isset($formdata->teacherid[$tid])){ //box was checked?
+                $user = $DB->get_record('user',array('id'=>$tid));
+
+                email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
+            }
+        }
+    } else {
     //form is shown for the first time
     
     if($workerrecord->timetrackermethod==0){

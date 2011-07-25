@@ -112,7 +112,7 @@
             if($worker->timetrackermethod == 0){
                 $ttuserid = $worker->id;
 
-                $pendingrecord = $DB->record_exists('block_timetracker_pending', 
+                $pendingrecord = $DB->get_record('block_timetracker_pending', 
                     array('userid'=>$ttuserid,'courseid'=>$courseid));
 
                 if(!$pendingrecord){ 
@@ -134,15 +134,15 @@
         
                     $this->content->text .= $clockinaction. $timeclockdataaction.'<br />';
                     $this->content->text .= '</div>';
-                }
-    
-    
-                if($pendingrecord){ 
+                } else {
                     $urlparams['userid']=$ttuserid;
                     $urlparams['id']=$courseid;
                     $urlparams['clockout']=1;
+                    $urlparams['ispending']=true;
+                    $urlparams['unitid']=$pendingrecord->id;
                     $indexparams['userid'] = $ttuserid;
                     $indexparams['id'] = $courseid;
+                    
                     $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
                     $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
                     $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
@@ -180,9 +180,9 @@
                 $urlparams['id']=$courseid;
                 $indexparams['userid'] = $ttuserid;
                 $indexparams['id'] = $courseid;
+                
                 $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php', $urlparams);
                 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
-                $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
                 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
                 // Clock In Icon
@@ -193,10 +193,7 @@
                 $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
                 $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
     
-                $alerticon= new pix_icon('alert','Alert Supervisor','block_timetracker');
-                $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
-                
-                $this->content->text .= $clockinaction. $timeclockdataaction. $alertaction.'<br />';
+                $this->content->text .= $clockinaction. $timeclockdataaction.'<br />';
                 $this->content->text .= '</div>';
                 $this->content->text .= '<hr>';
                 }

@@ -151,20 +151,21 @@ $string['errortitle'] = 'Error Alert for {$a}';
 $string['sendbutton'] = 'Send';
 $string['to'] = 'To:  '; 
 $string['subject'] = 'Subject:  '; 
-$string['subjecttext'] = 'Work Unit Error for {$a}'; 
+$string['subjecttext'] = 'TimeTracker Work Unit Error Alert for {$a}'; 
 $string['data'] = 'Change Work Unit Data to:  '; 
 $string['date'] = 'Date:  '; 
 $string['timeinerror'] = 'Time In:  '; 
 $string['timeouterror'] = 'Time Out:  '; 
+$string['deleteunit'] = 'Delete this work unit'; 
 $string['messageforerror'] = 'Message:  '; 
 $string['selectallnone'] = 'Select all or none';
-$string['existingunit'] = 'Existing Work Unit Data:  ';
-$string['existingtimein'] = 'Existing Time In:</b>  {$a}';
-$string['existingtimeout'] = 'Existing Time Out:</b>  {$a}';
-$string['existingduration'] = 'Duration:</b>  {$a}';
+$string['existingunit'] = '<b>Existing Work Unit Data:</b>';
+$string['existingtimein'] = '<b>Existing Time In:</b>  {$a}';
+$string['existingtimeout'] = '<b>Existing Time Out:</b>  {$a}';
+$string['existingduration'] = '<b>Duration:</b>  {$a}';
 
-$string['emessagetext'] = '{$a} has sent an error alert request.  Please review the following data';
-$string['emessagehtml'] = '';
+$string['emessagetext'] = 'One of your workers has sent an error alert request.  Please review the following data:';
+$string['emessagehtml'] = '{$a} has sent an error alert request.  Please review the following data:';
 
 //Error Codes
 $string['notpermissible'] = 'You do not have permissions to perform this action';
@@ -229,3 +230,4 @@ $string['currpayrate_help'] = 'The worker\'s current rate of pay. <br />Enter $7
 $string['trackermethod_help'] = 'The method the worker will use to track hours. <br /><br /> TimeClock has the worker clock in at the beginning of his or her shift and clock out at the conclusion of his or her shift. <br /> Hourlog has the worker choose the date and time he or she began the work shift and ended the work shift. <br /><br />This method is set automatically from the TimeTracker configuration page.  The Tracking Method can be changed for individual workers.';
 $string['messageforerror_help'] = 'Allows the worker to send a message regarding the work unit error
 to his or her supervisor.';
+$string['deleteunit_help'] = 'Request that your supervisor delete this work unit.';
