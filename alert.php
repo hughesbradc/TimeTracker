@@ -99,17 +99,70 @@ if ($mform->is_cancelled()){
 } else if ($formdata=$mform->get_data()){
     // Data collection to send email to supervisor(s)
     $from = $DB->get_record('user',array('id'=>$USER->id));
-    $subject = get_string('subjecttext','block_timteracker'); 
-    $messagetext = get_string('emessagetext','block_timetracker');
-    $messagehtml = get_string('emessagehtml','block_timetracker');
+    $subject = get_string('subjecttext','block_timetracker', $workerrecord->firstname.'
+        '.$workerrecord->lastname);
 
-        foreach($formdata->teacherid as $tid){
-            if(isset($formdata->teacherid[$tid])){ //box was checked?
+    $messagetext = get_string('emessage1','block_timetracker');
+    $messagetext = get_string('emessage1','block_timetracker');
+    $messagetext .= get_string('br2','block_timetracker');
+    $messagetext .= get_string('emessage2','block_timetracker');
+    $messagetext .= get_string('br1','block_timetracker');
+    $messagetext .= get_string('emessage3','block_timetracker', userdate($formdata->origtimein)); 
+    $messagetext .= get_string('br2','block_timetracker');
+    $messagetext .= get_string('emessage5','block_timetracker');
+    $messagetext .= get_string('br1','block_timetracker');
+    $messagetext .= get_string('emessage3','block_timetracker', userdate($formdata->timeinerror));
+    $messagetext .= get_string('br1','block_timetracker');
+    $messagetext .= get_string('emessage4','block_timetracker', userdate($formdata->timeouterror));
+    $messagetext .= get_string('br2','block_timetracker');
+    $messagetext .= get_string('emessage6','block_timetracker', $formdata->message);
+
+    $messagehtml = get_string('emessage1','block_timetracker');
+    $messagehtml .= get_string('br2','block_timetracker');
+    $messagehtml .= get_string('emessage2','block_timetracker');
+    $messagehtml .= get_string('br1','block_timetracker');
+    $messagehtml .= get_string('emessage3','block_timetracker', userdate($formdata->origtimein)); 
+    if(!$ispending){ 
+        $messagehtml .= get_string('br1','block_timetracker');
+        $messagehtml .= get_string('emessage4','block_timetracker', userdate($formdata->origtimeout)); 
+    }
+    $messagehtml .= get_string('br2','block_timetracker');
+    $messagehtml .= get_string('emessage5','block_timetracker');
+    $messagehtml .= get_string('br1','block_timetracker');
+    $messagehtml .= get_string('emessage3','block_timetracker', userdate($formdata->timeinerror));
+    $messagehtml .= get_string('br1','block_timetracker');
+    $messagehtml .= get_string('emessage4','block_timetracker', userdate($formdata->timeouterror));
+    $messagehtml .= get_string('br2','block_timetracker');
+    $messagehtml .= get_string('emessage6','block_timetracker', $formdata->message);
+    $messagehtml .= get_string('br1','block_timetracker');
+    $messagehtml .= get_string('emessageapprove','block_timetracker', userdate($formdata->timeouterror));
+    $messagehtml .= get_string('br1','block_timetracker');
+    $messagehtml .= get_string('emessagechange','block_timetracker', userdate($formdata->timeouterror));
+    $messagehtml .= get_string('br2','block_timetracker');
+    $messagehtml .= get_string('emessagedeny','block_timetracker', $formdata->message);
+    
+
+        foreach($formdata->teacherid as $tid=>$checkvalue){
+            //print_object($tid.' '.$checkvalue);
+            if($checkvalue == 1){ //box was checked?
                 $user = $DB->get_record('user',array('id'=>$tid));
-
-                email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
+                //print('emailing user: '.$tid);
+                if($user){
+                    $mailok = email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
+                    //If pending, delete the pending unit so that the worker can clock-in now.
+                    if($ispending && $mailok)
+                        $DB->delete_records('block_timetracker_pending',array('id'=>$unitid));
+                    if(!$mailok)
+                        print_error("Error sending message to $user->firstname $user->lastname");
+                } else 
+                    print_error("Failed mailing user $tid");
             }
         }
+
+        $status = get_string('emessagesent','block_timetracker');
+        redirect($index,$status,2);
+
+    
     } else {
     //form is shown for the first time
     

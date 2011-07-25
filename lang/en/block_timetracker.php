@@ -18,6 +18,7 @@
  * @package    Block @subpackage TimeTracker @copyright  2011 Marty Gilbert & Brad Hughes @license
  * http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['datetimeformat']='%m/%d/%y, %I:%M %p';
 $string['timeformat']='%I:%M%p';
 
@@ -164,8 +165,21 @@ $string['existingtimein'] = '<b>Existing Time In:</b>  {$a}';
 $string['existingtimeout'] = '<b>Existing Time Out:</b>  {$a}';
 $string['existingduration'] = '<b>Duration:</b>  {$a}';
 
-$string['emessagetext'] = 'One of your workers has sent an error alert request.  Please review the following data:';
-$string['emessagehtml'] = '{$a} has sent an error alert request.  Please review the following data:';
+// Error Alert Email
+$string['emessage1'] = 'Please review the following TimeTracker error alert data:';
+$string['emessage2'] = '<b>Existing Data:</b>';
+$string['emessage3'] = 'Time In:  {$a}';
+$string['emessage4'] = 'Time Out:  {$a}';
+$string['emessage5'] = '<b>Proposed Data:</b>';
+$string['emessage6'] = 'Message: {$a}';
+$string['br1'] = '<br />';
+$string['br2'] = '<br /><br />';
+$string['emessagesent'] = 'Your notification has been sent to the selected supervisor(s)!';
+$string['emessageapprove'] = 'Approve';
+$string['emessagechange'] = 'Change';
+$string['emessagedeny'] = 'No action is required to deny this request.  You may want to respond to
+    this email notifying the worker that the request was not approved.';
+
 
 //Error Codes
 $string['notpermissible'] = 'You do not have permissions to perform this action';

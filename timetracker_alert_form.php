@@ -82,6 +82,8 @@ class timetracker_alert_form  extends moodleform {
 
         $mform->addElement('hidden','userid', $this->userid);
         $mform->addElement('hidden','id', $this->courseid);
+        $mform->addElement('hidden','unitid', $this->unitid);
+        $mform->addElement('hidden','ispending', $this->ispending);
 
         if($canmanage){
         
@@ -116,7 +118,7 @@ class timetracker_alert_form  extends moodleform {
             //Time out and elapsed time
             $mform->addElement('html', '<br />'); 
             $mform->addElement('html',get_string('existingtimeout','block_timetracker',
-                userdate($unit->timein, get_string('datetimeformat','block_timetracker'))));
+                userdate($unit->timeout, get_string('datetimeformat','block_timetracker'))));
         
             $mform->addElement('html', '<br />'); 
             $mform->addElement('html',get_string('existingduration','block_timetracker',
@@ -131,8 +133,11 @@ class timetracker_alert_form  extends moodleform {
         $mform->addElement('date_time_selector','timeouterror','Time Out: ');
 		$mform->addHelpButton('timeouterror','timeout','block_timetracker');
 
+        $mform->addElement('hidden','origtimein', $unit->timein); 
+        
         if(!$this->ispending){
             $mform->setDefault('timeouterror',$unit->timeout);
+            $mform->addElement('hidden','origtimeout', $unit->timeout); 
         } else {
             $mform->setDefault('timeouterror',$unit->timein + (60 * 60 * 2));
         }
