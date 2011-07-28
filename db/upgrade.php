@@ -159,6 +159,9 @@ function xmldb_block_timetracker_upgrade($oldversion) {
         $table->add_field('alerttime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
             null, null);
 
+        // Adding keys to table block_timetracker_config
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
         // Conditionally launch create table for block_timetracker_alert_units
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
@@ -181,6 +184,9 @@ function xmldb_block_timetracker_upgrade($oldversion) {
             XMLDB_NOTNULL, null, '0');
         $table->add_field('alertid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
             XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table block_timetracker_config
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
         // Conditionally launch create table for block_timetracker_alert_com
         if (!$dbman->table_exists($table)) {
