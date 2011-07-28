@@ -61,7 +61,7 @@ $string['savebutton'] = 'Save';
 $string['blocktitle'] = 'TimeTracker';
 $string['hourstitle'] = 'Hours';
 $string['earningstitle'] = 'Earnings';
-$string['totalmonth'] = 'This month:';
+$string['totalmonth'] = 'This month: ';
 $string['totalterm'] = 'This term: ';
 $string['totalytd'] = 'Year to date: ';
 $string['total'] = 'Total: ';
@@ -147,7 +147,7 @@ $string['noworkers'] = 'No workers listed';
 $string['updateformheadertitle'] = 'Update Worker Information';
 $string['manageworkertitle'] = 'Manage Workers';
 
-// Strings for 'Error Alert' Page
+// Strings for 'Error Alert'
 $string['errortitle'] = 'Error Alert for {$a}';
 $string['sendbutton'] = 'Send';
 $string['to'] = 'To:  '; 
@@ -164,17 +164,23 @@ $string['existingunit'] = '<b>Existing Work Unit Data:</b>';
 $string['existingtimein'] = '<b>Existing Time In:</b>  {$a}';
 $string['existingtimeout'] = '<b>Existing Time Out:</b>  {$a}';
 $string['existingduration'] = '<b>Duration:</b>  {$a}';
+$string['approvedsuccess'] = 'The error approval has been processed successfully!  Please wait to be
+    redirected.'; 
 
 // Error Alert Email
 $string['emessage1'] = 'Please review the following TimeTracker error alert data:';
 $string['emessage2'] = '<b>Existing Data:</b>';
 $string['emessage3'] = 'Time In:  {$a}';
 $string['emessage4'] = 'Time Out:  {$a}';
+$string['emessageduration'] = 'Duration:  {$a}';
 $string['emessage5'] = '<b>Proposed Data:</b>';
 $string['emessage6'] = 'Message: {$a}';
 $string['br1'] = '<br />';
 $string['br2'] = '<br /><br />';
+$string['hr'] = '<hr>';
 $string['emessagesent'] = 'Your notification has been sent to the selected supervisor(s)!';
+$string['emessageavailable'] = '<b>Available Actions:</b>';
+$string['emessagedisclaimer'] = '(Please note that you will be prompted to sign into Moodle in order to complete the request).';
 $string['emessageapprove'] = 'Approve';
 $string['emessagechange'] = 'Change';
 $string['emessagedeny'] = 'No action is required to deny this request.  You may want to respond to
@@ -185,7 +191,7 @@ $string['emessagedeny'] = 'No action is required to deny this request.  You may 
 $string['notpermissible'] = 'You do not have permissions to perform this action';
 $string['errordeleting'] = 'Invalid session key or user id';
 $string['usernotexist'] = 'User does not exist';
-
+$string['alreadyapproved'] = 'This work unit has already been approved by {$a}';
 
 //Context-Sensitive Help
 //Configuration Page

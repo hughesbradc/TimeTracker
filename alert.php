@@ -102,21 +102,55 @@ if ($mform->is_cancelled()){
     $subject = get_string('subjecttext','block_timetracker', $workerrecord->firstname.'
         '.$workerrecord->lastname);
 
-    $messagetext = get_string('emessage1','block_timetracker');
+    // BUILD HYPERLINKS FOR EMAIL
+    $delete = 0;
+    if(isset($formdata->deleteunit))
+        $delete = 1;
+    
+    $approvelink =  $CFG->wwwroot.'/blocks/timetracker/eapendingapprove.php?userid='.$userid.'&id='
+        .$courseid.'&ti='.$formdata->timeinerror.'&to='.$formdata->timeouterror.'&delete='.$delete;
+
+    $changelink = $CFG->wwwroot.'/blocks/timetracker/editunit.php?id='.$courseid.'&userid='.$userid.
+        '&unitid='.$unitid;
+
+
+    //***** PLAIN TEXT *****//
     $messagetext = get_string('emessage1','block_timetracker');
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage2','block_timetracker');
     $messagetext .= get_string('br1','block_timetracker');
     $messagetext .= get_string('emessage3','block_timetracker', userdate($formdata->origtimein)); 
+    if(!$ispending){ 
+        $messagetext .= get_string('br1','block_timetracker');
+        $messagetext .= get_string('emessage4','block_timetracker', userdate($formdata->origtimeout)); 
+        $messagetext .= get_string('br1','block_timetracker');
+        $messagetext .= get_string('emessageduration','block_timetracker', 
+            format_elapsed_time($formdata->origtimeout - $formdata->origtimein));
+    }
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage5','block_timetracker');
     $messagetext .= get_string('br1','block_timetracker');
     $messagetext .= get_string('emessage3','block_timetracker', userdate($formdata->timeinerror));
     $messagetext .= get_string('br1','block_timetracker');
     $messagetext .= get_string('emessage4','block_timetracker', userdate($formdata->timeouterror));
+    $messagetext .= get_string('br1','block_timetracker');
+    $messagetext .= get_string('emessageduration','block_timetracker', 
+        format_elapsed_time($formdata->timeouterror - $formdata->timeinerror));
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage6','block_timetracker', $formdata->message);
+    $messagetext .= get_string('br2','block_timetracker');
+    $messagetext .= get_string('hr','block_timetracker');
+    $messagetext .= get_string('emessageavailable','block_timetracker');
+    $messagetext .= get_string('br1','block_timetracker');
+    $messagetext .= get_string('emessagedisclaimer','block_timetracker');
+    $messagetext .= get_string('br2','block_timetracker');
+    $messagetext .= get_string('emessageapprove','block_timetracker');
+    $messagetext .= get_string('br1','block_timetracker');
+    $messagetext .= get_string('emessagechange','block_timetracker');
+    $messagetext .= get_string('br1','block_timetracker');
+    $messagetext .= get_string('emessagedeny','block_timetracker', $formdata->message);
 
+    //***** HTML *****//
     $messagehtml = get_string('emessage1','block_timetracker');
     $messagehtml .= get_string('br2','block_timetracker');
     $messagehtml .= get_string('emessage2','block_timetracker');
@@ -125,6 +159,9 @@ if ($mform->is_cancelled()){
     if(!$ispending){ 
         $messagehtml .= get_string('br1','block_timetracker');
         $messagehtml .= get_string('emessage4','block_timetracker', userdate($formdata->origtimeout)); 
+        $messagehtml .= get_string('br1','block_timetracker');
+        $messagehtml .= get_string('emessageduration','block_timetracker', 
+            format_elapsed_time($formdata->origtimeout - $formdata->origtimein));
     }
     $messagehtml .= get_string('br2','block_timetracker');
     $messagehtml .= get_string('emessage5','block_timetracker');
@@ -132,16 +169,41 @@ if ($mform->is_cancelled()){
     $messagehtml .= get_string('emessage3','block_timetracker', userdate($formdata->timeinerror));
     $messagehtml .= get_string('br1','block_timetracker');
     $messagehtml .= get_string('emessage4','block_timetracker', userdate($formdata->timeouterror));
+    $messagehtml .= get_string('br1','block_timetracker');
+    $messagehtml .= get_string('emessageduration','block_timetracker', 
+        format_elapsed_time($formdata->timeouterror - $formdata->timeinerror));
     $messagehtml .= get_string('br2','block_timetracker');
     $messagehtml .= get_string('emessage6','block_timetracker', $formdata->message);
-    $messagehtml .= get_string('br1','block_timetracker');
-    $messagehtml .= get_string('emessageapprove','block_timetracker', userdate($formdata->timeouterror));
-    $messagehtml .= get_string('br1','block_timetracker');
-    $messagehtml .= get_string('emessagechange','block_timetracker', userdate($formdata->timeouterror));
     $messagehtml .= get_string('br2','block_timetracker');
-    $messagehtml .= get_string('emessagedeny','block_timetracker', $formdata->message);
+    $messagehtml .= get_string('hr','block_timetracker');
+    $messagehtml .= get_string('emessageavailable','block_timetracker');
+    $messagehtml .= get_string('br1','block_timetracker');
+    $messagehtml .= get_string('emessagedisclaimer','block_timetracker');
+    $messagehtml .= get_string('br2','block_timetracker');
     
+    // Approve link
+    $messagehtml .= '<a href="'.$approvelink.'">';
+    $messagehtml .= get_string('emessageapprove','block_timetracker');
+    $messagehtml .= '</a>';
+    
+    $messagehtml .= get_string('br1','block_timetracker');
+    
+    // Change link
+    $messagehtml .= '<a href="'.$changelink.'">';
+    $messagehtml .= get_string('emessagechange','block_timetracker');
+    $messagehtml .= '</a>';
+    
+    $messagehtml .= get_string('br1','block_timetracker');
+    $messagehtml .= get_string('emessagedeny','block_timetracker', $formdata->message);
+   
+    // Move data from 'pending' or 'workunit' table into the 'alert_units' table
+    // Pending Work Unit
+     
 
+    // Completed Work Unit
+
+
+    // Send the email to the selected supervisor(s)
         foreach($formdata->teacherid as $tid=>$checkvalue){
             //print_object($tid.' '.$checkvalue);
             if($checkvalue == 1){ //box was checked?
@@ -149,9 +211,12 @@ if ($mform->is_cancelled()){
                 //print('emailing user: '.$tid);
                 if($user){
                     $mailok = email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
-                    //If pending, delete the pending unit so that the worker can clock-in now.
+                    // Delete the unit from the 'pending' or 'workunit' table since the data was
+                    // inserted into the 'alert_unit' table and any emails have been sent.
                     if($ispending && $mailok)
                         $DB->delete_records('block_timetracker_pending',array('id'=>$unitid));
+                    if(!$ispending && $mailok)
+                        $DB->delete_records('block_timetracker_workunit'),array('id'=>$unitid));
                     if(!$mailok)
                         print_error("Error sending message to $user->firstname $user->lastname");
                 } else 

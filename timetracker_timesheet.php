@@ -28,10 +28,12 @@ require_once ('lib.php');
 
 class timetracker_timesheet_form  extends moodleform {
 
-    function timetracker_timesheet_form($context,$userid = 0,$courseid=0){
+    function timetracker_timesheet_form($context,$userid = 0,$courseid=0, $month, $year){
         $this->context = $context;
         $this->userid = $userid;
         $this->courseid = $courseid;
+        $this->month = $month;
+        $this->year = $year
         parent::__construct();
     }
 
@@ -44,40 +46,20 @@ class timetracker_timesheet_form  extends moodleform {
             $canmanage = true;
         }
 
-        if($this->userid==0 && !$canmanage){
-            print_error('notpermissible','block_timetracker',
-                $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
-        }
+        // Collect all of the workers under the supervisor
 
-        if($this->userid == 0 && $canmanage){
-            //supervisor -- show all!
-            $workers =
-            $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$this->courseid));
-            if(!$workers){
-               $mform->addElement('html','No workers found'); 
-               return;
-            }
-            //add the workers to a drop down list
-
-        }  else {
-
-            $usersid = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid), 'id');
-            //add a hidden field to store userid (bet it's below)
-
-            $mform->addElement('header', 'general', 'Calendar');
-            $mform->addElement('hidden','id', $this->courseid);
-            $mform->addElement('hidden','userid', $userid->id);
-            
-            if(!$usersid && $usersid->id != $this->userid && !$canmanage){
-                print_error('notpermissible','block_timetracker',
-                    $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
-            }
+        //$workerlist = $DB->get_records('block_timetracker_
+       
+        if($canmanage) {
+            $mform->addElement('select', 'calendar_workers', 'Workers', array(
         }
 
         $mform->addElement('select', 'calendar_month', 'Month', 
             array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'));
         //TODO Will eventually look at the earliest record in the database and generate year from that
         //record to the current year
-        $mform->addElement('select', 'calendar_year', 'Year', array('2011'));
+        
+        $earliestyear = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE workerid='.
+            $this->userid ' DESC LIMIT 1';
 
-
+        $mform->addElement('select', 'calendar_year', 'Year', array(''));

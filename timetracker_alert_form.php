@@ -141,9 +141,11 @@ class timetracker_alert_form  extends moodleform {
         } else {
             $mform->setDefault('timeouterror',$unit->timein + (60 * 60 * 2));
         }
-        
-        $mform->addElement('checkbox', 'deleteunit', get_string('deleteunit','block_timetracker'));
-        $mform->addHelpButton('deleteunit', 'deleteunit', 'block_timetracker');
+       
+        if(!$this->ispending){
+            $mform->addElement('checkbox', 'deleteunit', get_string('deleteunit','block_timetracker'));
+            $mform->addHelpButton('deleteunit', 'deleteunit', 'block_timetracker');
+        }
 
         $mform->addElement('textarea', 'message', 
             get_string('messageforerror','block_timetracker'), 'wrap="virtual" rows="6" cols="75"');
