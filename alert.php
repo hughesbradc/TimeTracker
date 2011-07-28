@@ -198,11 +198,15 @@ if ($mform->is_cancelled()){
    
     // Move data from 'pending' or 'workunit' table into the 'alert_units' table
     // Pending Work Unit
-     
-
+    if($ispending){
+        $alertunit = get_record('block_timetracker_pending',array('id'=>$unitid));
+    } else {
+        $alertunit = get_record('block_timetracker_workunit',array('id'=>$unitid));
+    }
     // Completed Work Unit
 
-
+    if($alertunit){
+        unset($formdata->id);
     // Send the email to the selected supervisor(s)
         foreach($formdata->teacherid as $tid=>$checkvalue){
             //print_object($tid.' '.$checkvalue);
@@ -223,6 +227,7 @@ if ($mform->is_cancelled()){
                     print_error("Failed mailing user $tid");
             }
         }
+    }
 
         $status = get_string('emessagesent','block_timetracker');
         redirect($index,$status,2);
