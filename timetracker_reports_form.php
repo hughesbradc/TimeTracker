@@ -159,7 +159,7 @@ class timetracker_reports_form  extends moodleform {
                 $actions = $deleteaction; 
 
                 if($canmanage){
-                    $paramstring .= "&unitid=$pending->id";
+                    $paramstring .= "&unitid=$pending->id&ispending=true";
                     $editurl = new moodle_url($baseurl.'/editunit.php'.$paramstring);
                     $editaction = $OUTPUT->action_icon($editurl, 
                         new pix_icon('t/edit', get_string('edit')));

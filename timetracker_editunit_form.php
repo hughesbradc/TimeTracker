@@ -92,12 +92,12 @@ class timetracker_editunit_form extends moodleform {
 
         /** EXISTING DATA **/
         $mform->addElement('html',get_string('existingunit','block_timetracker'));
-        $mform->addElement('html','<blockquote><b>');
+        $mform->addElement('html','<blockquote>');
         $mform->addElement('html', get_string('existingtimein','block_timetracker',
             userdate($unit->timein, get_string('datetimeformat','block_timetracker'))));
 
         if(!$this->ispending){
-            $mform->addElement('html','<br /><b>');
+            $mform->addElement('html','<br />');
             $mform->addElement('html',get_string('existingtimein','block_timetracker',
                 userdate($unit->timeout, get_string('datetimeformat','block_timetracker'))));
             $mform->addElement('html','<br /><b>');

@@ -87,7 +87,6 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     //print_object($workers);
 
     foreach($formdata->workerid as $idx){
-         
         if((isset($formdata->activeid[$idx]) && $workers[$idx]->active==0) ||  //not the same
          (!isset($formdata->activeid[$idx]) && $workers[$idx]->active == 1)){ //not the same
             $workers[$idx]->active = isset($formdata->activeid[$idx])?1:0;
