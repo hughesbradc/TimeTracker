@@ -84,16 +84,18 @@ function xmldb_block_timetracker_upgrade($oldversion) {
 
         // Define field supervisor to be added to block_timetracker_workerinfo
         $table = new xmldb_table('block_timetracker_workerinfo');
-        $field = new xmldb_field('supervisor', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '0', 'budget');
+        $field = new xmldb_field('supervisor', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, 
+            null, '0', 'budget');
 
         // Conditionally launch add field supervisor
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-    // Define field institution to be added to block_timetracker_workerinfo
+        // Define field institution to be added to block_timetracker_workerinfo
         $table = new xmldb_table('block_timetracker_workerinfo');
-        $field = new xmldb_field('institution', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '0', 'supervisor');
+        $field = new xmldb_field('institution', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, 
+            '0', 'supervisor');
 
         // Conditionally launch add field institution
         if (!$dbman->field_exists($table, $field)) {
@@ -102,14 +104,16 @@ function xmldb_block_timetracker_upgrade($oldversion) {
 
         // Changing type of field currpayrate on table block_timetracker_workerinfo to number
         $table = new xmldb_table('block_timetracker_workerinfo');
-        $field = new xmldb_field('currpayrate', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0', 'position');
+        $field = new xmldb_field('currpayrate', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, 
+            null, '0', 'position');
 
         // Launch change of type for field currpayrate
         $dbman->change_field_type($table, $field);
 
          // Define field maxtermearnings to be added to block_timetracker_workerinfo
         $table = new xmldb_table('block_timetracker_workerinfo');
-        $field = new xmldb_field('maxtermearnings', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0', 'comments');
+        $field = new xmldb_field('maxtermearnings', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, 
+            null, '0', 'comments');
 
         // Conditionally launch add field maxtermearnings
         if (!$dbman->field_exists($table, $field)) {
@@ -118,7 +122,8 @@ function xmldb_block_timetracker_upgrade($oldversion) {
 
          // Changing type of field payrate on table block_timetracker_workunit to number
         $table = new xmldb_table('block_timetracker_workunit');
-        $field = new xmldb_field('payrate', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, null, 'timeout');
+        $field = new xmldb_field('payrate', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, 
+            null, null, 'timeout');
 
         // Launch change of type for field payrate
         $dbman->change_field_type($table, $field);
@@ -127,7 +132,65 @@ function xmldb_block_timetracker_upgrade($oldversion) {
         // timetracker savepoint reached
         upgrade_block_savepoint(true, 2011041114, 'timetracker');
  
+    }
+
+    if ($oldversion < 2011072800) {
+
+        // Define table block_timetracker_alert_units to be created
+        $table = new xmldb_table('block_timetracker_alert_units');
+
+        // Adding fields to table block_timetracker_alert_units
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL,
+            XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            XMLDB_NOTNULL, null, '0');
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            XMLDB_NOTNULL, null, '0');
+        $table->add_field('timein', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null,
+            null);
+        $table->add_field('timeout', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null,
+            null);
+        $table->add_field('payrate', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL,
+            null, null);
+        $table->add_field('lastedited', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
+            null, null);
+        $table->add_field('lasteditedby', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            XMLDB_NOTNULL, null, '0');
+        $table->add_field('alerttime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
+            null, null);
+
+        // Conditionally launch create table for block_timetracker_alert_units
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
         }
+
+        // timetracker savepoint reached
+        upgrade_block_savepoint(true, 2011072800, 'timetracker');
+    }
+
+
+ if ($oldversion < 2011072800) {
+
+        // Define table block_timetracker_alert_com to be created
+        $table = new xmldb_table('block_timetracker_alert_com');
+
+        // Adding fields to table block_timetracker_alert_com
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL,
+            XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            XMLDB_NOTNULL, null, '0');
+        $table->add_field('alertid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            XMLDB_NOTNULL, null, '0');
+
+        // Conditionally launch create table for block_timetracker_alert_com
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // timetracker savepoint reached
+        upgrade_block_savepoint(true, 2011072800, 'timetracker');
+    }
+
 
 
 
