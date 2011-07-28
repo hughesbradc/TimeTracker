@@ -81,9 +81,9 @@
     </TABLE>
     <TABLE NAME="block_timetracker_alert_units" COMMENT="block_timetracker_alert_units table retrofitted from MySQL" PREVIOUS="block_timetracker_config" NEXT="block_timetracker_alert_com">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="timein"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="mdluserid"/>
+        <FIELD NAME="mdluserid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="mdluserid" NEXT="timein"/>
         <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="courseid" NEXT="timeout"/>
         <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="timein" NEXT="payrate"/>
         <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" PREVIOUS="timeout" NEXT="lastedited"/>
@@ -94,9 +94,9 @@
     </TABLE>
     <TABLE NAME="block_timetracker_alert_com" COMMENT="communication info regarding alerted units" PREVIOUS="block_timetracker_alert_units">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="alertid"/>
-        <FIELD NAME="alertid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="mdluserid"/>
+        <FIELD NAME="mdluserid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="alertid"/>
+        <FIELD NAME="alertid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="mdluserid"/>
       </FIELDS>
     </TABLE>
   </TABLES>
