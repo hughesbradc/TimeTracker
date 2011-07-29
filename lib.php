@@ -104,9 +104,13 @@ function get_alert_links($supervisorid, $courseid){
     $alertlinks = array();
     foreach ($alerts as $alert){
         $url = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?';
+        /*
+        $params = "id=$alert->courseid&userid=$alert->userid".
+            "&ti=$alert->timein&to=$alert->timeout&
         $alerlinks[$alert->userid]['approve'] =
         $alerlinks[$alert->userid]['deny'] =
         $alerlinks[$alert->userid]['change'] = 
+            */
 
     }
 
