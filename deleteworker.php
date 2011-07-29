@@ -74,7 +74,7 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
 } else {
     if($userid && confirm_sesskey()){
         //purge them from the db
-        print_object($userid);
+        //print_object($userid);
         $DB->delete_records('block_timetracker_workerinfo',array('id'=>$userid));    
         $DB->delete_records('block_timetracker_workunit',array('userid'=>$userid));    
         $DB->delete_records('block_timetracker_pending',array('userid'=>$userid));    

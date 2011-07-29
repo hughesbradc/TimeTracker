@@ -107,12 +107,14 @@ if ($mform->is_cancelled()){
     if(isset($formdata->deleteunit))
         $delete = 1;
     
-    $approvelink =  $CFG->wwwroot.'/blocks/timetracker/eapendingapprove.php?userid='.$userid.'&id='
+    $approvelink =  $CFG->wwwroot.'/blocks/timetracker/eaaction.php?userid='.$userid.'&id='
         .$courseid.'&ti='.$formdata->timeinerror.'&to='.$formdata->timeouterror.'&delete='.$delete;
 
-    $changelink = $CFG->wwwroot.'/blocks/timetracker/editunit.php?id='.$courseid.'&userid='.$userid.
+    $changelink = $CFG->wwwroot.'/blocks/timetracker/eaaction.php?id='.$courseid.'&userid='.$userid.
         '&unitid='.$unitid;
 
+    $denylink = $CFG->wwwroot.'/blocks/timetracker/eaaction.php?id='.$courseid.'&userid='.$userid.
+        '&unitid='.$unitid;
 
     //***** PLAIN TEXT *****//
     $messagetext = get_string('emessage1','block_timetracker');
@@ -192,10 +194,12 @@ if ($mform->is_cancelled()){
     $messagehtml .= '<a href="'.$changelink.'">';
     $messagehtml .= get_string('emessagechange','block_timetracker');
     $messagehtml .= '</a>';
-    
-    $messagehtml .= get_string('br1','block_timetracker');
-    $messagehtml .= get_string('emessagedeny','block_timetracker', $formdata->message);
-   
+
+    // Deny link
+    $messagehtml .= '<a href="'.$denylink.'">';
+    $messagehtml .= get_string('emessagedeny','block_timetracker');
+    $messagehtml .= '</a>';
+
     // Move data from 'pending' or 'workunit' table into the 'alert_units' table
     if($ispending){
         // Pending Work Unit
@@ -207,9 +211,9 @@ if ($mform->is_cancelled()){
 
     if($alertunit){
         unset($formdata->id);
-        $unit->alerttime = time();
-
-        $alertid = $DB->insert_record('block_timetracker_alert_units', $unit);
+        $alertunit->alerttime = time();
+        $alertunit->payrate = $workerrecord->currpayrate;
+        $alertid = $DB->insert_record('block_timetracker_alert_units', $alertunit);
     // Send the email to the selected supervisor(s)
 
         if($alertid){
