@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This form will allow the worker to submit an alert and correction to the supervisor of an error in a work unit.
- * The supervisor will be able to approve or deny the correction.
+ * This form will allow the worker to submit an alert and correction to the supervisor of an error in a 
+ * work unit. The supervisor will be able to approve, change, or deny the correction.
  *
  * @package    Block
  * @subpackage TimeTracker
@@ -89,9 +89,6 @@ if($workerrecord->active == 0){
     die;
 }
 
-
-
-
 if ($mform->is_cancelled()){ 
     //user clicked cancel
     redirect($index);
@@ -100,21 +97,18 @@ if ($mform->is_cancelled()){
     // Data collection to send email to supervisor(s)
     $from = $DB->get_record('user',array('id'=>$USER->id));
     $subject = get_string('subjecttext','block_timetracker', $workerrecord->firstname.'
-        '.$workerrecord->lastname.' - '.$course->shortname);
+        '.$workerrecord->lastname.' in '.$course->shortname);
 
     // BUILD HYPERLINKS FOR EMAIL
     $delete = 0;
     if(isset($formdata->deleteunit))
         $delete = 1;
     
-    $approvelink =  $CFG->wwwroot.'/blocks/timetracker/eaaction.php?userid='.$userid.'&id='
-        .$courseid.'&ti='.$formdata->timeinerror.'&to='.$formdata->timeouterror.'&delete='.$delete;
-
-    $changelink = $CFG->wwwroot.'/blocks/timetracker/eaaction.php?id='.$courseid.'&userid='.$userid.
-        '&unitid='.$unitid;
-
-    $denylink = $CFG->wwwroot.'/blocks/timetracker/eaaction.php?id='.$courseid.'&userid='.$userid.
-        '&unitid='.$unitid;
+    $linkbase = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?userid='.$userid.'&id='
+           .$courseid.'&ti='.$formdata->timeinerror.'&to='.$formdata->timeouterror.'&delete='.$delete;
+    $approvelink = $linkbase.'&action=approve';
+    $changelink = $linkbase.'&action=change';
+    $denylink = $linkbase.'&action=deny';
 
     //***** PLAIN TEXT *****//
     $messagetext = get_string('emessage1','block_timetracker');
@@ -195,12 +189,14 @@ if ($mform->is_cancelled()){
     $messagehtml .= get_string('emessagechange','block_timetracker');
     $messagehtml .= '</a>';
 
+    $messagehtml .= get_string('br1','block_timetracker');
+    
     // Deny link
     $messagehtml .= '<a href="'.$denylink.'">';
     $messagehtml .= get_string('emessagedeny','block_timetracker');
     $messagehtml .= '</a>';
 
-    // Move data from 'pending' or 'workunit' table into the 'alert_units' table
+    // Move data from 'pending' or 'workunit' table into the 'alertunits' table
     if($ispending){
         // Pending Work Unit
         $alertunit =$DB->get_record('block_timetracker_pending',array('id'=>$unitid));
@@ -238,7 +234,7 @@ if ($mform->is_cancelled()){
                     //print('emailing user: '.$tid);
                     if($user){
                         $mailok = email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
-
+                            
                         $res = $DB->insert_record('block_timetracker_alert_com',$alertcom); 
 
                         if (!$res){
@@ -246,7 +242,7 @@ if ($mform->is_cancelled()){
                         }
 
                         // Delete the unit from the 'pending' or 'workunit' table since the data was
-                        // inserted into the 'alert_units' table and any emails have been sent.
+                        // inserted into the 'alertunits' table and any emails have been sent.
                         if($ispending && $mailok)
                             $DB->delete_records('block_timetracker_pending',array('id'=>$unitid));
                         if(!$ispending && $mailok)
