@@ -213,7 +213,7 @@ if ($mform->is_cancelled()){
         unset($formdata->id);
         $alertunit->alerttime = time();
         $alertunit->payrate = $workerrecord->currpayrate;
-        $alertid = $DB->insert_record('block_timetracker_alert_units', $alertunit);
+        $alertid = $DB->insert_record('block_timetracker_alertunits', $alertunit);
     // Send the email to the selected supervisor(s)
 
         if($alertid){

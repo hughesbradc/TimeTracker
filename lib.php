@@ -93,6 +93,27 @@ function get_total_earnings($userid, $courseid){
     return round($earnings,2);
 
 }
+
+/**
+* Determine if the supervisor has alerts waiting
+* @param $supervisorid of the supervisor in question
+* @param $courseid id of the course
+* @return T if alerts are pending, F if not.
+*/
+function has_alerts($supervisorid, $courseid){
+    global $CFG,$DB;
+    //check the alert* tables to see if there are any outstanding alerts:
+    //$sql = 'SELECT COUNT('.$CFG->prefix.'block_timetracker_alertunits.*) FROM '.
+    $sql = 'SELECT COUNT(*) FROM '.
+        $CFG->prefix.'block_timetracker_alertunits,'.
+        $CFG->prefix.'block_timetracker_alert_com WHERE mdluserid='.
+        $supervisorid.' AND courseid='.$courseid.' ORDER BY alerttime';
+
+    $numalerts = $DB->count_records_sql($sql);
+    return ($numalerts != 0);
+
+}
+
 /**
 * Generate the alert links for a supervisor
 * @param $supervisorid of the supervisor in question
@@ -107,10 +128,12 @@ function get_alert_links($supervisorid, $courseid){
         $CFG->prefix.'block_timetracker_alertunits,'.
         $CFG->prefix.'block_timetracker_alert_com WHERE mdluserid='.
         $supervisorid.' AND courseid='.$courseid.' ORDER BY alerttime';
+    //print_object($sql);
 
     $alerts = $DB->get_recordset_sql($sql);
     $alertlinks = array();
     foreach ($alerts as $alert){
+        //print_object($alert);
         $url = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?';
         
         $params = "id=$alert->courseid&userid=$alert->userid".

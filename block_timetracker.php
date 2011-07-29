@@ -58,9 +58,8 @@
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
 
             //check to see if the supervisor needs to manage
-            $alertlinks = get_alert_links($USER->id,$COURSE->id);
-            print_object($alertlinks);    
-            if($alertlinks){
+            if(has_alerts($USER->id,$COURSE->id)){
+                $this->content->text .= "<b>ALERT ALERT ALERT</b><br /><br />";
             }
 
             $indexparams['id'] = $courseid;
