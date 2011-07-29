@@ -183,8 +183,7 @@ $string['emessageavailable'] = '<b>Available Actions:</b>';
 $string['emessagedisclaimer'] = '(Please note that you will be prompted to sign into Moodle in order to complete the request).';
 $string['emessageapprove'] = 'Approve';
 $string['emessagechange'] = 'Change';
-$string['emessagedeny'] = 'No action is required to deny this request.  You may want to respond to
-    this email notifying the worker that the request was not approved.';
+$string['emessagedeny'] = 'Deny';
 
 
 //Error Codes
