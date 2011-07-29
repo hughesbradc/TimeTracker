@@ -68,7 +68,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_timetracker_config" COMMENT="config options for each TimeTracker block" PREVIOUS="block_timetracker_term" NEXT="block_timetracker_alert_units">
+    <TABLE NAME="block_timetracker_config" COMMENT="config options for each TimeTracker block" PREVIOUS="block_timetracker_term" NEXT="block_timetracker_alertunits">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="courseid"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="id of the course where this block lives" PREVIOUS="id" NEXT="name"/>
@@ -79,23 +79,23 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_timetracker_alert_units" COMMENT="block_timetracker_alert_units table retrofitted from MySQL" PREVIOUS="block_timetracker_config" NEXT="block_timetracker_alert_com">
+    <TABLE NAME="block_timetracker_alertunits" COMMENT="block_timetracker_alertunits table retrofitted from MySQL" PREVIOUS="block_timetracker_config" NEXT="block_timetracker_alert_com">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="mdluserid"/>
-        <FIELD NAME="mdluserid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="mdluserid" NEXT="timein"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="timein"/>
         <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="courseid" NEXT="timeout"/>
         <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="timein" NEXT="payrate"/>
-        <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" PREVIOUS="timeout" NEXT="lastedited"/>
-        <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="payrate" NEXT="lasteditedby"/>
+        <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" DECIMALS="2" PREVIOUS="timeout" NEXT="lastedited"/>
+        <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="payrate" NEXT="lasteditedby"/>
         <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited" NEXT="alerttime"/>
-        <FIELD NAME="alerttime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="lasteditedby"/>
+        <FIELD NAME="alerttime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="lasteditedby"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_timetracker_alert_com" COMMENT="communication info regarding alerted units" PREVIOUS="block_timetracker_alert_units">
+    <TABLE NAME="block_timetracker_alert_com" COMMENT="communication info regarding alerted units" PREVIOUS="block_timetracker_alertunits">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="mdluserid"/>
         <FIELD NAME="mdluserid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="alertid"/>

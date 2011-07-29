@@ -56,14 +56,14 @@ class timetracker_updateworkerinfo_form extends moodleform {
 
         if(!$worker){ //set the config defaults from config table
             $config = get_timetracker_config($this->courseid);
-            $payrate = $config['curr_pay_rate']->value;
-            $maxearnings = $config['default_max_earnings']->value;
-            $trackermethod = $config['trackermethod']->value;
-            $department= $config['department']->value;
-            $position= $config['position']->value;
-            $budget= $config['budget']->value;
-            $institution= $config['institution']->value;
-            $supname= $config['supervisor']->value;
+            $payrate = $config['curr_pay_rate'];
+            $maxearnings = $config['maxtermearnings'];
+            $trackermethod = $config['trackermethod'];
+            $department= $config['department'];
+            $position= $config['position'];
+            $budget= $config['budget'];
+            $institution= $config['institution'];
+            $supname= $config['supname'];
 
         } else {
             $payrate = $worker->currpayrate;
@@ -147,14 +147,19 @@ class timetracker_updateworkerinfo_form extends moodleform {
         } else {
             $mform->addElement('text','currpayrate',
                 get_string('currpayrate','block_timetracker'), 'readonly="readonly"');
+            $mform->setDefault('currpayrate',$payrate);
             $mform->addElement('text','dept',
                 get_string('department','block_timetracker'), 'readonly="readonly"');
+            $mform->setDefault('dept',$department);
             $mform->addElement('text','position',
                 get_string('position','block_timetracker'), 'readonly="readonly"');
+            $mform->setDefault('position',$position);
             $mform->addElement('text','budget',
                 get_string('budget','block_timetracker'), 'readonly="readonly"');
+            $mform->setDefault('budget',$budget);
             $mform->addElement('text','supervisor',
                 get_string('supervisor','block_timetracker'), 'readonly="readonly"');
+            $mform->setDefault('supervisor',$supname);
             $mform->addElement('hidden','timetrackermethod', $trackermethod);
         }
         $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
