@@ -89,7 +89,8 @@
         <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" DECIMALS="2" PREVIOUS="timeout" NEXT="lastedited"/>
         <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="payrate" NEXT="lasteditedby"/>
         <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited" NEXT="alerttime"/>
-        <FIELD NAME="alerttime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="lasteditedby"/>
+        <FIELD NAME="alerttime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="lasteditedby" NEXT="todelete"/>
+        <FIELD NAME="todelete" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="alerttime"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

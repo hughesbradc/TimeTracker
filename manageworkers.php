@@ -87,9 +87,9 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     //print_object($workers);
 
     foreach($formdata->workerid as $idx){
-        if((isset($formdata->activeid[$idx]) && $workers[$idx]->active==0) ||  //not the same
-         (!isset($formdata->activeid[$idx]) && $workers[$idx]->active == 1)){ //not the same
-            $workers[$idx]->active = isset($formdata->activeid[$idx])?1:0;
+        if(($formdata->activeid[$idx]==1 && $workers[$idx]->active==0) ||  //not the same
+         ($formdata->activeid[$idx]==0 && $workers[$idx]->active == 1)){ //not the same
+            $workers[$idx]->active = $formdata->activeid[$idx];
             //print_object($workers[$idx]);
             $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
          }
