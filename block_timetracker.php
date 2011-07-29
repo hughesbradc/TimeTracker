@@ -58,12 +58,10 @@
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
 
             //check to see if the supervisor needs to manage
-            /*
             $alertlinks = get_alert_links($USER->id,$COURSE->id);
+            print_object($alertlinks);    
             if($alertlinks){
-                
             }
-            */
 
             $indexparams['id'] = $courseid;
             $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);

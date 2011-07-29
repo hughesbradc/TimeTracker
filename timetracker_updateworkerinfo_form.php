@@ -57,7 +57,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
         if(!$worker){ //set the config defaults from config table
             $config = get_timetracker_config($this->courseid);
             $payrate = $config['curr_pay_rate'];
-            $maxearnings = $config['maxtermearnings'];
+            $maxearnings = $config['default_max_earnings'];
             $trackermethod = $config['trackermethod'];
             $department= $config['department'];
             $position= $config['position'];

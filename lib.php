@@ -93,10 +93,18 @@ function get_total_earnings($userid, $courseid){
     return round($earnings,2);
 
 }
-
+/**
+* Generate the alert links for a supervisor
+* @param $supervisorid of the supervisor in question
+* @param $courseid id of the course
+* @return two-dimensional array of links. First index is the TT worker id, the second
+* index is either 'approve', 'deny', or 'change' for each of the corresponding links
+*/
 function get_alert_links($supervisorid, $courseid){
+    global $CFG,$DB;
     //check the alert* tables to see if there are any outstanding alerts:
-    $sql = 'SELECT '.$CFG->prefix.'.block_timetracker_alertunits,'.
+    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_alertunits.* FROM '.
+        $CFG->prefix.'block_timetracker_alertunits,'.
         $CFG->prefix.'block_timetracker_alert_com WHERE mdluserid='.
         $supervisorid.' AND courseid='.$courseid.' ORDER BY alerttime';
 
@@ -104,13 +112,14 @@ function get_alert_links($supervisorid, $courseid){
     $alertlinks = array();
     foreach ($alerts as $alert){
         $url = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?';
-        /*
+        
         $params = "id=$alert->courseid&userid=$alert->userid".
-            "&ti=$alert->timein&to=$alert->timeout&
-        $alerlinks[$alert->userid]['approve'] =
-        $alerlinks[$alert->userid]['deny'] =
-        $alerlinks[$alert->userid]['change'] = 
-            */
+            "&ti=$alert->timein&to=$alert->timeout";
+        if($alert->todelete) $params.="&delete=1";
+
+        $alertlinks[$alert->userid]['approve'] = $url.$params."&action=approve";
+        $alertlinks[$alert->userid]['deny'] = $url.$params."&action=deny";
+        $alertlinks[$alert->userid]['change'] = $url.$params."&action=change";
 
     }
 
