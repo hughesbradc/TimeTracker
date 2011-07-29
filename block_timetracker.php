@@ -56,6 +56,9 @@
 
         } 
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
+
+            //check to see if the supervisor needs to manage
+
             $indexparams['id'] = $courseid;
             $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
             

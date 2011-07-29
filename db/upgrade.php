@@ -147,9 +147,9 @@ function xmldb_block_timetracker_upgrade($oldversion) {
         $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
             XMLDB_NOTNULL, null, '0');
         $table->add_field('timein', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null,
-            null);
+            null,'0');
         $table->add_field('timeout', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null,
-            null);
+            null,'0');
         $table->add_field('payrate', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL,
             null, null);
         $table->add_field('lastedited', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
