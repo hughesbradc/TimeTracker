@@ -54,7 +54,7 @@
             }
             return $this->content;
 
-        } 
+        }
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
 
             //check to see if the supervisor needs to manage
