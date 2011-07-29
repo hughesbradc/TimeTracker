@@ -94,6 +94,22 @@ function get_total_earnings($userid, $courseid){
 
 }
 
+function get_alert_links($supervisorid, $courseid){
+    //check the alert* tables to see if there are any outstanding alerts:
+    $sql = 'SELECT '.$CFG->prefix.'.block_timetracker_alert_units,'.
+        $CFG->prefix.'block_timetracker_alert_com WHERE mdluserid='.
+        $supervisorid.' AND courseid='.$courseid.' ORDER BY alerttime';
+
+    $alerts = $DB->get_recordset_sql($sql);
+    $alertlinks = array();
+    foreach ($alerts as $alert){
+        
+
+    }
+
+    return $alertlinks;
+}
+
 /**
 * Calculate Total Hours
 * @param $workerunits is an array, each $subunit has $subunit->timein and $subunit->timeout

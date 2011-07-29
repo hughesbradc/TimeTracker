@@ -78,20 +78,26 @@ class timetracker_manageworkers_form  extends moodleform {
                 $mform->addElement('html','<tr><td>'); 
                 if($worker->active){
                     if($canactivate){
-                        $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',
-                            array('checked="checked"'));
+                        //$mform->addElement('advcheckbox', 'activeid['.$worker->id.']','','',
+                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', null,
+                            array('checked="checked"','group'=>1));
                     } else {
-                        $mform->addElement('checkbox', 'activeid['.$worker->id.']','','',
+                        //$mform->addElement('advcheckbox', 'activeid['.$worker->id.']','','',
+                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', null,
                             array('checked="checked"','disabled="disabled"'));
                     }
                 } else {
                     if($canactivate){
-                        $mform->addElement('checkbox', 'activeid['.$worker->id.']');
+                        //$mform->addElement('advcheckbox', 'activeid['.$worker->id.']','','',
+                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', null,
+                            array('group' => 1));
                     } else {
-                        $mform->addElement('checkbox', 'activeid['.$worker->id.']', '','',
+                        //$mform->addElement('advcheckbox', 'activeid['.$worker->id.']', '','',
+                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']', '', null,
                             array('disabled="disabled"'));
                     }
                 }
+
     
                 $row='</td>';
                 $row.='<td>'.$worker->lastname.'</td>';
@@ -144,6 +150,8 @@ class timetracker_manageworkers_form  extends moodleform {
     
                 $row.='</tr>';
                 $mform->addElement('html',$row);
+
+                $this->add_checkbox_controller(1,null,null,1);
     
                 $mform->addElement('hidden','workerid['.$worker->id.']', $worker->id);
             }
