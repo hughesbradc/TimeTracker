@@ -136,10 +136,10 @@ function xmldb_block_timetracker_upgrade($oldversion) {
 
     if ($oldversion < 2011072800) {
 
-        // Define table block_timetracker_alert_units to be created
-        $table = new xmldb_table('block_timetracker_alert_units');
+        // Define table block_timetracker_alertunits to be created
+        $table = new xmldb_table('block_timetracker_alertunits');
 
-        // Adding fields to table block_timetracker_alert_units
+        // Adding fields to table block_timetracker_alertunits
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL,
             XMLDB_SEQUENCE, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
@@ -162,7 +162,7 @@ function xmldb_block_timetracker_upgrade($oldversion) {
         // Adding keys to table block_timetracker_config
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
-        // Conditionally launch create table for block_timetracker_alert_units
+        // Conditionally launch create table for block_timetracker_alertunits
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
