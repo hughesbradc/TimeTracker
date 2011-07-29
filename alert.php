@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This form will allow the worker to submit an alert and correction to the supervisor of an error in a work unit.
- * The supervisor will be able to approve or deny the correction.
+ * This form will allow the worker to submit an alert and correction to the supervisor of an error in a 
+ * work unit. The supervisor will be able to approve, change, or deny the correction.
  *
  * @package    Block
  * @subpackage TimeTracker
@@ -89,9 +89,6 @@ if($workerrecord->active == 0){
     die;
 }
 
-
-
-
 if ($mform->is_cancelled()){ 
     //user clicked cancel
     redirect($index);
@@ -107,14 +104,11 @@ if ($mform->is_cancelled()){
     if(isset($formdata->deleteunit))
         $delete = 1;
     
-    $approvelink =  $CFG->wwwroot.'/blocks/timetracker/alertaction.php?userid='.$userid.'&id='
-        .$courseid.'&ti='.$formdata->timeinerror.'&to='.$formdata->timeouterror.'&delete='.$delete;
-
-    $changelink = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?id='.$courseid.'&userid='.$userid.
-        '&unitid='.$unitid;
-
-    $denylink = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?id='.$courseid.'&userid='.$userid.
-        '&unitid='.$unitid;
+    $linkbase = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?userid='.$userid.'&id='
+           .$courseid.'&ti='.$formdata->timeinerror.'&to='.$formdata->timeouterror.'&delete='.$delete;
+    $approvelink = $linkbase.'&action=approve';
+    $changelink = $linkbase.'&action=change';
+    $denylink = $linkbase.'&action=deny';
 
     //***** PLAIN TEXT *****//
     $messagetext = get_string('emessage1','block_timetracker');
@@ -240,7 +234,7 @@ if ($mform->is_cancelled()){
                     //print('emailing user: '.$tid);
                     if($user){
                         $mailok = email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
-
+                            
                         $res = $DB->insert_record('block_timetracker_alert_com',$alertcom); 
 
                         if (!$res){

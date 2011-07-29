@@ -28,12 +28,14 @@ require_once(dirname(__FILE__) . '/../../config.php');
 
 require_login();
 
-$id = required_param('id', PARAM_INTEGER); // Worker id
-$courseid = required_param('courseid', PARAM_INTEGER);
-$ti = required_param('timein', PARAM_INTEGER);
-$to = required_param('timeout', PARAM_INTEGER);
+$userid = required_param('userid', PARAM_INTEGER); // Worker id
+$courseid = required_param('id', PARAM_INTEGER);
+$ti = required_param('ti', PARAM_INTEGER);
+$to = required_param('to', PARAM_INTEGER);
+$delete = required_param('delete', PARAM_BOOL);
+$action = required_param('action', PARAM_ALPHA);
 
-$course = $DB->get_record('course', array('id' => $courseid), '*' MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
 
@@ -56,20 +58,38 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
     print_error('notpermissible','block_timetracker',
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 } else {
-    // Add the approved error correct into the 'workunit' table
-    // userid (student), courseid, timein, timeout, payrate, lastedited, lasteditedby
 
-    $payrate = 'SELECT payrate FROM '.$CFG->prefix.'block_timetracker_workerinfo WHERE id='. $id .';';
+    $payrate = 'SELECT payrate FROM '.$CFG->prefix.'block_timetracker_workerinfo WHERE id='. $userid .';';
     $lastedited = time();
-    $lasteditedby = ; //Supervisor's id
+    $lasteditedby = $USER->id; //Supervisor's id
 
-    $sql = 'INSERT INTO '.$CFG->prefix.'block_timetracker_workunit (userid, courseid, timein,
-        timeout, payrate, lastedited, lasteditedby) ';
-    $sql .= $id ', ', $courseid ', ', $ti ', ',$to ', ', $payrate ', ', $lastedited ', ',
-    $lasteditedby ';';
+        print($userid);
+        print('<br />');
+        print($courseid);
+        print('<br />');
+        print($ti);
+        print('<br />');
+        print($to);
+        print('<br />');
+        print($delete);
+        print('<br />');
+        print($action);
+        print('<br />');
+    if($action == 'approve'){
+        print('You clicked approved!');
+    } else if ($action == 'deny'){
+        print('You clicked deny!');
+    } else {
+        print('You either clicked change, or you didn\'t meet the other two conditions.');
+    }
     
-    insert_record($sql);
+    //$sql = 'INSERT INTO '.$CFG->prefix.'block_timetracker_workunit (userid, courseid, timein,
+    //    timeout, payrate, lastedited, lasteditedby) ';
+    //$sql .= $userid ', ', $courseid ', ', $ti ', ',$to ', ', $payrate ', ', $lastedited ', ',
+    //$lasteditedby ';';
     
-    redirect($nexturl, get_string('approvedsuccess','block_timetracker'), 2);
+    //insert_record($sql);
+    
+    //redirect($nexturl, get_string('approvedsuccess','block_timetracker'), 2);
 }
 ?>
