@@ -100,19 +100,21 @@ if ($mform->is_cancelled()){
     // Data collection to send email to supervisor(s)
     $from = $DB->get_record('user',array('id'=>$USER->id));
     $subject = get_string('subjecttext','block_timetracker', $workerrecord->firstname.'
-        '.$workerrecord->lastname);
+        '.$workerrecord->lastname.' - '.$course->shortname);
 
     // BUILD HYPERLINKS FOR EMAIL
     $delete = 0;
     if(isset($formdata->deleteunit))
         $delete = 1;
     
-    $approvelink =  $CFG->wwwroot.'/blocks/timetracker/eapendingapprove.php?userid='.$userid.'&id='
+    $approvelink =  $CFG->wwwroot.'/blocks/timetracker/eaaction.php?userid='.$userid.'&id='
         .$courseid.'&ti='.$formdata->timeinerror.'&to='.$formdata->timeouterror.'&delete='.$delete;
 
-    $changelink = $CFG->wwwroot.'/blocks/timetracker/editunit.php?id='.$courseid.'&userid='.$userid.
+    $changelink = $CFG->wwwroot.'/blocks/timetracker/eaaction.php?id='.$courseid.'&userid='.$userid.
         '&unitid='.$unitid;
 
+    $denylink = $CFG->wwwroot.'/blocks/timetracker/eaaction.php?id='.$courseid.'&userid='.$userid.
+        '&unitid='.$unitid;
 
     //***** PLAIN TEXT *****//
     $messagetext = get_string('emessage1','block_timetracker');
@@ -192,37 +194,73 @@ if ($mform->is_cancelled()){
     $messagehtml .= '<a href="'.$changelink.'">';
     $messagehtml .= get_string('emessagechange','block_timetracker');
     $messagehtml .= '</a>';
-    
-    $messagehtml .= get_string('br1','block_timetracker');
-    $messagehtml .= get_string('emessagedeny','block_timetracker', $formdata->message);
-   
+
+    // Deny link
+    $messagehtml .= '<a href="'.$denylink.'">';
+    $messagehtml .= get_string('emessagedeny','block_timetracker');
+    $messagehtml .= '</a>';
+
     // Move data from 'pending' or 'workunit' table into the 'alert_units' table
-    // Pending Work Unit
-     
+    if($ispending){
+        // Pending Work Unit
+        $alertunit =$DB->get_record('block_timetracker_pending',array('id'=>$unitid));
+    } else {
+        // Completed Work Unit
+        $alertunit =$DB->get_record('block_timetracker_workunit',array('id'=>$unitid));
+    }
 
-    // Completed Work Unit
-
-
+    if($alertunit){
+        unset($formdata->id);
+        $alertunit->alerttime = time();
+        $alertunit->payrate = $workerrecord->currpayrate;
+        $alertid = $DB->insert_record('block_timetracker_alert_units', $alertunit);
     // Send the email to the selected supervisor(s)
-        foreach($formdata->teacherid as $tid=>$checkvalue){
-            //print_object($tid.' '.$checkvalue);
-            if($checkvalue == 1){ //box was checked?
-                $user = $DB->get_record('user',array('id'=>$tid));
-                //print('emailing user: '.$tid);
-                if($user){
-                    $mailok = email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
-                    // Delete the unit from the 'pending' or 'workunit' table since the data was
-                    // inserted into the 'alert_unit' table and any emails have been sent.
-                    if($ispending && $mailok)
-                        $DB->delete_records('block_timetracker_pending',array('id'=>$unitid));
-                    if(!$ispending && $mailok)
-                        $DB->delete_records('block_timetracker_workunit'),array('id'=>$unitid));
-                    if(!$mailok)
-                        print_error("Error sending message to $user->firstname $user->lastname");
-                } else 
-                    print_error("Failed mailing user $tid");
+
+        if($alertid){
+            $alertcom = new stdClass();
+            $alertcom->alertid = $alertid;
+            $alertcom->mdluserid = $USER->id;
+
+            //Insert student record into 'alert_com'
+            $res = $DB->insert_record('block_timetracker_alert_com',$alertcom); 
+
+            if (!$res){
+                print_error('cannot add student to alert_com');
             }
+
+            foreach($formdata->teacherid as $tid=>$checkvalue){
+                //print_object($tid);
+            
+                if($checkvalue == 1){ //box was checked?
+                    $user = $DB->get_record('user',array('id'=>$tid));
+                    $alertcom->mdluserid = $tid;
+                    //insert alertcom into db
+                    //print('emailing user: '.$tid);
+                    if($user){
+                        $mailok = email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
+
+                        $res = $DB->insert_record('block_timetracker_alert_com',$alertcom); 
+
+                        if (!$res){
+                            print_error('cannot add teacher to alert_com');
+                        }
+
+                        // Delete the unit from the 'pending' or 'workunit' table since the data was
+                        // inserted into the 'alert_units' table and any emails have been sent.
+                        if($ispending && $mailok)
+                            $DB->delete_records('block_timetracker_pending',array('id'=>$unitid));
+                        if(!$ispending && $mailok)
+                            $DB->delete_records('block_timetracker_workunit',array('id'=>$unitid));
+                        if(!$mailok)
+                            print_error("Error sending message to $user->firstname $user->lastname");
+                    } else 
+                        print_error("Failed mailing user $tid");
+                }
+            }
+        } else {
+            //print out an error saying we can't handle this alert
         }
+    }
 
         $status = get_string('emessagesent','block_timetracker');
         redirect($index,$status,2);
