@@ -100,20 +100,20 @@ if ($mform->is_cancelled()){
     // Data collection to send email to supervisor(s)
     $from = $DB->get_record('user',array('id'=>$USER->id));
     $subject = get_string('subjecttext','block_timetracker', $workerrecord->firstname.'
-        '.$workerrecord->lastname.' - '.$course->shortname);
+        '.$workerrecord->lastname.' in '.$course->shortname);
 
     // BUILD HYPERLINKS FOR EMAIL
     $delete = 0;
     if(isset($formdata->deleteunit))
         $delete = 1;
     
-    $approvelink =  $CFG->wwwroot.'/blocks/timetracker/eaaction.php?userid='.$userid.'&id='
+    $approvelink =  $CFG->wwwroot.'/blocks/timetracker/alertaction.php?userid='.$userid.'&id='
         .$courseid.'&ti='.$formdata->timeinerror.'&to='.$formdata->timeouterror.'&delete='.$delete;
 
-    $changelink = $CFG->wwwroot.'/blocks/timetracker/eaaction.php?id='.$courseid.'&userid='.$userid.
+    $changelink = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?id='.$courseid.'&userid='.$userid.
         '&unitid='.$unitid;
 
-    $denylink = $CFG->wwwroot.'/blocks/timetracker/eaaction.php?id='.$courseid.'&userid='.$userid.
+    $denylink = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?id='.$courseid.'&userid='.$userid.
         '&unitid='.$unitid;
 
     //***** PLAIN TEXT *****//
@@ -195,12 +195,14 @@ if ($mform->is_cancelled()){
     $messagehtml .= get_string('emessagechange','block_timetracker');
     $messagehtml .= '</a>';
 
+    $messagehtml .= get_string('br1','block_timetracker');
+    
     // Deny link
     $messagehtml .= '<a href="'.$denylink.'">';
     $messagehtml .= get_string('emessagedeny','block_timetracker');
     $messagehtml .= '</a>';
 
-    // Move data from 'pending' or 'workunit' table into the 'alert_units' table
+    // Move data from 'pending' or 'workunit' table into the 'alertunits' table
     if($ispending){
         // Pending Work Unit
         $alertunit =$DB->get_record('block_timetracker_pending',array('id'=>$unitid));
@@ -213,7 +215,7 @@ if ($mform->is_cancelled()){
         unset($formdata->id);
         $alertunit->alerttime = time();
         $alertunit->payrate = $workerrecord->currpayrate;
-        $alertid = $DB->insert_record('block_timetracker_alert_units', $alertunit);
+        $alertid = $DB->insert_record('block_timetracker_alertunits', $alertunit);
     // Send the email to the selected supervisor(s)
 
         if($alertid){
@@ -246,7 +248,7 @@ if ($mform->is_cancelled()){
                         }
 
                         // Delete the unit from the 'pending' or 'workunit' table since the data was
-                        // inserted into the 'alert_units' table and any emails have been sent.
+                        // inserted into the 'alertunits' table and any emails have been sent.
                         if($ispending && $mailok)
                             $DB->delete_records('block_timetracker_pending',array('id'=>$unitid));
                         if(!$ispending && $mailok)
