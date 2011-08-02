@@ -129,6 +129,9 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $maintabs[] = new tabobject('manage', 
             new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 
             'Manage Workers');
+        $maintabs[] = new tabobject('alerts', 
+            new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 
+            'Alerts');
     }
     
     $tabs = array($maintabs);

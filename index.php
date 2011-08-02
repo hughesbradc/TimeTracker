@@ -80,7 +80,11 @@ if($worker && $worker->timetrackermethod==1){
     $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
 }
 if($canmanage){
-    $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+    $maintabs[] = new tabobject('manage', new moodle_url($CFG->wwwroot.
+        '/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+    $maintabs[] = new tabobject('alerts', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 
+        'Alerts');
 }
 
 $tabs = array($maintabs);
@@ -188,6 +192,7 @@ if ($canmanage) { //supervisor
     $statstable = new flexible_table('timetracker-display-worker-summary');
     $statstable->define_columns(array('perid', 'hvalue','evalue'));
     $statstable->define_headers(array('Period', 'Hours', 'Earnings'));
+    $statstable->define_baseurl($CFG->wwwroot.'/blocks/timetracker/index.php');
     $statstable->set_attribute('cellspacing', '0');
     $statstable->setup();
 

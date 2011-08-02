@@ -54,6 +54,8 @@ $maintabs[] = new tabobject('reports',
     new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
 $maintabs[] = new tabobject('manage', 
     new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+$maintabs[] = new tabobject('alerts', 
+    new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 'Alerts');
 
 $manageworkerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
