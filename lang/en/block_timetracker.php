@@ -167,13 +167,14 @@ $string['existingduration'] = '<b>Duration:</b>  {$a}';
 $string['approvedsuccess'] = 'The error approval has been processed successfully!  Please wait to be
     redirected.'; 
 
-// Error Alert Email
+// Error Alert Emails
 $string['emessage1'] = 'Please review the following TimeTracker error alert data:';
 $string['emessage2'] = '<b>Existing Data:</b>';
 $string['emessage3'] = 'Time In:  {$a}';
 $string['emessage4'] = 'Time Out:  {$a}';
 $string['emessageduration'] = 'Duration:  {$a}';
 $string['emessage5'] = '<b>Proposed Data:</b>';
+$string['emessagedelete'] = 'Delete this work unit.';
 $string['emessage6'] = 'Message: {$a}';
 $string['br1'] = '<br />';
 $string['br2'] = '<br /><br />';
@@ -185,6 +186,10 @@ $string['emessageapprove'] = 'Approve';
 $string['emessagechange'] = 'Change';
 $string['emessagedeny'] = 'Deny';
 
+$string['approvedsubject'] = 'Error Alert Approved for {$a}';
+$string['amessage1'] = 'Sent on behalf of {$a}:';
+$string['amessage2'] = 'The following work unit has been approved:';
+$string['approveddata'] = '<b>Approved Data:</b>';
 
 //Error Codes
 $string['notpermissible'] = 'You do not have permissions to perform this action';

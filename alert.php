@@ -104,11 +104,6 @@ if ($mform->is_cancelled()){
     if(isset($formdata->deleteunit))
         $delete = 1;
     
-    $linkbase = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?userid='.$userid.'&id='
-           .$courseid.'&ti='.$formdata->timeinerror.'&to='.$formdata->timeouterror.'&delete='.$delete;
-    $approvelink = $linkbase.'&action=approve';
-    $changelink = $linkbase.'&action=change';
-    $denylink = $linkbase.'&action=deny';
 
     //***** PLAIN TEXT *****//
     $messagetext = get_string('emessage1','block_timetracker');
@@ -177,42 +172,66 @@ if ($mform->is_cancelled()){
     $messagehtml .= get_string('emessagedisclaimer','block_timetracker');
     $messagehtml .= get_string('br2','block_timetracker');
     
-    // Approve link
-    $messagehtml .= '<a href="'.$approvelink.'">';
-    $messagehtml .= get_string('emessageapprove','block_timetracker');
-    $messagehtml .= '</a>';
-    
-    $messagehtml .= get_string('br1','block_timetracker');
-    
-    // Change link
-    $messagehtml .= '<a href="'.$changelink.'">';
-    $messagehtml .= get_string('emessagechange','block_timetracker');
-    $messagehtml .= '</a>';
 
-    $messagehtml .= get_string('br1','block_timetracker');
-    
-    // Deny link
-    $messagehtml .= '<a href="'.$denylink.'">';
-    $messagehtml .= get_string('emessagedeny','block_timetracker');
-    $messagehtml .= '</a>';
-
-    // Move data from 'pending' or 'workunit' table into the 'alertunits' table
+    // Get data from 'pending' or 'workunit' table to put into the 'alertunits' table
     if($ispending){
         // Pending Work Unit
-        $alertunit =$DB->get_record('block_timetracker_pending',array('id'=>$unitid));
+        $alertunit = $DB->get_record('block_timetracker_pending',array('id'=>$unitid));
     } else {
         // Completed Work Unit
-        $alertunit =$DB->get_record('block_timetracker_workunit',array('id'=>$unitid));
+        $alertunit = $DB->get_record('block_timetracker_workunit',array('id'=>$unitid));
     }
 
+
     if($alertunit){
+
         unset($formdata->id);
         $alertunit->alerttime = time();
         $alertunit->payrate = $workerrecord->currpayrate;
+        $alertunit->origtimein = $alertunit->timein;
+        if(!$ispending)
+            $alertunit->origtimeout = $alertunit->timeout;
+
+        $alertunit->timein = $formdata->timeinerror;
+        $alertunit->timeout = $formdata->timeouterror;
+
         $alertid = $DB->insert_record('block_timetracker_alertunits', $alertunit);
-    // Send the email to the selected supervisor(s)
+        
+        if(!$ispending){
+            $DB->delete_records('block_timetracker_pending',array('id'=>$unitid));
+        } else {
+            $DB->delete_records('block_timetracker_workunit',array('id'=>$unitid));
+        }
+
+
+        // Send the email to the selected supervisor(s)
 
         if($alertid){
+            $linkbase = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?alertid='.
+                $alertid.'&delete='.$delete;
+            $approvelink = $linkbase.'&action=approve';
+            $changelink = $linkbase.'&action=change';
+            $denylink = $linkbase.'&action=deny';
+    
+            // Approve link
+            $messagehtml .= '<a href="'.$approvelink.'">';
+            $messagehtml .= get_string('emessageapprove','block_timetracker');
+            $messagehtml .= '</a>';
+            
+            $messagehtml .= get_string('br1','block_timetracker');
+            
+            // Change link
+            $messagehtml .= '<a href="'.$changelink.'">';
+            $messagehtml .= get_string('emessagechange','block_timetracker');
+            $messagehtml .= '</a>';
+        
+            $messagehtml .= get_string('br1','block_timetracker');
+            
+            // Deny link
+            $messagehtml .= '<a href="'.$denylink.'">';
+            $messagehtml .= get_string('emessagedeny','block_timetracker');
+            $messagehtml .= '</a>';
+
             $alertcom = new stdClass();
             $alertcom->alertid = $alertid;
             $alertcom->mdluserid = $USER->id;
