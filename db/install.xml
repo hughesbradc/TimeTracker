@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/timetracker/db" VERSION="20110728" COMMENT="XMLDB file for Moodle Timetracker block"
+<XMLDB PATH="blocks/timetracker/db" VERSION="2011072803" COMMENT="XMLDB file for Moodle Timetracker block"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
