@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/timetracker/db" VERSION="2011072803" COMMENT="XMLDB file for Moodle Timetracker block"
+<XMLDB PATH="blocks/timetracker/db" VERSION="2011072804" COMMENT="XMLDB file for Moodle Timetracker block"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -85,8 +85,10 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="timein"/>
         <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="courseid" NEXT="timeout"/>
-        <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="timein" NEXT="payrate"/>
-        <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" DECIMALS="2" PREVIOUS="timeout" NEXT="lastedited"/>
+        <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="timein" NEXT="origtimein"/>
+        <FIELD NAME="origtimein" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="timeout" NEXT="origtimeout"/>
+        <FIELD NAME="origtimeout" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="origtimein" NEXT="payrate"/>
+        <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" DECIMALS="2" PREVIOUS="origtimeout" NEXT="lastedited"/>
         <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="payrate" NEXT="lasteditedby"/>
         <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited" NEXT="alerttime"/>
         <FIELD NAME="alerttime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="lasteditedby" NEXT="todelete"/>
