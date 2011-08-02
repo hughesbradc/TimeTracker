@@ -189,14 +189,15 @@ $string['emessage3'] = 'Time In:  {$a}';
 $string['emessage4'] = 'Time Out:  {$a}';
 $string['emessageduration'] = 'Duration:  {$a}';
 $string['emessage5'] = '<b>Proposed Data:</b>';
-$string['emessagedelete'] = 'Delete this work unit.';
+$string['emessagedelete'] = 'Delete this work unit';
 $string['emessage6'] = 'Message: {$a}';
 $string['br1'] = '<br />';
 $string['br2'] = '<br /><br />';
 $string['hr'] = '<hr>';
 $string['emessagesent'] = 'Your notification has been sent to the selected supervisor(s)!';
 $string['emessageavailable'] = '<b>Available Actions:</b>';
-$string['emessagedisclaimer'] = '(Please note that you will be prompted to sign into Moodle in order to complete the request).';
+$string['emessagedisclaimer'] = '(Please note that you will be prompted to sign into Moodle in order to 
+    complete the request).';
 $string['emessageapprove'] = 'Approve';
 $string['emessagechange'] = 'Change';
 $string['emessagedeny'] = 'Deny';
@@ -205,6 +206,7 @@ $string['approvedsubject'] = 'Error Alert Approved for {$a}';
 $string['amessage1'] = 'Sent on behalf of {$a}:';
 $string['amessage2'] = 'The following work unit has been approved:';
 $string['approveddata'] = '<b>Approved Data:</b>';
+$string['unitdeleted'] = 'This work unit has been deleted.';
 
 //Error Codes
 $string['notpermissible'] = 'You do not have permissions to perform this action';

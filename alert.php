@@ -121,12 +121,18 @@ if ($mform->is_cancelled()){
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage5','block_timetracker');
     $messagetext .= get_string('br1','block_timetracker');
-    $messagetext .= get_string('emessage3','block_timetracker', userdate($formdata->timeinerror));
-    $messagetext .= get_string('br1','block_timetracker');
-    $messagetext .= get_string('emessage4','block_timetracker', userdate($formdata->timeouterror));
-    $messagetext .= get_string('br1','block_timetracker');
-    $messagetext .= get_string('emessageduration','block_timetracker', 
-        format_elapsed_time($formdata->timeouterror - $formdata->timeinerror));
+    
+    if($delete == 1){
+        $messagetext .= get_string('emessagedelete','block_timetracker');
+    } else {
+        $messagetext .= get_string('br1','block_timetracker');
+        $messagetext .= get_string('emessage3','block_timetracker', userdate($formdata->timeinerror));
+        $messagetext .= get_string('br1','block_timetracker');
+        $messagetext .= get_string('emessage4','block_timetracker', userdate($formdata->timeouterror));
+        $messagetext .= get_string('br1','block_timetracker');
+        $messagetext .= get_string('emessageduration','block_timetracker', 
+            format_elapsed_time($formdata->timeouterror - $formdata->timeinerror));
+    }
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage6','block_timetracker', $formdata->message);
     $messagetext .= get_string('br2','block_timetracker');
@@ -135,11 +141,6 @@ if ($mform->is_cancelled()){
     $messagetext .= get_string('br1','block_timetracker');
     $messagetext .= get_string('emessagedisclaimer','block_timetracker');
     $messagetext .= get_string('br2','block_timetracker');
-    $messagetext .= get_string('emessageapprove','block_timetracker');
-    $messagetext .= get_string('br1','block_timetracker');
-    $messagetext .= get_string('emessagechange','block_timetracker');
-    $messagetext .= get_string('br1','block_timetracker');
-    $messagetext .= get_string('emessagedeny','block_timetracker', $formdata->message);
 
     //***** HTML *****//
     $messagehtml = get_string('emessage1','block_timetracker');
@@ -157,12 +158,18 @@ if ($mform->is_cancelled()){
     $messagehtml .= get_string('br2','block_timetracker');
     $messagehtml .= get_string('emessage5','block_timetracker');
     $messagehtml .= get_string('br1','block_timetracker');
-    $messagehtml .= get_string('emessage3','block_timetracker', userdate($formdata->timeinerror));
-    $messagehtml .= get_string('br1','block_timetracker');
-    $messagehtml .= get_string('emessage4','block_timetracker', userdate($formdata->timeouterror));
-    $messagehtml .= get_string('br1','block_timetracker');
-    $messagehtml .= get_string('emessageduration','block_timetracker', 
-        format_elapsed_time($formdata->timeouterror - $formdata->timeinerror));
+    
+    if($delete == 1){
+        $messagehtml .= get_string('emessagedelete','block_timetracker');
+    } else {
+        $messagehtml .= get_string('br1','block_timetracker');
+        $messagehtml .= get_string('emessage3','block_timetracker', userdate($formdata->timeinerror));
+        $messagehtml .= get_string('br1','block_timetracker');
+        $messagehtml .= get_string('emessage4','block_timetracker', userdate($formdata->timeouterror));
+        $messagehtml .= get_string('br1','block_timetracker');
+        $messagehtml .= get_string('emessageduration','block_timetracker', 
+            format_elapsed_time($formdata->timeouterror - $formdata->timeinerror));
+    }
     $messagehtml .= get_string('br2','block_timetracker');
     $messagehtml .= get_string('emessage6','block_timetracker', $formdata->message);
     $messagehtml .= get_string('br2','block_timetracker');
@@ -171,7 +178,6 @@ if ($mform->is_cancelled()){
     $messagehtml .= get_string('br1','block_timetracker');
     $messagehtml .= get_string('emessagedisclaimer','block_timetracker');
     $messagehtml .= get_string('br2','block_timetracker');
-    
 
     // Get data from 'pending' or 'workunit' table to put into the 'alertunits' table
     if($ispending){
@@ -194,6 +200,9 @@ if ($mform->is_cancelled()){
 
         $alertunit->timein = $formdata->timeinerror;
         $alertunit->timeout = $formdata->timeouterror;
+
+        if($delete == 1)
+            $alertunit->todelete = 1;
 
         $alertid = $DB->insert_record('block_timetracker_alertunits', $alertunit);
         
