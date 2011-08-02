@@ -134,10 +134,9 @@ function get_alert_links($supervisorid, $courseid){
     $alertlinks = array();
     foreach ($alerts as $alert){
         //print_object($alert);
-        $url = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?';
+        $url = $CFG->wwwroot.'/blocks/timetracker/alertaction.php';
         
-        $params = "id=$alert->courseid&userid=$alert->userid".
-            "&ti=$alert->timein&to=$alert->timeout";
+        $params = "?alertid=$alert->id";
         if($alert->todelete) $params.="&delete=1";
 
         $alertlinks[$alert->userid]['approve'] = $url.$params."&action=approve";
