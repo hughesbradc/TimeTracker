@@ -167,6 +167,21 @@ $string['existingduration'] = '<b>Duration:</b>  {$a}';
 $string['approvedsuccess'] = 'The error approval has been processed successfully!  Please wait to be
     redirected.'; 
 
+//Manage Unit Alerts
+$string['previous'] = 'Current Work Unit';
+$string['proposed'] = 'Proposed Work Unit';
+$string['noalerts'] = 'No Alerts at this Time';
+$string['managealerts'] = 'Manage Alert Work Units';
+$string['managealerts_help'] = 
+'This page allows the supervisor or administrator to manage alerted work units.
+Typically, this indicates that the worker has issued a dispute with the recorded time, and
+has notified his/her supervisor of the error. The three options afforded are:
+<ul>
+<li><b>Approve</b> - Accept the workers propsed changes to the work unit.</li>
+<li><b>Change</b> - Modify the work unit</li>
+<li><b>Deny</b> - Deny the request and leave the original work unit intact.</li>
+</ul>';
+
 // Error Alert Email
 $string['emessage1'] = 'Please review the following TimeTracker error alert data:';
 $string['emessage2'] = '<b>Existing Data:</b>';
