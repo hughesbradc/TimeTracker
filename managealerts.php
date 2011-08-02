@@ -58,7 +58,7 @@ $maintabs[] = new tabobject('alerts',
 
 $alertsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams);
 
-$PAGE->set_url($manageworkerurl);
+$PAGE->set_url($alertsurl);
 $PAGE->set_pagelayout('base');
 
 $strtitle = get_string('manageworkertitle','block_timetracker');

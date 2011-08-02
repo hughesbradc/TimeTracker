@@ -57,13 +57,17 @@
         }
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
 
+            $hasalerts = has_alerts($USER->id,$COURSE->id);
+            if(has_capability('moodle/site:config',$this->context)){
+                $hasalerts = has_course_alerts($COURSE->id);
+            }
+
             //check to see if the supervisor needs to manage
-            if(has_alerts($USER->id,$COURSE->id)){
-                $this->content->text .= '<span style="color: red">';
-                $this->content->text .= '<a href="'.$CFG->wwwroot.
+            if($hasalerts){
+                $this->content->text .= '<a style="color: red" href="'.$CFG->wwwroot.
                     '/blocks/timetracker/managealerts.php?id='.$COURSE->id.
-                    '">Manage Alerts</a>';
-                $this->content->text .= "</span><br /><br />";
+                    '">**Manage Alerts**</a>';
+                $this->content->text .= "<br /><br />";
             }
 
             $indexparams['id'] = $courseid;

@@ -38,11 +38,15 @@ class timetracker_managealerts_form  extends moodleform {
 
 
         $mform =& $this->_form; // Don't forget the underscore! 
-        if (has_capability('block/timetracker:manageworkers', $this->context)) {
+        if (!has_capability('block/timetracker:manageworkers', $this->context)) {
             $mform->addElement('html','You don\'t have permission to view alerts'); 
             return;
         }
 
+        $isadmin = false;
+        if(has_capability('moodle/site:config',$this->context)){
+            $isadmin = true;
+        }
 
         $mform->addElement('header', 'general', get_string('managealerts','block_timetracker')); 
 		$mform->addHelpButton('general','managealerts','block_timetracker');
@@ -65,14 +69,21 @@ class timetracker_managealerts_form  extends moodleform {
                 <th>'.get_string('action').'</th>
              </tr>');
 
-        if(!has_alerts($USER->id,$COURSE->id){
+        if(!$isadmin && !has_alerts($USER->id,$COURSE->id)){
             $mform->addElement('html',
                 '<tr><td colspan="6" style="text-align: center">'.
                 get_string('noalerts','block_timetracker').'</td></tr></table>');
         } else {
-
-
-            $alertlinks=get_alert_links($USER->id, $COURSE->id); 
+            if($isadmin && !has_course_alerts($COURSE->id)){
+                $mform->addElement('html',
+                    '<tr><td colspan="6" style="text-align: center">'.
+                    get_string('noalerts','block_timetracker').'</td></tr></table>');
+                return;
+            }
+            if($isadmin)
+                $alertlinks=get_course_alert_links($COURSE->id);
+            else 
+                $alertlinks=get_alert_links($USER->id, $COURSE->id); 
             $alerts = $DB->get_records('block_timetracker_alertunits', 
                 array('courseid'=>$COURSE->id), 'alerttime');
 
@@ -82,23 +93,37 @@ class timetracker_managealerts_form  extends moodleform {
                     array('id'=>$alert->userid));
 
                 $mform->addElement('html','<tr>'); 
-                $row.='<td>'.$worker->lastname.'</td>';
+                $row ='<td>'.$worker->lastname.'</td>';
                 $row.='<td>'.$worker->firstname.'</td>';
-                $row.='<td>In: '.userdate($worker->origtimein, 
-                    get_string('datetimeformat','block_timetracker');
-                if($worker->origtimein > 0){
-                    $row.=' Out: '.userdate($worker->origtimein, 
-                        get_string('datetimeformat','block_timetracker');
-                    $row.=' Elapsed: '.format_elapsed_time($worker->origtimeout -
-                        $worker->origtimein);
+                $row.='<td>In: '.userdate($alert->origtimein, 
+                    get_string('datetimeformat','block_timetracker'));
+
+                if($alert->origtimein > 0){
+                    $row.='<br />Out: '.userdate($alert->origtimeout, 
+                        get_string('datetimeformat','block_timetracker'));
+                    $row.='<br />Elapsed: '.format_elapsed_time($alert->origtimeout -
+                        $alert->origtimein);
+                } else {
+                    $row.= '';
                 }
+
                 $row .='</td>';
+                $row.='<td>In: '.userdate($alert->timein, 
+                    get_string('datetimeformat','block_timetracker'));
+
+                $row.='<br />Out: '.userdate($alert->timeout, 
+                    get_string('datetimeformat','block_timetracker'));
+
+                $row.='<br />Elapsed: '.format_elapsed_time($alert->timeout -
+                    $alert->timein);
+
+                $row.='</td>';
 
                 $editurl = new moodle_url($alertlinks[$worker->id]['change']);
                 $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
     
                 $approveurl = new moodle_url($alertlinks[$worker->id]['approve']);
-                $approveaction=$OUTPUT->action_icon($approveurl, new pix_icon('t/calendar', 'Reports'));
+                $approveaction=$OUTPUT->action_icon($approveurl, new pix_icon('i/approve', 'Reports'));
     
                 $deleteurl = new moodle_url($alertlinks[$worker->id]['deny']);
                 $deleteicon = new pix_icon('t/delete', get_string('delete'));

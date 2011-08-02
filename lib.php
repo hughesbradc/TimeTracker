@@ -95,6 +95,26 @@ function get_total_earnings($userid, $courseid){
 }
 
 /**
+* Determine if the course has alerts waiting
+* @param $courseid id of the course
+* @return T if alerts are pending, F if not.
+*/
+function has_course_alerts($courseid){
+    global $CFG,$DB;
+    //check the alert* tables to see if there are any outstanding alerts:
+    //$sql = 'SELECT COUNT('.$CFG->prefix.'block_timetracker_alertunits.*) FROM '.
+    $sql = 'SELECT COUNT(*) FROM '.
+        $CFG->prefix.'block_timetracker_alertunits,'.
+        $CFG->prefix.'block_timetracker_alert_com WHERE courseid='.$courseid.
+            ' ORDER BY alerttime';
+
+    $numalerts = $DB->count_records_sql($sql);
+    error_log($numalerts." alerts found! CID: $courseid");
+    return ($numalerts != 0);
+
+}
+
+/**
 * Determine if the supervisor has alerts waiting
 * @param $supervisorid of the supervisor in question
 * @param $courseid id of the course
@@ -110,6 +130,7 @@ function has_alerts($supervisorid, $courseid){
         $supervisorid.' AND courseid='.$courseid.' ORDER BY alerttime';
 
     $numalerts = $DB->count_records_sql($sql);
+    error_log($numalerts." alerts found! USERID: $supervisorid CID: $courseid");
     return ($numalerts != 0);
 
 }
@@ -128,6 +149,39 @@ function get_alert_links($supervisorid, $courseid){
         $CFG->prefix.'block_timetracker_alertunits,'.
         $CFG->prefix.'block_timetracker_alert_com WHERE mdluserid='.
         $supervisorid.' AND courseid='.$courseid.' ORDER BY alerttime';
+    //print_object($sql);
+
+    $alerts = $DB->get_recordset_sql($sql);
+    $alertlinks = array();
+    foreach ($alerts as $alert){
+        //print_object($alert);
+        $url = $CFG->wwwroot.'/blocks/timetracker/alertaction.php';
+        
+        $params = "?alertid=$alert->id";
+        if($alert->todelete) $params.="&delete=1";
+
+        $alertlinks[$alert->userid]['approve'] = $url.$params."&action=approve";
+        $alertlinks[$alert->userid]['deny'] = $url.$params."&action=deny";
+        $alertlinks[$alert->userid]['change'] = $url.$params."&action=change";
+
+    }
+
+    return $alertlinks;
+}
+
+/**
+* Generate the alert links for a course
+* @param $courseid id of the course
+* @return two-dimensional array of links. First index is the TT worker id, the second
+* index is either 'approve', 'deny', or 'change' for each of the corresponding links
+*/
+function get_course_alert_links($courseid){
+    global $CFG,$DB;
+    //check the alert* tables to see if there are any outstanding alerts:
+    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_alertunits.* FROM '.
+        $CFG->prefix.'block_timetracker_alertunits,'.
+        $CFG->prefix.'block_timetracker_alert_com WHERE courseid='.$courseid.
+            ' ORDER BY alerttime';
     //print_object($sql);
 
     $alerts = $DB->get_recordset_sql($sql);
