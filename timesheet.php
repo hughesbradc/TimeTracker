@@ -26,4 +26,87 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
+require_once('../../config.php');
 
+global $CFG, $COURSE, $USER, $DB;
+
+require_login();
+
+$userid = required_param('userid', PARAM_INTEGER);
+$courseid = required_param('id', PARAM_INTEGER);
+$month = required_param('month', PARAM_INTEGER);
+$year = required_param('year', PARAM_INTEGER);
+
+$urlparams['userid'] = $userid;
+$urlparams['id'] = $courseid;
+$urlparams['month'] = $month;
+$urlparams['year'] = $year;
+
+$timesheeturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet.php',$urlparams);
+
+$course = $DB->get_record('course', array('id'=>$courseid), '*' MUST_EXIST);
+$PAGE->set_course($course);
+$context = $PAGE->context;
+
+$PAGE->set_url($timesheeturl);
+$PAGE->set_pagelayout('course');
+
+$canmanage = false;
+if(has_capability('block/timetracker:manageworkers', $context)){
+    $canmanage = true;
+}
+
+$strtitle = get_string('timesheettitle','block_timetracker');
+$PAGE->set_title($strtitle);
+
+$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+
+$indexparams['userid'] = $userid;
+$indexparams['id'] = $courseid;
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
+
+$PAGE->navbar->add(get_string('blocks'));
+$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
+$PAGE->navbar->add($strtitle);
+
+$mform = new timetracker_timesheet_form($context, $userid, $courseid, $month, $year);
+
+if($mform->is_cancelled(){
+    //User clicked cancel
+    redirect($urlparams,'Cancelling form',2);
+} else if($formdata=$mform->get_data()){
+    // What to do when the user clicks submit
+    if(!$canmanage){
+        // Worker - Send to spreadsheet.php
+    
+    } else {
+        // Supervisor - Send to spreadsheet.php
+        
+        // If supervisor selects all, do this
+
+    }
+} else {
+    //Form is shown for the first time
+    echo $OUTPUT->header();
+    $maintabs[] = new tabobject('home', $index, 'Main');
+    $maintabs[] = new tabobject('reports', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+    $maintabs[] = new tabobject('hourlog', 
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
+    if($canmanage){
+        $maintabs[] = new tabobject('manage', 
+            new moodle_url($CFG->wwwroot.
+            '/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
+        $maintabs[] = new tabobject('alerts', 
+            new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 
+            'Alerts');
+    }
+    
+    $tabs = array($maintabs);
+    print_tabs($tabs, 'hourlog');
+
+    $mform->display();
+    echo $OUTPUT->footer();
+}
+
+?>

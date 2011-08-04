@@ -30,6 +30,7 @@ $string['timetracker:activateworkers'] = 'Activate Workers';
 $string['notactiveerror'] = 'You are not authorized to work.  Please contact your supervisor.';
 $string['defaultworkerconfig'] = 'Default Worker Configuration';
 
+
 //Strings for Block Settings
 $string['workerdisplaysettings'] = 'Worker Display Settings';
 $string['showtotalhours'] = 'Display total hours worked';
@@ -46,18 +47,21 @@ $string['budget'] = 'Budget Number';
 $string['institution'] = 'Institution Name';
 $string['supname'] = 'Supervisor(s) Name(s)';
 
+
 // Strings for Page Tabs
 $string['home'] = 'Home';
 $string['hourlog'] = 'Hourlog';
 $string['reports'] = 'Reports';
 $string['settings'] = 'Settings';
 
+
 // Global Strings
 $string['datefrom'] = 'Date from ';
 $string['dateto'] = ' to ';
 $string['submitbutton'] = 'Submit';
 $string['savebutton'] = 'Save';
- 
+
+
 // Strings for Block
 $string['blocktitle'] = 'TimeTracker';
 $string['hourstitle'] = 'Hours';
@@ -69,12 +73,14 @@ $string['total'] = 'Total: ';
 $string['manage'] = 'Manage';
 $string['registerinfo'] = 'Register Work Study Information';
 
+
 // Strings for Employee Home Page (also includes strings from the 'block' section above)
 $string['welcome'] = 'Welcome';
 $string['currentstats'] = 'Current Statistics for {$a}';
 $string['contact'] = 'Contact: ';
 $string['supervisor'] = 'Supervisor';
 $string['finaid'] = 'Financial Aid Work Study Coordinator';
+
 
 // Strings for Employee Hourlog Page
 $string['hourlogtitle'] = 'Hourlog for {$a}';
@@ -96,13 +102,16 @@ $string['clockinlink'] = 'Clock In';
 $string['clockoutlink'] = 'Clock Out';
 $string['pendingtimestamp'] = 'You have a pending timestamp: ';
 
+
 // Strings for Employee Reports Page
 $string['reportstitle'] = 'Reports';
 $string['timeperiod'] = 'Time Period';
 $string['cumulative'] = 'Cumulative';
 
+
 // String for Supervisor Home Page
 $string['homedefinition'] = 'Here is a summary of the last 10 employee activities: ';
+
 
 // Strings for Supervisor Hourlog Page
 $string['hourlogdefinition'] = 'Please choose an employee to view/edit hourlog.';
@@ -111,15 +120,15 @@ $string['headertimein'] = 'Time In';
 $string['headertimeout'] = 'Time Out';
 $string['headeredit'] = 'Edit';
 $string['headerdelete'] = 'Delete';
-
-
 $string['editunittitle'] = 'Editing workunit for {$a}';
+
 
 // Strings for Supervisor Reports Page
 $string['hourlogheader'] = 'Hourlog';
 $string['iemployee'] = 'Individual Employee';
 $string['selemployee'] = 'Select Employee';
 $string['aemployees'] = 'All Employees';
+
 
 // Strings for 'Update Worker Information' Page
 $string['emplinfo'] = 'Employee Information';
@@ -148,6 +157,7 @@ $string['noworkers'] = 'No workers listed';
 $string['updateformheadertitle'] = 'Update Worker Information';
 $string['manageworkertitle'] = 'Manage Workers';
 
+
 // Strings for 'Error Alert'
 $string['errortitle'] = 'Error Alert for {$a}';
 $string['sendbutton'] = 'Send';
@@ -168,20 +178,22 @@ $string['existingduration'] = '<b>Duration:</b>  {$a}';
 $string['approvedsuccess'] = 'The error approval has been processed successfully!  Please wait to be
     redirected.'; 
 
+
 //Manage Unit Alerts
 $string['previous'] = 'Current Work Unit';
 $string['proposed'] = 'Proposed Work Unit';
 $string['noalerts'] = 'No Alerts at this Time';
 $string['managealerts'] = 'Manage Alert Work Units';
-$string['managealerts_help'] = 
-'This page allows the supervisor or administrator to manage alerted work units.
-Typically, this indicates that the worker has issued a dispute with the recorded time, and
-has notified his/her supervisor of the error. The three options afforded are:
-<ul>
-<li><b>Approve</b> - Accept the workers propsed changes to the work unit.</li>
-<li><b>Change</b> - Modify the work unit</li>
-<li><b>Deny</b> - Deny the request and leave the original work unit intact.</li>
-</ul>';
+$string['managealerts_help'] = 'This page allows the supervisor or administrator to manage alerted work units
+    Typically, this indicates that the worker has issued a dispute with the recorded time, and
+    has notified his/her supervisor of the error. The three options afforded are:
+    <ul>
+    <li><b>Approve</b> - Accept the workers propsed changes to the work unit.</li>
+    <li><b>Change</b> - Modify the work unit</li>
+    <li><b>Deny</b> - Deny the request and leave the original work unit intact.</li>
+    </ul>';
+$string['changealert'] = 'Change Work Unit Error Alert for {$a}';
+$string['changeto'] = 'Change To:';
 
 // Error Alert Email
 $string['emessage1'] = 'Please review the following TimeTracker error alert data:';
@@ -195,7 +207,6 @@ $string['emessage6'] = 'Message: {$a}';
 $string['br1'] = '<br />';
 $string['br2'] = '<br /><br />';
 $string['hr'] = '<hr>';
-$string['emessagesent'] = 'Your notification has been sent to the selected supervisor(s)!';
 $string['emessageavailable'] = '<b>Available Actions:</b>';
 $string['emessagedisclaimer'] = '(Please note that you will be prompted to sign into Moodle in order to 
     complete the request).';
@@ -209,11 +220,26 @@ $string['amessage2'] = 'The following work unit has been approved:';
 $string['approveddata'] = '<b>Approved Data:</b>';
 $string['unitdeleted'] = 'This work unit has been deleted.';
 
+$string['denysubject'] = 'Error Alert Denied for {$a}';
+$string['dmessage1'] = 'The following alert unit data was denied:';
+
+$string['emessagesent'] = 'Your notification has been sent to the selected supervisor(s)!';
+$string['approvesuccess'] = 'You have successfully approved the error alert request.  The worker and any
+    other supervisor(s) will be notified.';
+$string['denysuccess'] = 'You have successfully denied the error alert request.  The worker and any
+    other supervisor(s) will be notified.';
+
+$string['changeapproved'] = 'This work unit has been approved with the following change:';
+$string['deletewarning'] = 'Warning: You are about to delete this work unit.  Are you sure?';
+
+
 //Error Codes
 $string['notpermissible'] = 'You do not have permissions to perform this action';
 $string['errordeleting'] = 'Invalid session key or user id';
 $string['usernotexist'] = 'User does not exist';
 $string['alreadyapproved'] = 'This work unit has already been approved by {$a}';
+
+$string['timesheettitle'] = 'Timesheet Report';
 
 //Context-Sensitive Help
 //Configuration Page

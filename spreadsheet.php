@@ -253,10 +253,12 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
             if($unit->timein < $eod && $unit->timein > $mid){
                 $in = userdate($unit->timein,get_string('timeformat','block_timetracker'));
                 $out = userdate($unit->timeout,get_string('timeformat','block_timetracker'));
-                $wustr .= "In: $in\nOut: $out\n";
-                //unset($units[$key]);
-                $weeksum += get_hours(($unit->timeout - $unit->timein));
-                //error_log($weeksum);
+                if(($unit->timeout - $unit->timein) >449){
+                    $wustr .= "In: $in\nOut: $out\n";
+                    //unset($units[$key]);
+                    $weeksum += get_hours(($unit->timeout - $unit->timein));
+                    //error_log($weeksum);
+                }
             } else {
                 break;
             }
