@@ -26,6 +26,7 @@ $string['couldnotclockout'] = 'Error adding clock out';
 $string['trackermethod'] = 'Which timetracking method would you like to use?';
 $string['pluginname'] = 'TimeTracker';
 $string['timetracker:manageworkers'] = 'Manage Workers';
+$string['timetracker:activateworkers'] = 'Activate Workers';
 $string['notactiveerror'] = 'You are not authorized to work.  Please contact your supervisor.';
 $string['defaultworkerconfig'] = 'Default Worker Configuration';
 
@@ -272,3 +273,6 @@ $string['trackermethod_help'] = 'The method the worker will use to track hours. 
 $string['messageforerror_help'] = 'Allows the worker to send a message regarding the work unit error
 to his or her supervisor.';
 $string['deleteunit_help'] = 'Request that your supervisor delete this work unit.';
+
+//Terms
+$string['terms_title'] = 'Edit Terms';

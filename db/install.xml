@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/timetracker/db" VERSION="2011072804" COMMENT="XMLDB file for Moodle Timetracker block"
+<XMLDB PATH="blocks/timetracker/db" VERSION="20110804" COMMENT="XMLDB file for Moodle Timetracker block"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -58,11 +58,11 @@
     </TABLE>
     <TABLE NAME="block_timetracker_term" COMMENT="Holds information regarding various terms." PREVIOUS="block_timetracker_workunit" NEXT="block_timetracker_config">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="starttime"/>
-        <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="endtime"/>
-        <FIELD NAME="endtime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="starttime" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" PREVIOUS="endtime" NEXT="description"/>
-        <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="name"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="name" NEXT="month"/>
+        <FIELD NAME="month" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="courseid" NEXT="day"/>
+        <FIELD NAME="day" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="month"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -92,7 +92,8 @@
         <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="payrate" NEXT="lasteditedby"/>
         <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited" NEXT="alerttime"/>
         <FIELD NAME="alerttime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="lasteditedby" NEXT="todelete"/>
-        <FIELD NAME="todelete" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="alerttime"/>
+        <FIELD NAME="todelete" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="alerttime" NEXT="message"/>
+        <FIELD NAME="message" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" PREVIOUS="todelete"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -109,7 +109,7 @@ function has_course_alerts($courseid){
             ' ORDER BY alerttime';
 
     $numalerts = $DB->count_records_sql($sql);
-    error_log($numalerts." alerts found! CID: $courseid");
+    //error_log($numalerts." alerts found! CID: $courseid");
     return ($numalerts != 0);
 
 }
@@ -130,7 +130,7 @@ function has_alerts($supervisorid, $courseid){
         $supervisorid.' AND courseid='.$courseid.' ORDER BY alerttime';
 
     $numalerts = $DB->count_records_sql($sql);
-    error_log($numalerts." alerts found! USERID: $supervisorid CID: $courseid");
+    //error_log($numalerts." alerts found! USERID: $supervisorid CID: $courseid");
     return ($numalerts != 0);
 
 }
@@ -381,6 +381,102 @@ function get_hours_this_year($userid,$courseid){
 }
 
 /**
+*
+* @return array 'termstart' and 'termend'
+*/
+function get_term_boundaries($courseid){
+    global $DB;
+    $currtime = time();
+    $year = date("Y");
+
+    $terms = $DB->get_records('block_timetracker_term',array('courseid'=>$courseid), 'month, day');
+
+    if(!$terms) return 0;
+
+    $term_times = array();
+    $counter = 0;
+    foreach($terms as $term){
+        $tstart = mktime(0,0,0,$term->month,$term->day,$year);
+        $term_times[] = $tstart; 
+        if($counter == 0){
+            $term_times[] = mktime(0,0,0,$term->month,$term->day,$year+1);
+        }
+        $counter++;
+    }
+
+    sort($term_times);
+
+    $termstart = 0;
+    $termend = 0;
+    foreach($term_times as $termtime){
+        if($currtime < $termtime){
+            $termend = $termtime - 1;
+            break;
+        }
+        $termstart = $termtime;
+    }
+
+    $boundaries = array('termstart'=>$termstart,'termend'=>$termend);
+    return $boundaries;
+}
+
+
+/**
+* @return hours (in decimal) for the current term
+*
+*/
+function get_hours_this_term($userid,$courseid){
+
+    global $CFG, $DB;
+    $boundaries = get_term_boundaries($courseid);
+
+    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
+        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.
+        $boundaries['termstart'].' AND '.$boundaries['termend'].' AND '.
+        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
+            'block_timetracker_workerinfo.id AND '.
+        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
+            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
+        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+
+    $units = $DB->get_recordset_sql($sql);
+
+    if(!$units) return 0;
+    $total = 0;
+    foreach($units as $unit){
+        $total += round_time($unit->timeout - $unit->timein);
+    }
+    return get_hours($total);
+}
+
+function get_earnings_this_term($userid,$courseid){
+
+    global $CFG, $DB;
+
+    $boundaries = get_term_boundaries($courseid);
+
+    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
+        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.
+        $boundaries['termstart'].' AND '.$boundaries['termend'].' AND '.
+        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
+            'block_timetracker_workerinfo.id AND '.
+        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
+            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
+        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+
+    $units = $DB->get_recordset_sql($sql);
+
+    if(!$units) return 0;
+    $earnings = 0;
+    foreach($units as $unit){
+        $earnings += get_hours(round_time($unit->timeout - $unit->timein))*$unit->payrate;
+    }
+    return round($earnings,2);
+}
+
+/**
 * We need
 * this month
 * this term
@@ -408,19 +504,22 @@ function get_worker_stats($userid,$courseid){
     $stats['monthhours'] = get_hours_this_month($userid, $courseid);
     $stats['yearhours'] = get_hours_this_year($userid, $courseid);
     //TODO fix this
-    $stats['termhours'] = $stats['yearhours'];
+    //$stats['termhours'] = $stats['yearhours'];
+    $stats['termhours'] = get_hours_this_term($userid, $courseid);
 
     $stats['totalearnings'] = get_total_earnings($userid,$courseid);
     $stats['monthearnings'] = get_earnings_this_month($userid,$courseid);
     $stats['yearearnings'] = get_earnings_this_year($userid,$courseid);
     //TODO fix this
-    $stats['termearnings'] = $stats['yearearnings'];
+    //$stats['termearnings'] = $stats['yearearnings'];
+    $stats['termearnings'] = get_earnings_this_term($userid,$courseid);
 
     return $stats; 
 }
 
 
 /**
+* XXX TODO document this function
 * @return an array of config items for this course;
 */
 function get_timetracker_config($courseid){

@@ -24,9 +24,11 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once('timetracker_manageworkers_form.php');
+require_once('timetracker_manageworkers_form.php'); //get lib.php from here.
+
 
 require_login();
+
 
 $courseid = required_param('id', PARAM_INTEGER);
 
@@ -42,6 +44,7 @@ if($courseid){
     $context = get_context_instance(CONTEXT_SYSTEM);
     $PAGE->set_context($context);
 }
+error_log("in manage workers and $COURSE->id");
 
 
 if (!has_capability('block/timetracker:manageworkers', $context)) {
@@ -56,6 +59,8 @@ $maintabs[] = new tabobject('manage',
     new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
 $maintabs[] = new tabobject('alerts', 
     new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 'Alerts');
+$maintabs[] = new tabobject('terms',
+    new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php',$urlparams), 'Terms');
 
 $manageworkerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
@@ -102,6 +107,32 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     redirect($manageworkerurl,'Changes saved successfully',2);
 
 } else {
+    //before displaying anything, add any enrolled users NOT in the WORKERINFO table.
+    //consider moving this to a 'refresh' link or something so it doesn't do it everytime?
+    //TODO
+    $config = get_timetracker_config($courseid);
+    $students = get_users_by_capability($context, 'mod/assignment:submit');
+    foreach ($students as $student){
+        if(!$DB->record_exists('block_timetracker_workerinfo',array('mdluserid'=>$student->id))){
+            $student->mdluserid = $student->id;
+            unset($student->id);
+            $student->courseid = $courseid;
+            $student->address = '0';
+            $student->position = $config['position'];
+            $student->currpayrate = $config['curr_pay_rate'];
+            $student->timetrackermethod = $config['trackermethod'];
+            $student->dept = $config['department'];
+            $student->budget = $config['budget'];
+            $student->supervisor = $config['supname'];
+            $student->institution = $config['institution'];
+            $student->maxtermearnings = $config['default_max_earnings'];
+            $res = $DB->insert_record('block_timetracker_workerinfo',$student);
+            if(!$res){
+                print_error("Error adding $student->firstname $student->lastname to TimeTracker");
+            }
+        }
+    }
+
     echo $OUTPUT->header();
     $tabs = array($maintabs);
     print_tabs($tabs, 'manage');

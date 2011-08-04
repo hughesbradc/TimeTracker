@@ -92,7 +92,7 @@ while ($currcheckin < $checkout){
     $out_off = dst_offset_on($checkout);
 
     if($in_off != $out_off){
-        error_log("********* THEY ARE DIFFERENT: $in_off and $out_off");
+        //error_log("********* THEY ARE DIFFERENT: $in_off and $out_off");
     }
 
     $currcheckin += $tomidnight + 1;
@@ -102,8 +102,8 @@ while ($currcheckin < $checkout){
     //error_log('86399 + ' .usergetmidnight($currcheckin). ' - ' .$currcheckin .' = '.$tomidnight);
 
     if($tomidnight == -1){
-        error_log($currcheckin. ' ' . $checkout . ' ' .$tomidnight);
-        error_log(dst_offset_on($currcheckin).' dst on out: '.dst_offset_on($checkout));
+        //error_log($currcheckin. ' ' . $checkout . ' ' .$tomidnight);
+        //error_log(dst_offset_on($currcheckin).' dst on out: '.dst_offset_on($checkout));
         //$tomidnight += 86399;
         break;
     }

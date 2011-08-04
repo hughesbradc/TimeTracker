@@ -36,6 +36,8 @@
         $clockin = optional_param('clockin', 0,PARAM_INTEGER);
         $clockout = optional_param('clockout',0, PARAM_INTEGER);
         $courseid = $COURSE->id;
+        error_log("in block_tt and $COURSE->id");
+        error_log("in block_tt and cid is $courseid");
         $worker = $DB->get_record('block_timetracker_workerinfo', 
             array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
@@ -104,10 +106,10 @@
             $this->content->text .='</ul>';
 
         } else {
-	        $recordexists = $DB->record_exists('block_timetracker_workerinfo', 
-                array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
-            if (!$recordexists){
+            //Worker doesn't exist yet, or has missing data
+            if (!$worker || ($worker->address=='0')){
+                //print_object($worker);
                 $link =
                 '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id.'&mdluserid='.$USER->id;
                 $action = null; 
@@ -115,6 +117,7 @@
                 $this->content->text .= $OUTPUT->action_link($link, 
                     get_string('registerinfo', 'block_timetracker'), $action);
                 $this->content->text .= '</center>';
+                return $this->content;
             } else {
                   
                 if($worker->active == 0){
@@ -214,7 +217,7 @@
             }
 
 
-            if($recordexists){     
+            if($worker){     
                 if($this->config->block_timetracker_show_month_hours ||
                     $this->config->block_timetracker_show_term_hours ||
                     $this->config->block_timetracker_show_ytd_hours ||

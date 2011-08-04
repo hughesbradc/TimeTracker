@@ -85,6 +85,9 @@ if($canmanage){
     $maintabs[] = new tabobject('alerts', 
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 
         'Alerts');
+    $maintabs[] = new tabobject('terms',
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php',$urlparams), 
+        'Terms');
 }
 
 $tabs = array($maintabs);
