@@ -64,9 +64,9 @@
 
             //check to see if the supervisor needs to manage
             if($hasalerts){
-                $this->content->text .= '<a style="color: red" href="'.$CFG->wwwroot.
+                $this->content->text .= '<b><center><a style="color: red" href="'.$CFG->wwwroot.
                     '/blocks/timetracker/managealerts.php?id='.$COURSE->id.
-                    '">**Manage Alerts**</a>';
+                    '">**Manage Alerts**</center></b></a>';
                 $this->content->text .= "<br /><br />";
             }
 

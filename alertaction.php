@@ -16,7 +16,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * eapendingapprove.php
  * This page will 'do magic' when a supervisor approves an error alert regarding a pending work unit.
  *
  * @package    TimeTracker
@@ -26,6 +25,9 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once('lib.php');
+require_once('timetracker_changealert_form.php');
+
+global $CFG, $COURSE, $USER;
 
 require_login();
 
@@ -39,6 +41,8 @@ if(!$alertunit){
 
 $courseid = $alertunit->courseid;
 
+$indexparams['id'] = $courseid; 
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
 
 $course = $DB->get_record('course', array('id' => $alertunit->courseid), '*', MUST_EXIST);
@@ -53,7 +57,6 @@ $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
-
 
 //********** TODO **********//
 //Add check - if request has already been approved, display 'alreadyapproved' string.
@@ -70,39 +73,27 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         $alertunit->userid .';';
     $lastedited = time();
     $lasteditedby = $USER->id; //Supervisor's id
-        /*
-        print($alertunit->userid);
-        print('<br />');
-        print($alertunit->courseid);
-        print('<br />');
-        print($alertunit->timein);
-        print('<br />');
-        print($alertunit->timeout);
-        print('<br />');
-        print($alertunit->todelete);
-        print('<br />');
-        print($action);
-        print('<br />');
-        */
+    
+    $alertcom = $DB->get_records('block_timetracker_alert_com', array('alertid'=>$alertid));
+       
     if($action == 'approve'){
         if($alertunit->todelete == 1){
             $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertid));
         } else {
-        
             //Add to 'workunit' table and delete from 'alertunits' and notify everyone
             $alertunit->lastedited = time();
             $alertunit->lasteditedby = $USER->id;
             $result = $DB->insert_record('block_timetracker_workunit', $alertunit);
         
-            //Send email to all users in 'alert_com'
             if(!$result){
                 print_error('Something happened');       
             }
         }
         
-        $alertcom = $DB->get_records('block_timetracker_alert_com', array('alertid'=>$alertid));
-       
         $from = $USER; 
+
+        // Email worker and any other supervisor(s) that the work unit has been approved
+       
         $subject = get_string('approvedsubject','block_timetracker', $worker->firstname.'
         '.$worker->lastname.' in '.$course->shortname);
         
@@ -159,37 +150,242 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             $messagehtml .= get_string('emessageduration','block_timetracker', 
             format_elapsed_time($alertunit->timeout - $alertunit->timein));
         }
-
-        // Email worker and any other supervisor(s) that the work unit has been approved
+       
         foreach ($alertcom as $alertcomentry){
             if($USER->id != $alertcomentry->mdluserid){
-                print("USER id is: $USER->id <br />");
-                print("user->id is $alertcomentry->mdluserid <br />");
-                // Get email from each in moodle table
+                // Get email address from each in moodle table
                 $emailto = $DB->get_record('user', array('id'=>$alertcomentry->mdluserid));
                 if($emailto){
                     email_to_user($emailto, $from, $subject, $messagetext, $messagehtml);
                 }
             } 
-    
-            $DB->delete_records('block_timetracker_alert_com', array('mdluserid'=>$alertcomentry->id));
+            // Remove record(s) from the 'alert_com' table
+            $DB->delete_records('block_timetracker_alert_com', array('alertid'=>$alertcomentry->alertid,'mdluserid'=>$alertcomentry->mdluserid));
         }
         $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertunit->id));
+
+        $status = get_string('approvesuccess','block_timetracker');
+        redirect($index,$status,2);
     } else if ($action == 'deny'){
-        print('You clicked deny!');
-        //Delete from 'alertunits' and notify everyone
+        if($alertunit->origtimeout == 0){
+            /* 
+             * Set the timein and timeout as the same value so that this will ensure the unit
+             * doesn't show on the monthly report and add to the 'workunit' table so that data 
+             * isn't lost.
+            */
+            unset($alertunit->id);
+            $alertunit->timein = $alertunit->origtimein;
+            $alertunit->timeout = $alertunit->origtimein;
+            $DB->insert_record('block_timetracker_workunit', $alertunit);
+        } else {
+            $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertunit->id));
+
+            // Add work unit back to 'workunit' table
+            unset($alertunit->id);
+            $alertunit->timein = $alertunit->origtimein;
+            $alertunit->timeout = $alertunit->origtimeout;
+            $DB->insert_record('block_timetracker_workunit', $alertunit);
+        }
+
+        // Email worker and any other supervisor(s) that the work unit has been approved
+        
+        $from = $USER; 
+        $subject = get_string('denysubject','block_timetracker', $worker->firstname.'
+        '.$worker->lastname.' in '.$course->shortname);
+        
+        //********** PLAIN TEXT **********//
+        $messagetext = get_string('amessage1','block_timetracker', $USER->firstname.'
+            '.$USER->lastname); 
+        $messagetext .= get_string('br2','block_timetracker'); 
+        $messagetext .= get_string('dmessage1','block_timetracker');
+        $messagetext .= get_string('br2','block_timetracker'); 
+        $messagetext .= get_string('emessage2','block_timetracker');
+        $messagetext .= get_string('br1','block_timetracker'); 
+        $messagetext .= get_string('emessage3','block_timetracker', userdate($alertunit->origtimein));
+        $messagetext .= get_string('br1','block_timetracker'); 
+        $messagetext .= get_string('emessage4','block_timetracker', userdate($alertunit->origtimeout));
+        $messagetext .= get_string('br1','block_timetracker'); 
+        $messagetext .= get_string('emessageduration','block_timetracker', 
+            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+        $messagetext .= get_string('br2','block_timetracker');
+        $messagetext .= get_string('approveddata','block_timetracker');
+        $messagetext .= get_string('br1','block_timetracker'); 
+        
+        if($alertunit->todelete == 1){
+            $messagetext .= get_string('unitdeleted','block_timetracker');
+        } else {
+            $messagetext .= get_string('emessage4','block_timetracker', userdate($alertunit->timeout));
+            $messagetext .= get_string('br1','block_timetracker'); 
+            $messagetext .= get_string('emessageduration','block_timetracker', 
+            format_elapsed_time($alertunit->timeout - $alertunit->timein));
+        }
+
+        //********** HTML **********//
+        $messagehtml = get_string('amessage1','block_timetracker', $USER->firstname.'
+            '.$USER->lastname); 
+        $messagehtml .= get_string('br2','block_timetracker'); 
+        $messagehtml .= get_string('dmessage1','block_timetracker');
+        $messagehtml .= get_string('br2','block_timetracker'); 
+        $messagehtml .= get_string('emessage2','block_timetracker');
+        $messagehtml .= get_string('br1','block_timetracker'); 
+        $messagehtml .= get_string('emessage3','block_timetracker', userdate($alertunit->origtimein));
+        $messagehtml .= get_string('br1','block_timetracker'); 
+        $messagehtml .= get_string('emessage4','block_timetracker', userdate($alertunit->origtimeout));
+        $messagehtml .= get_string('br1','block_timetracker'); 
+        $messagehtml .= get_string('emessageduration','block_timetracker', 
+            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+        $messagehtml .= get_string('br2','block_timetracker');
+        $messagehtml .= get_string('approveddata','block_timetracker');
+        $messagehtml .= get_string('br1','block_timetracker'); 
+        
+        if($alertunit->todelete == 1){
+            $messagehtml .= get_string('unitdeleted','block_timetracker');
+        } else {
+            $messagehtml .= get_string('emessage4','block_timetracker', userdate($alertunit->timeout));
+            $messagehtml .= get_string('br1','block_timetracker'); 
+            $messagehtml .= get_string('emessageduration','block_timetracker', 
+            format_elapsed_time($alertunit->timeout - $alertunit->timein));
+        }
+        
+        foreach ($alertcom as $alertcomentry){
+            if($USER->id != $alertcomentry->mdluserid){
+                //print("USER id is: $USER->id <br />");
+                //print("user->id is $alertcomentry->mdluserid <br />");
+                // Get email from each in moodle tablecorrectioncorrectioo
+                $emailto = $DB->get_record('user', array('id'=>$alertcomentry->mdluserid));
+                if($emailto){
+                    email_to_user($emailto, $from, $subject, $messagetext, $messagehtml);
+                }
+            } 
+            // Remove record(s) from the 'alert_com' table
+            $DB->delete_records('block_timetracker_alert_com', array('alertid'=>$alertcomentry->alertid,
+                'mdluserid'=>$alertcomentry->mdluserid));
+        }
+        $status = get_string('denysuccess','block_timetracker');
+        redirect($index,$status,2);
     } else {
-        print('You either clicked change, or you didn\'t meet the other two conditions.');
-        //What do we do here?
+        // Supervisor wishes to change data in the error alert
+        $mform = new timetracker_changealert_form($context, $alertid);
+
+        if ($mform->is_cancelled()){ 
+            //user clicked cancel
+            redirect($index);
+
+        } else if ($formdata=$mform->get_data()){
+            //Form is submitted, add the unit to the 'workunit' database; email worker and any other
+            //supervisors that the alert has been completed.
+           
+            if(isset($formdata->deleteunit)){
+                $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertid));
+            } else {
+                $formdata->lastedited = time();
+                $DB->insert_record('block_timetracker_workunit', $formdata);
+
+                $from = $USER; 
+
+                // Email worker and any other supervisor(s) that the work unit has been approved
+       
+                $subject = get_string('approvedsubject','block_timetracker', $worker->firstname.'
+                    '.$worker->lastname.' in '.$course->shortname);
+            
+                //********** PLAIN TEXT **********//
+                $messagetext = get_string('amessage1','block_timetracker', $USER->firstname.'
+                    '.$USER->lastname); 
+                $messagetext .= get_string('br2','block_timetracker'); 
+                $messagetext .= get_string('amessage2','block_timetracker');
+                $messagetext .= get_string('br2','block_timetracker'); 
+                $messagetext .= get_string('changemessage','block_timetracker');
+                $messagetext .= get_string('br1','block_timetracker'); 
+                $messagetext .= get_string('emessage3','block_timetracker', userdate($alertunit->origtimein));
+                $messagetext .= get_string('br1','block_timetracker'); 
+                $messagetext .= get_string('emessage4','block_timetracker', 
+                    userdate($alertunit->origtimeout));
+                $messagetext .= get_string('br1','block_timetracker'); 
+                $messagetext .= get_string('emessageduration','block_timetracker', 
+                    format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+                $messagetext .= get_string('br2','block_timetracker');
+                $messagetext .= get_string('approveddata','block_timetracker');
+                $messagetext .= get_string('br1','block_timetracker'); 
+                
+                if($alertunit->todelete == 1){
+                    $messagetext .= get_string('unitdeleted','block_timetracker');
+                } else {
+                    $messagetext .= get_string('emessage4','block_timetracker', 
+                        userdate($alertunit->timeout));
+                    $messagetext .= get_string('br1','block_timetracker'); 
+                    $messagetext .= get_string('emessageduration','block_timetracker', 
+                    format_elapsed_time($alertunit->timeout - $alertunit->timein));
+                }
+        
+                //********** HTML **********//
+                $messagehtml = get_string('amessage1','block_timetracker', $USER->firstname.'
+                    '.$USER->lastname); 
+                $messagehtml .= get_string('br2','block_timetracker'); 
+                $messagehtml .= get_string('amessage2','block_timetracker');
+                $messagehtml .= get_string('br2','block_timetracker'); 
+                $messagehtml .= get_string('emessage2','block_timetracker');
+                $messagehtml .= get_string('br1','block_timetracker'); 
+                $messagehtml .= get_string('emessage3','block_timetracker', userdate($alertunit->origtimein));
+                $messagehtml .= get_string('br1','block_timetracker'); 
+                $messagehtml .= get_string('emessage4','block_timetracker', 
+                    userdate($alertunit->origtimeout));
+                $messagehtml .= get_string('br1','block_timetracker'); 
+                $messagehtml .= get_string('emessageduration','block_timetracker', 
+                    format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+                $messagehtml .= get_string('br2','block_timetracker');
+                $messagehtml .= get_string('approveddata','block_timetracker');
+                $messagehtml .= get_string('br1','block_timetracker'); 
+                
+                if($alertunit->todelete == 1){
+                    $messagehtml .= get_string('unitdeleted','block_timetracker');
+                } else {
+                    $messagehtml .= get_string('emessage4','block_timetracker', 
+                        userdate($alertunit->timeout));
+                    $messagehtml .= get_string('br1','block_timetracker'); 
+                    $messagehtml .= get_string('emessageduration','block_timetracker', 
+                    format_elapsed_time($alertunit->timeout - $alertunit->timein));
+                }
+            
+                foreach ($alertcom as $alertcomentry){
+                    if($USER->id != $alertcomentry->mdluserid){
+                        // Get email address from each in moodle table
+                        $emailto = $DB->get_record('user', array('id'=>$alertcomentry->mdluserid));
+                        if($emailto){
+                            email_to_user($emailto, $from, $subject, $messagetext, $messagehtml);
+                        }
+                    } 
+                // Remove record(s) from the 'alert_com' table
+                $DB->delete_records('block_timetracker_alert_com', array('alertid'=>$alertcomentry->alertid,
+                    'mdluserid'=>$alertcomentry->mdluserid));
+                }
+            }
+        } else {
+            //form is shown for the first time
+            echo $OUTPUT->header();
+            $maintabs[] = new tabobject('home', $index, 'Main');
+            $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.
+                '/blocks/timetracker/reports.php',
+            $urlparams), 'Reports');
+            $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.
+                '/blocks/timetracker/hourlog.php',
+            $urlparams), 'Hour Log');
+            $maintabs[] = new tabobject('alert', new moodle_url($CFG->wwwroot.
+                '/blocks/timetracker/hourlog.php', $urlparams), 'Alert Supervisor');
+            if($canmanage){
+                $maintabs[] = new tabobject('manage', 
+                    new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 
+                    'Manage Workers');
+                $maintabs[] = new tabobject('alerts', 
+                    new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 
+                    'Alerts');
+            }
+            $tabs = array($maintabs);
+            print_tabs($tabs, 'alert');
+
+            $mform->display();
+            echo $OUTPUT->footer();
+        }
+    
     }
-    
-    //$sql = 'INSERT INTO '.$CFG->prefix.'block_timetracker_workunit (userid, courseid, timein,
-    //    timeout, payrate, lastedited, lasteditedby) ';
-    //$sql .= $userid ', ', $courseid ', ', $ti ', ',$to ', ', $payrate ', ', $lastedited ', ',
-    //$lasteditedby ';';
-    
-    //insert_record($sql);
-    
-    //redirect($nexturl, get_string('approvedsuccess','block_timetracker'), 2);
 }
 ?>
