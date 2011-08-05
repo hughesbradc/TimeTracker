@@ -1,6 +1,3 @@
-//If admin, see 3 boxes:  worker, year, month; click go, generates many
-//If worker, see 2 boxes:  year, month; click go, generates one
-
 <?php
 
 // This file is part of Moodle - http://moodle.org/
@@ -27,6 +24,7 @@
  */
 
 require_once('../../config.php');
+require_once('timetracker_timesheet_form.php');
 
 global $CFG, $COURSE, $USER, $DB;
 
@@ -44,7 +42,7 @@ $urlparams['year'] = $year;
 
 $timesheeturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet.php',$urlparams);
 
-$course = $DB->get_record('course', array('id'=>$courseid), '*' MUST_EXIST);
+$course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
 
@@ -71,20 +69,11 @@ $PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_timesheet_form($context, $userid, $courseid, $month, $year);
 
-if($mform->is_cancelled(){
+if($mform->is_cancelled()){
     //User clicked cancel
     redirect($urlparams,'Cancelling form',2);
 } else if($formdata=$mform->get_data()){
-    // What to do when the user clicks submit
-    if(!$canmanage){
-        // Worker - Send to spreadsheet.php
-    
-    } else {
-        // Supervisor - Send to spreadsheet.php
-        
-        // If supervisor selects all, do this
 
-    }
 } else {
     //Form is shown for the first time
     echo $OUTPUT->header();
@@ -104,7 +93,6 @@ if($mform->is_cancelled(){
     
     $tabs = array($maintabs);
     print_tabs($tabs, 'hourlog');
-
     $mform->display();
     echo $OUTPUT->footer();
 }
