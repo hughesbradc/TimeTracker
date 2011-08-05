@@ -49,16 +49,13 @@ class timetracker_timesheet_form  extends moodleform {
         // Collect all of the workers under the supervisor
 
         if($canmanage) {
-            print("in canmanage 'if'");
             $workerlist = array();
             $workers =
                 $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$this->courseid),
                 'lastname DESC');
-            print_object($workers);
             foreach($workers as $worker){
                 $workerlist[$worker->id] = $worker->firstname.' '.$worker->lastname;
             }
-            print_object($workerlist);
             $mform->addElement('select', 'workerid', 'Workers', $workerlist);
         } else {
             $mform->addElement('hidden','workerid',$USER->id);    
