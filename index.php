@@ -132,13 +132,15 @@ if ($canmanage) { //supervisor
                 $row.='<td style="text-align: center">'.format_elapsed_time($currelapsed).'</td>';
 
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
-                $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".sesskey().'&unitid='.$unit->id.'&next=1';
+                $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".
+                    sesskey().'&unitid='.$unit->id.'&next=1';
     
                 $editurl = new moodle_url($baseurl.'/editunit.php'.$paramstring);
-                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
+                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
+                    get_string('edit'),'block_timetracker'));
 
                 $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php'.$paramstring);
-                $deleteicon = new pix_icon('t/delete', get_string('delete'));
+                $deleteicon = new pix_icon('clock_delete', get_string('delete'),'block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action('Are you sure you want to delete this work unit?'));
@@ -164,7 +166,7 @@ if ($canmanage) { //supervisor
         echo get_string('notactiveerror','block_timetracker').'<br /><br />';
     } else {
         if(!$userPending && $worker->timetrackermethod==0){
-            $clockinicon = new pix_icon('clock_in_big','Clock in', 'block_timetracker');
+            $clockinicon = new pix_icon('clock_play','Clock in', 'block_timetracker');
             $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',$urlparams);
             $clockinurl->params(array('clockin'=>1));
             $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
@@ -172,10 +174,10 @@ if ($canmanage) { //supervisor
             echo '<h2>';
             echo $clockinaction;
             echo ' Clock in?</h2>';
-            echo "You are not currently clocked in. Click the green clock above to clock in now.<br />";
+            echo "You are not currently clocked in. Click the icon to clock in now.<br />";
             echo $OUTPUT->box_end();
         } else if(!$userPending && $worker->timetrackermethod==1){
-            $clockinicon = new pix_icon('clock_in_big','Clock in', 'block_timetracker');
+            $clockinicon = new pix_icon('clock_play','Clock in', 'block_timetracker');
             $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams);
             $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
             echo $OUTPUT->box_start('generalbox boxaligncenter');
@@ -238,7 +240,7 @@ if ($canmanage) { //supervisor
         $clockouturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
         $clockouturl->params(array('clockout'=>1));
         foreach ($userPending as $pending){
-            $clockouticon = new pix_icon('clock_out','Clock out','block_timetracker');
+            $clockouticon = new pix_icon('clock_stop','Clock out','block_timetracker');
             $clockoutaction = $OUTPUT->action_icon($clockouturl, $clockouticon);
 
             $urlparams['ispending']=true;
@@ -247,9 +249,10 @@ if ($canmanage) { //supervisor
             $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
             
             $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
-            $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".sesskey().'&pendingid='.$pending->id;
+            $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".
+                sesskey().'&pendingid='.$pending->id;
             $deleteurl = new moodle_url($baseurl.'/deletepending.php'.$paramstring);
-            $deleteicon = new pix_icon('t/delete', get_string('delete'));
+            $deleteicon = new pix_icon('clock_delete', get_string('delete'),'block_timetracker');
             $deleteaction = $OUTPUT->action_icon(
                 $deleteurl, $deleteicon, 
                 new confirm_action('Are you sure you want to delete this pending work unit?'));

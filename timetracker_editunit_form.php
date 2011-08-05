@@ -62,13 +62,15 @@ class timetracker_editunit_form extends moodleform {
         }
 
         if($this->ispending){
+            //error_log("getting a pending unit # $this->unitid");
             $unit = $DB->get_record('block_timetracker_pending',array('id'=>$this->unitid));
+            //print_object($unit);
         } else {
             $unit = $DB->get_record('block_timetracker_workunit',array('id'=>$this->unitid));
         }
 
         if(!$unit){
-            print_error('Unit does not exist');
+            print_error('Unit does not exist: '.$this->unitid);
             return;
         }
 
@@ -85,6 +87,7 @@ class timetracker_editunit_form extends moodleform {
         $mform->addElement('hidden','userid', $this->userid);
         $mform->addElement('hidden','unitid', $this->unitid);
         $mform->addElement('hidden','id', $this->courseid);
+        $mform->addElement('hidden','ispending', $this->ispending);
         //edited by supervisor
         $mform->addElement('hidden','editedby', '0');
         /** END HIDDEN FIELDS **/

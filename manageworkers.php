@@ -44,7 +44,7 @@ if($courseid){
     $context = get_context_instance(CONTEXT_SYSTEM);
     $PAGE->set_context($context);
 }
-error_log("in manage workers and $COURSE->id");
+//error_log("in manage workers and $COURSE->id");
 
 
 if (!has_capability('block/timetracker:manageworkers', $context)) {

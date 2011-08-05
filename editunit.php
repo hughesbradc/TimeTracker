@@ -88,6 +88,7 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
+//error_log('before creating form');
 $mform = new timetracker_editunit_form($context, $userid,
     $courseid, $unitid, $start, $end, $ispending);
 
@@ -100,6 +101,8 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
+    $urlparams = array();
+    $urlparams['id'] = $courseid;
     redirect($index,'');
 } else if ($formdata=$mform->get_data()){
 
@@ -122,8 +125,10 @@ if ($mform->is_cancelled()){ //user clicked cancel
     $maintabs[] = new tabobject('home', $index, 'Main');
     $maintabs[] = new tabobject('reports', 
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
+    /*
     $maintabs[] = new tabobject('editunit', 
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/editunit.php',$urlparams), 'Edit Workunit');
+    */
 
     if($canmanage){
         $maintabs[] = new tabobject('manage', 
@@ -138,7 +143,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
     }
     
     $tabs = array($maintabs);
-    print_tabs($tabs, 'editunit');
+    print_tabs($tabs, '');
 
     $mform->display();
     echo $OUTPUT->footer();

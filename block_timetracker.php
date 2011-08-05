@@ -36,8 +36,8 @@
         $clockin = optional_param('clockin', 0,PARAM_INTEGER);
         $clockout = optional_param('clockout',0, PARAM_INTEGER);
         $courseid = $COURSE->id;
-        error_log("in block_tt and $COURSE->id");
-        error_log("in block_tt and cid is $courseid");
+        //error_log("in block_tt and $COURSE->id");
+        //error_log("in block_tt and cid is $courseid");
         $worker = $DB->get_record('block_timetracker_workerinfo', 
             array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
 
@@ -76,7 +76,7 @@
             $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
             
             $this->content->text .= '<div style="text-align: center">';
-            $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
+            $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
             $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
     
             $this->content->text .= $timeclockdataaction.'<br />';
@@ -143,13 +143,14 @@
     
                     // Clock In Icon
                     $this->content->text .= '<div style="text-align: center">';
-                    $clockinicon = new pix_icon('clock_in','Clock in', 'block_timetracker');
+                    //$clockinicon = new pix_icon('clock_in','Clock in', 'block_timetracker');
+                    $clockinicon = new pix_icon('clock_play','Clock in', 'block_timetracker');
                     $clockinaction = $OUTPUT->action_icon($link, $clockinicon);
         
-                    $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
+                    $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
                     $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
         
-                    $this->content->text .= $clockinaction. $timeclockdataaction.'<br />';
+                    $this->content->text .= $clockinaction. ' '.$timeclockdataaction.'<br />';
                     $this->content->text .= '</div>';
                 } else {
                     $urlparams['userid']=$ttuserid;
@@ -166,16 +167,18 @@
         
                     $this->content->text .= '<div style="text-align: center">';
                     
-                    $clockouticon = new pix_icon('clock_out','Clock out','block_timetracker');
+                    //$clockouticon = new pix_icon('clock_out','Clock out','block_timetracker');
+                    $clockouticon = new pix_icon('clock_stop','Clock out','block_timetracker');
                     $clockoutaction = $OUTPUT->action_icon($link, $clockouticon);
                     
-                    $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
+                    $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
                     $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
                     
                     $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
                     $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
                     
-                    $this->content->text .= $clockoutaction. $timeclockdataaction. $alertaction. '<br />';
+                    $this->content->text .= $clockoutaction. ' '.
+                        $timeclockdataaction. ' '.$alertaction. '<br />';
     
                     $this->content->text .= '<b>';
                     $this->content->text .= '</b>';

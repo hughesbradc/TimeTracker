@@ -148,25 +148,39 @@ class timetracker_reports_form  extends moodleform {
                 $row.='<td>'.userdate($pending->timein,
                     get_string('datetimeformat','block_timetracker')).'</td>';
 
+
+
                 $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".sesskey().
                     '&unitid='.$pending->id;
+
+                /*
+                $cout = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php'.$paramstring);
+                $clockouticon = new pix_icon('clock_stop','Clock out','block_timetracker');
+                $clockoutaction = $OUTPUT->action_icon($cout, $clockouticon);
+                */
+
                 $deleteurl = new moodle_url($baseurl.'/deletepending.php'.$paramstring);
-                $deleteicon = new pix_icon('t/delete', get_string('delete'));
+                $deleteicon = new pix_icon('clock_delete',
+                    get_string('delete'),'block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action('Are you sure you want to delete this pending work unit?'));
 
-                $actions = $deleteaction; 
 
                 if($canmanage){
                     $paramstring .= "&unitid=$pending->id&ispending=true";
                     $editurl = new moodle_url($baseurl.'/editunit.php'.$paramstring);
                     $editaction = $OUTPUT->action_icon($editurl, 
-                        new pix_icon('t/edit', get_string('edit')));
-                    $actions .= $editaction; 
-        
-                     
+                        new pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
                 }
+                if($editaction){
+                    //$actions = $clockoutaction.' '.$editaction.' '.$deleteaction;
+                    $actions = $editaction.' '.$deleteaction;
+                } else {
+                    //$actions = $clockoutaction..' '.$deleteaction;
+                    $actions = $deleteaction;
+                }
+
                 $row .= '<td style="text-align: center">'.$actions.'</td>';
                 $row .= '</tr>';
                 $mform->addElement('html',$row);
@@ -236,10 +250,11 @@ class timetracker_reports_form  extends moodleform {
                     $editurl = new
                         moodle_url($baseurl.'/editunit.php'.$paramstring);
                     $editaction = $OUTPUT->action_icon($editurl, 
-                        new pix_icon('t/edit', get_string('edit')));
+                        new pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
         
                     $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php'.$paramstring);
-                    $deleteicon = new pix_icon('t/delete', get_string('delete'));
+                    $deleteicon = new pix_icon('clock_delete',
+                        get_string('delete'),'block_timetracker');
                     $deleteaction = $OUTPUT->action_icon(
                         $deleteurl, $deleteicon, 
                         new confirm_action('Are you sure you want to delete this work unit?'));

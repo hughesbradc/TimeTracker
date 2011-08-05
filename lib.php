@@ -391,29 +391,30 @@ function get_term_boundaries($courseid){
 
     $terms = $DB->get_records('block_timetracker_term',array('courseid'=>$courseid), 'month, day');
 
-    if(!$terms) return 0;
-
-    $term_times = array();
-    $counter = 0;
-    foreach($terms as $term){
-        $tstart = mktime(0,0,0,$term->month,$term->day,$year);
-        $term_times[] = $tstart; 
-        if($counter == 0){
-            $term_times[] = mktime(0,0,0,$term->month,$term->day,$year+1);
-        }
-        $counter++;
-    }
-
-    sort($term_times);
-
     $termstart = 0;
     $termend = 0;
-    foreach($term_times as $termtime){
-        if($currtime < $termtime){
-            $termend = $termtime - 1;
-            break;
+    if($terms){
+
+        $term_times = array();
+        $counter = 0;
+        foreach($terms as $term){
+            $tstart = mktime(0,0,0,$term->month,$term->day,$year);
+            $term_times[] = $tstart; 
+            if($counter == 0){
+                $term_times[] = mktime(0,0,0,$term->month,$term->day,$year+1);
+            }
+            $counter++;
         }
-        $termstart = $termtime;
+    
+        sort($term_times);
+    
+        foreach($term_times as $termtime){
+            if($currtime < $termtime){
+                $termend = $termtime - 1;
+                break;
+            }
+            $termstart = $termtime;
+        }
     }
 
     $boundaries = array('termstart'=>$termstart,'termend'=>$termend);

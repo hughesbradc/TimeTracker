@@ -132,20 +132,22 @@ class timetracker_manageworkers_form  extends moodleform {
                     "?id=$COURSE->id&userid=$worker->id&mdluserid=$worker->mdluserid&sesskey=".sesskey();
     
                 $editurl = new moodle_url($baseurl.'/updateworkerinfo.php'.$paramstring);
-                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
+                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
+                    get_string('edit'),'block_timetracker'));
     
                 $reportsurl = new moodle_url($baseurl.'/reports.php'.$paramstring);
-                $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('t/calendar', 'Reports'));
+                $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('report', 
+                    'Reports','block_timetracker'));
     
                 $deleteurl = new moodle_url($baseurl.'/deleteworker.php'.$paramstring);
-                $deleteicon = new pix_icon('t/delete', get_string('delete'));
+                $deleteicon = new pix_icon('clock_delete', get_string('delete'),'block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action(
                     'Are you sure you want to delete this worker and all this worker\'s work units?'));
     
                 $row .= '<td style="text-align: center">'.
-                    $editaction . ' ' . $reportsaction. ' '.$deleteaction.'</td>';
+                    $editaction . ' ' . $deleteaction. ' '.$reportsaction.'</td>';
     
     
                 $row.='</tr>';

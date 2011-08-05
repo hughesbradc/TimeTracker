@@ -120,14 +120,16 @@ class timetracker_managealerts_form  extends moodleform {
                 $row.='</td>';
 
                 $editurl = new moodle_url($alertlinks[$worker->id]['change']);
-                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
+                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
+                    get_string('edit'),'block_timetracker'));
     
                 $approveurl = new moodle_url($alertlinks[$worker->id]['approve']);
-                $checkicon = new pix_icon('check','Approve','block_timetracker');
+                $checkicon = new pix_icon('approve','Approve','block_timetracker');
                 $approveaction=$OUTPUT->action_icon($approveurl, $checkicon);
     
                 $deleteurl = new moodle_url($alertlinks[$worker->id]['deny']);
-                $deleteicon = new pix_icon('t/delete', get_string('delete'));
+                $deleteicon = new pix_icon('clock_delete',
+                    get_string('delete'),'block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action(
