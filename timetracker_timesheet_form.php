@@ -33,7 +33,7 @@ class timetracker_timesheet_form  extends moodleform {
         $this->userid = $userid;
         $this->courseid = $courseid;
         $this->month = $month;
-        $this->year = $year
+        $this->year = $year;
         parent::__construct();
     }
 
@@ -48,18 +48,63 @@ class timetracker_timesheet_form  extends moodleform {
 
         // Collect all of the workers under the supervisor
 
-        //$workerlist = $DB->get_records('block_timetracker_
-       
         if($canmanage) {
-            $mform->addElement('select', 'calendar_workers', 'Workers', array(
+            print("in canmanage 'if'");
+            $workerlist = array();
+            $workers =
+                $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$this->courseid),
+                'lastname DESC');
+            print_object($workers);
+            foreach($workers as $worker){
+                $workerlist[$worker->id] = $worker->firstname.' '.$worker->lastname;
+            }
+            print_object($workerlist);
+            $mform->addElement('select', 'workerid', 'Workers', $workerlist);
+        } else {
+            $mform->addElement('hidden','workerid',$USER->id);    
         }
 
-        $mform->addElement('select', 'calendar_month', 'Month', 
-            array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'));
+        $months = array(
+            1 =>'January',
+            2=>'February',
+            3=>'March',
+            4=>'April',
+            5=>'May',
+            6=>'June',
+            7=>'July',
+            8=>'August',
+            9=>'September',
+            10=>'October',
+            11=>'November',
+            12=>'December');
+
+        $mform->addElement('select', 'month', 'Month', $months);
         //TODO Will eventually look at the earliest record in the database and generate year from that
         //record to the current year
         
-        $earliestyear = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE workerid='.
-            $this->userid ' DESC LIMIT 1';
 
-        $mform->addElement('select', 'calendar_year', 'Year', array(''));
+        $sql = 'SELECT timein FROM '.$CFG->prefix.'block_timetracker_workunit ORDER BY timein LIMIT 1';
+        $earliestyear = $DB->get_record_sql($sql);
+        $sql = 'SELECT timeout FROM '.$CFG->prefix.'block_timetracker_workunit ORDER BY timeout DESC LIMIT 1';
+        $latestyear = $DB->get_record_sql($sql);
+        
+        $latestyear = date("Y", $latestyear->timeout);
+        $earliestyear = date("Y", $earliestyear->timein);
+        
+        $years = array();
+        foreach(range($earliestyear,$latestyear) as $year){
+            $years[$year] = $year;
+        }
+        if(!empty($years))
+            $mform->addElement('select', 'year', 'Year', $years);
+
+        $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
+    }
+
+    function validation($data){
+        $errors = array();
+
+        return $errors;
+    }
+}
+?>
