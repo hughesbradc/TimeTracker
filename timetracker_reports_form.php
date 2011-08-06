@@ -153,11 +153,10 @@ class timetracker_reports_form  extends moodleform {
                 $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".sesskey().
                     '&unitid='.$pending->id;
 
-                /*
-                $cout = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php'.$paramstring);
+                $cout = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php'.$paramstring.
+                    '&clockout=1');
                 $clockouticon = new pix_icon('clock_stop','Clock out','block_timetracker');
                 $clockoutaction = $OUTPUT->action_icon($cout, $clockouticon);
-                */
 
                 $deleteurl = new moodle_url($baseurl.'/deletepending.php'.$paramstring);
                 $deleteicon = new pix_icon('clock_delete',
@@ -174,11 +173,9 @@ class timetracker_reports_form  extends moodleform {
                         new pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
                 }
                 if($editaction){
-                    //$actions = $clockoutaction.' '.$editaction.' '.$deleteaction;
-                    $actions = $editaction.' '.$deleteaction;
+                    $actions = $clockoutaction.' '.$editaction.' '.$deleteaction;
                 } else {
-                    //$actions = $clockoutaction..' '.$deleteaction;
-                    $actions = $deleteaction;
+                    $actions = $clockoutaction.' '.$deleteaction;
                 }
 
                 $row .= '<td style="text-align: center">'.$actions.'</td>';

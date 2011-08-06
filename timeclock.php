@@ -25,7 +25,6 @@
 
 require_once('../../config.php');
 require_once ('lib.php');
-
 global $CFG, $COURSE, $USER;
 
 require_login();

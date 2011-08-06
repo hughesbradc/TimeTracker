@@ -234,6 +234,7 @@ if ($canmanage) { //supervisor
         
         $table->set_attribute('cellspacing', '0');
         $table->set_attribute('class', 'generaltable generalbox');
+        $table->define_baseurl($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
         $table->setup();
         

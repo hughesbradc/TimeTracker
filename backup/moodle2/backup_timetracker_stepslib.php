@@ -7,22 +7,28 @@ class backup_timetracker_block_structure_step extends backup_block_structure_ste
 
     protected function define_structure() {
         error_log("in define_structure()");
-        global $DB;
+        global $DB,$CFG;
+
         // To know if we are including userinfo
-        $userinfo = $this->get_setting_value('userinfo');
+        $userinfo = $this->get_setting_value('users');
 
         // Get the block
         $block = $DB->get_record('block_instances', array('id' => $this->task->get_blockid()));
 
         // Extract configdata
         $config = unserialize(base64_decode($block->configdata));
+        //$pre=$CFG->prefix.'block_timetracker_';
+        $pre='block_timetracker_';
+        //error_log($pre); 
+
+        $timetracker_main = new backup_nested_element('timetracker', array('id'), null);
 
         // Define each element separated
         $workerinfo = new backup_nested_element('workerinfo', array('id'), array(
             'active', 'address', 'budget', 'comments', 'currpayrate',
             'dept', 'email', 'firstname', 'idnum', 'institution', 'lastname',
             'maxtermearnings', 'phonenumber', 'supervisor', 
-            'timetrackermethod')); //annotate mdluserid
+            'timetrackermethod','mdluserid')); //annotate mdluserid
 
         $terms = new backup_nested_element('term', array('id'), array(
             'name', 'month', 'day')); 
@@ -30,49 +36,51 @@ class backup_timetracker_block_structure_step extends backup_block_structure_ste
         $config = new backup_nested_element('config',array('id'), array(
             'name','value')); 
 
-        $alertcom = new backup_nested_element('alert_com', array('id'), array(
-            'alertid')); //annotate mdluserid
-
         $alertunits = new backup_nested_element('alerunits', array('id'), array(
             'timein', 'lasteditedby', 'lastedited', 'message',
             'origtimein','origtimeout','payrate','todelete','alerttime')); 
 
+        $alertcom = new backup_nested_element('alert_com', array('id'), array('mdluserid')); 
+
         $pending = new backup_nested_element('pending', array('id'), array(
-            'timein')); //annotate userid
+            'timein')); 
         
         $workunits = new backup_nested_element('workunit', array('id'), array(
             'timein', 'timeout', 'lastedited', 'lasteditedby', 
-            'payrate')); //annotate userid
+            'payrate'));
 
 
         // Build the tree -- isn't this all of the dependencies?
-        $workerinfo->add_child($alertunits);
-        $workerinfo->add_child($pending);
+        $timetracker_main->add_child($workerinfo);
+        $timetracker_main->add_child($alertunits);
+        $timetracker_main->add_child($pending);
+        $timetracker_main->add_child($terms);
+        $timetracker_main->add_child($config);
+        $alertunits->add_child($alertcom);
         $workerinfo->add_child($workunits);
-        $workerinfo->add_child($terms);
-        $workerinfo->add_child($config);
-        $workerinfo->add_child($alertcom);
 
         // Define sources
-        $terms->set_source_table('terms', array('courseid' => backup::VAR_COURSEID));
-        $config->set_source_table('config', array('courseid' => backup::VAR_COURSEID));
+        $timetracker_main->set_source_array(array((object)array('id'=>$this->task->get_blockid())));
+        $terms->set_source_table($pre.'term', array('courseid' => backup::VAR_COURSEID));
+        $config->set_source_table($pre.'config', array('courseid' => backup::VAR_COURSEID));
         if($userinfo){
-            $alertcom->set_source_table('alert_com', array('courseid' => backup::VAR_COURSEID));
-            $workerinfo->set_source_table('workerinfo', array('courseid' => backup::VAR_COURSEID));
-            $alertunits->set_source_table('alertunits', array('courseid' => backup::VAR_COURSEID,
+            $workerinfo->set_source_table($pre.'workerinfo', array('courseid' => backup::VAR_COURSEID));
+            $alertunits->set_source_table($pre.'alertunits', array('courseid' => backup::VAR_COURSEID,
                 'userid'=>'../id'));
-            $pending->set_source_table('pending', array('courseid' => backup::VAR_COURSEID,
+            $alertcom->set_source_table($pre.'alert_com', array('courseid' => backup::VAR_COURSEID,
+                'alertid'=>'../id'));
+            $pending->set_source_table($pre.'pending', array('courseid' => backup::VAR_COURSEID,
                 'userid'=>'../id'));
-            $workunits->set_source_table('pending', array('courseid' => backup::VAR_COURSEID,
+            $workunits->set_source_table($pre.'pending', array('courseid' => backup::VAR_COURSEID,
                 'userid'=>'../id'));
-            $alertcom->annotate_ids('user', 'mdluserid');
-            $workerinfo->annotate_ids('user', 'mdluserid');
         }
 
 
         // Annotations (none)
+        $alertcom->annotate_ids('user', 'mdluserid');
+        $workerinfo->annotate_ids('user', 'mdluserid');
 
         // Return the root element (timetracker), wrapped into standard block structure
-        return $this->prepare_block_structure($workerinfo);
+        return $this->prepare_block_structure($timetracker_main);
     }
 }
