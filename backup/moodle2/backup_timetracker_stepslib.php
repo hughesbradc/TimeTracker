@@ -52,10 +52,10 @@ class backup_timetracker_block_structure_step extends backup_block_structure_ste
 
         // Build the tree -- isn't this all of the dependencies?
         $timetracker_main->add_child($workerinfo);
-        $timetracker_main->add_child($alertunits);
-        $timetracker_main->add_child($pending);
         $timetracker_main->add_child($terms);
         $timetracker_main->add_child($config);
+        $workerinfo->add_child($alertunits);
+        $workerinfo->add_child($pending);
         $alertunits->add_child($alertcom);
         $workerinfo->add_child($workunits);
 
@@ -71,7 +71,7 @@ class backup_timetracker_block_structure_step extends backup_block_structure_ste
                 'alertid'=>'../id'));
             $pending->set_source_table($pre.'pending', array('courseid' => backup::VAR_COURSEID,
                 'userid'=>'../id'));
-            $workunits->set_source_table($pre.'pending', array('courseid' => backup::VAR_COURSEID,
+            $workunits->set_source_table($pre.'workunit', array('courseid' => backup::VAR_COURSEID,
                 'userid'=>'../id'));
         }
 
