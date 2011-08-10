@@ -80,6 +80,10 @@ class timetracker_reports_form  extends moodleform {
             }
         }
 
+        $mform->addElement('header','general','Generate Monthly Timesheet');
+        $mform->addElement('html','<center><a
+            href="'.$CFG->wwwroot.'/blocks/timetracker/timesheet.php?id='.$this->courseid.'">Generate Monthly Timesheet</a></center>');
+
         $mform->addElement('header', 'general', 'Report time period'); 
         $mform->addElement('hidden','id', $this->courseid);
         $mform->addElement('hidden','userid', $this->userid);
@@ -274,7 +278,6 @@ class timetracker_reports_form  extends moodleform {
                 format_elapsed_time($total).'</td></tr></table>');
 
         } 
-    
     
     }
 

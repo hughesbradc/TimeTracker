@@ -77,6 +77,10 @@ $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8',
 $pdf->setCreator(PDF_CREATOR);
 $pdf->SetFont('helvetica', '', 8);
 $pdf->SetCellPadding(0);
+$pdf->SetTitle('Timesheet_'.$monthinfo['monthname'].'_'.$year);
+$pdf->SetAuthor('TimeTracker');
+$pdf->SetSubject(' ');
+$pdf->SetKeywords(' ');
 
 // Remove Default Header/Footer
 $pdf->setPrintHeader(false);
@@ -167,12 +171,12 @@ for($row=0; $row < 6; $row++){
     //write blank cells to catch up to the first day of the month
     while($counter != $dayofweek){
         $counter++; 
-        $days[] = '<td style="height: 15px">&nbsp;</td>';
-        $vals[] = '<td style="height: 70px">&nbsp;</td>';
+        $days[] = '<td style="height: 10px">&nbsp;</td>';
+        $vals[] = '<td style="height: 75px">&nbsp;</td>';
     }
 
     do {
-        $days[] = '<td style="height: 15px" align="center"><b>'.$date.'</b></td>';
+        $days[] = '<td style="height: 10px" align="center"><b>'.$date.'</b></td>';
 
 
         //begin of print work units
@@ -188,7 +192,7 @@ for($row=0; $row < 6; $row++){
                 $in = userdate($unit->timein,get_string('timeformat','block_timetracker'));
                 $out = userdate($unit->timeout,get_string('timeformat','block_timetracker'));
                 if(($unit->timeout - $unit->timein) >449){
-                    $wustr .= "In: $in<br />Out: $out";
+                    $wustr .= "In: $in<br />Out: $out<br />";
                     $weeksum += get_hours(($unit->timeout - $unit->timein));
                 }
             } else {
@@ -197,7 +201,7 @@ for($row=0; $row < 6; $row++){
         }
         
         //$worksheet[1]->write_string($currentrow +1, $dayofweek, $wustr, $format_cal_block);
-        $vals[] = '<td style="height: 70px"><font size="7">'.$wustr.'</font></td>';
+        $vals[] = '<td style="height: 75px"><font size="7">'.$wustr.'</font></td>';
         //end of print work units
         
         //if day of week = 7, copy value over and reset weekly sum to 0.        
@@ -210,8 +214,8 @@ for($row=0; $row < 6; $row++){
             //clear weekly sum
             $monthsum = $monthsum + $weeksum;
             //$worksheet[1]->write_string($currentrow +1, 7, $weeksum, $format_cal_total);
-            $days[] = '<td style="height: 15px">&nbsp;</td>';
-            $vals[] = '<td style="height: 70px" align="center"><font size="11"><b><br /><br />'.
+            $days[] = '<td style="height: 10px">&nbsp;</td>';
+            $vals[] = '<td style="height: 75px" align="center"><font size="11"><b><br /><br />'.
                 $weeksum.'</b><br /></font></td>';
             $weeksum = 0;
         }
@@ -228,7 +232,7 @@ for($i = 0; $i < 6; $i++){
         if(isset($days[$spot]))
             $htmldoc .= "\t".$days[$spot]."\n";    
         else
-            $htmldoc .= "\t".'<td style="height: 15px">&nbsp;</td>'."\n";
+            $htmldoc .= "\t".'<td style="height: 10px">&nbsp;</td>'."\n";
     }
     $htmldoc.="\n</tr>\n";
 
@@ -238,7 +242,7 @@ for($i = 0; $i < 6; $i++){
         if(isset($vals[$spot]))
             $htmldoc .= "\t".$vals[$spot]."\n";    
         else
-            $htmldoc .="\t".'<td style="height: 70px">&nbsp;</td>'."\n";
+            $htmldoc .="\t".'<td style="height: 75px">&nbsp;</td>'."\n";
     }
     $htmldoc.="\n</tr>\n";
 }
@@ -269,7 +273,7 @@ $pdf->writeHTML($htmldoc, true, false, false, false, '');
 
 
 //Close and Output PDF document
-$pdf->Output('TestHTML.pdf', 'I');
+$pdf->Output('Timesheet_2011_August.pdf', 'I');
 
 
 ?>

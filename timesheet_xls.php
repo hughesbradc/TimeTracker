@@ -98,12 +98,6 @@ $format_calendar_days->set_size(8);
 $format_calendar_days->set_fg_color(22);
 $format_calendar_days->set_border(1);
 
-$format_calendar_header =& $workbook->add_format();
-$format_calendar_header->set_bold();
-$format_calendar_header->set_align('center');
-$format_calendar_header->set_bottom(1);
-$format_calendar_header->set_size(8);
-
 $format_center =& $workbook->add_format();
 $format_center->set_align('center');
 

@@ -48,6 +48,8 @@ if(has_capability('block/timetracker:manageworkers', $context)){
     $canmanage = true;
 }
 
+$maintabs = get_tabs($urlparams, $canmanage);
+
 $strtitle = get_string('timesheettitle','block_timetracker');
 $PAGE->set_title($strtitle);
 
@@ -75,13 +77,11 @@ if($mform->is_cancelled()){
         redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_pdf.php?id='.$cid.
             '&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
     } else {
-        redirect($wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
+        redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
             '&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
     }
 } else {
-    //Form is shown for the first time
     echo $OUTPUT->header();
-    $maintabs = get_tabs($urlparams, $canmange);
     $tabs = array($maintabs);
     print_tabs($tabs, 'hourlog');
     $mform->display();

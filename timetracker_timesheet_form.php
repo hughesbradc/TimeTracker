@@ -82,7 +82,7 @@ class timetracker_timesheet_form  extends moodleform {
 
         $sql = 'SELECT timein FROM '.$CFG->prefix.'block_timetracker_workunit ORDER BY timein LIMIT 1';
         $earliestyear = $DB->get_record_sql($sql);
-        
+
         $earliestyear = date("Y", $earliestyear->timein);
         
         $years = array();
