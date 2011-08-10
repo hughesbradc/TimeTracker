@@ -28,17 +28,13 @@ require_once ('lib.php');
 
 class timetracker_timesheet_form  extends moodleform {
 
-    function timetracker_timesheet_form($context,$userid = 0,$courseid=0, $month, $year){
+    function timetracker_timesheet_form($context){
         $this->context = $context;
-        $this->userid = $userid;
-        $this->courseid = $courseid;
-        $this->month = $month;
-        $this->year = $year;
         parent::__construct();
     }
 
     function definition() {
-        global $CFG, $USER, $DB, $OUTPUT;
+        global $CFG, $USER, $DB, $COURSE;
         $mform =& $this->_form; // Don't forget the underscore! 
 
         $canmanage = false;
@@ -48,15 +44,20 @@ class timetracker_timesheet_form  extends moodleform {
 
         // Collect all of the workers under the supervisor
 
+        $mform->addElement('hidden','id',$COURSE->id);    
         if($canmanage) {
             $workerlist = array();
             $workers =
-                $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$this->courseid),
+                $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$COURSE->id),
                 'lastname DESC');
             foreach($workers as $worker){
                 $workerlist[$worker->id] = $worker->firstname.' '.$worker->lastname;
             }
-            $mform->addElement('select', 'workerid', 'Workers', $workerlist);
+            $select = &$mform->addElement('select','workerid',
+                get_string('workerid','block_timetracker'), $workerlist, 'size="5"');
+            $select->setMultiple(false);
+            $mform->addHelpButton('workerid','workerid','block_timetracker');
+            $mform->addRule('workerid', null, 'required', null, 'client', 'false');
         } else {
             $mform->addElement('hidden','workerid',$USER->id);    
         }
@@ -75,27 +76,39 @@ class timetracker_timesheet_form  extends moodleform {
             11=>'November',
             12=>'December');
 
-        $mform->addElement('select', 'month', 'Month', $months);
-        //TODO Will eventually look at the earliest record in the database and generate year from that
-        //record to the current year
-        
+        $mform->addElement('select', 'month', get_string('month','block_timetracker'), $months);
+        $mform->setDefault('month', date("m"));
+        $mform->addHelpButton('month','month','block_timetracker');
 
         $sql = 'SELECT timein FROM '.$CFG->prefix.'block_timetracker_workunit ORDER BY timein LIMIT 1';
         $earliestyear = $DB->get_record_sql($sql);
-        $sql = 'SELECT timeout FROM '.$CFG->prefix.'block_timetracker_workunit ORDER BY timeout DESC LIMIT 1';
-        $latestyear = $DB->get_record_sql($sql);
         
-        $latestyear = date("Y", $latestyear->timeout);
         $earliestyear = date("Y", $earliestyear->timein);
         
         $years = array();
-        foreach(range($earliestyear,$latestyear) as $year){
+        foreach(range($earliestyear,date("Y")) as $year){
             $years[$year] = $year;
         }
-        if(!empty($years))
-            $mform->addElement('select', 'year', 'Year', $years);
+        if(empty($years)) $years[date("Y")] = date("Y");
 
-        $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
+        $mform->addElement('select', 'year', get_string('year','block_timetracker'), $years);
+        $mform->addHelpButton('year','year','block_timetracker');
+        $mform->setDefault('year', date("Y"));
+        
+
+        if($canmanage){
+            // Show File Format Dropdown
+            $formats = array(
+                'pdf' => 'PDF',
+                'xls' => 'Spreadsheet');
+            $mform->addElement('select', 'fileformat', 
+                get_string('fileformat','block_timetracker'), $formats);
+            $mform->addHelpButton('fileformat','fileformat','block_timetracker');
+        } else {
+            $mform->addElement('hidden','fileformat','pdf');    
+        }
+
+        $this->add_action_buttons(true,get_string('generatebutton','block_timetracker'));
     }
 
     function validation($data){

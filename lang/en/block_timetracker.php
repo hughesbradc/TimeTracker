@@ -60,6 +60,7 @@ $string['datefrom'] = 'Date from ';
 $string['dateto'] = ' to ';
 $string['submitbutton'] = 'Submit';
 $string['savebutton'] = 'Save';
+$string['generatebutton'] = 'Generate';
 
 
 // Strings for Block
@@ -299,6 +300,17 @@ $string['trackermethod_help'] = 'The method the worker will use to track hours. 
 $string['messageforerror_help'] = 'Allows the worker to send a message regarding the work unit error
 to his or her supervisor.';
 $string['deleteunit_help'] = 'Request that your supervisor delete this work unit.';
+
+$string['workerid'] = 'Worker(s)';
+$string['workerid_help'] = 'Select one or more workers that you wish to generate the report
+    for.  <br /><br />
+    HINT: To select multiple workers, hold the \'Control\' (CTRL) button and click the desired users.';
+$string['month'] = 'Month';
+$string['month_help'] = 'Select the month that you wish to generate the report for.';
+$string['year'] = 'Year';
+$string['year_help'] = 'Select the year that you wish to generate the report for.';
+$string['fileformat'] = 'File Format';
+$string['fileformat_help'] = 'Select the file format in which you wish to generate the report.'; 
 
 //Terms
 $string['terms_title'] = 'Edit Terms';

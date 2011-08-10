@@ -173,15 +173,17 @@ class timetracker_alert_form  extends moodleform {
         //place the error
         $errors['teacherid['.$firstteach.']'] = 'You must select at least one supervisor.';
 
-        if($data['timeout'] > time()){
-            $errors['timeout'] = 'Time cannot be set in the future.';
+        if($data['timeinerror'] > time()){
+            $errors['timeinerror'] = 'Time cannot be set in the future.';
+        }
+        
+        if($data['timeouterror'] > time()){
+            $errors['timeouterror'] = 'Time cannot be set in the future.';
         }
 
-        /*
-        if($data['timein'] > $data['timeout']){
-            $errors['timein'] = 'Your time out cannot be before you clocked in.';
+        if($data['timeinerror'] > $data['timeout']){
+            $errors['timeinerror'] = 'Your time out cannot be before your time in.';
         }
-        */
 
         return $errors;
     }

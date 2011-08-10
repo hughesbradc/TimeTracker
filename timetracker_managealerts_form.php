@@ -129,11 +129,11 @@ class timetracker_managealerts_form  extends moodleform {
     
                 $deleteurl = new moodle_url($alertlinks[$worker->id]['deny']);
                 $deleteicon = new pix_icon('clock_delete',
-                    get_string('delete'),'block_timetracker');
+                    'Delete','block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action(
-                    'Are you sure you want to delete this work unit?'));
+                    'Are you sure you want to delete this alert unit?'));
     
                 $row .= '<td style="text-align: center">'.
                     $approveaction . ' ' . $deleteaction. ' '.$editaction.'</td>';

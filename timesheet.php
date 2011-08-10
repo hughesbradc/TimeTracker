@@ -30,15 +30,9 @@ global $CFG, $COURSE, $USER, $DB;
 
 require_login();
 
-$userid = required_param('userid', PARAM_INTEGER);
 $courseid = required_param('id', PARAM_INTEGER);
-$month = required_param('month', PARAM_INTEGER);
-$year = required_param('year', PARAM_INTEGER);
 
-$urlparams['userid'] = $userid;
 $urlparams['id'] = $courseid;
-$urlparams['month'] = $month;
-$urlparams['year'] = $year;
 
 $timesheeturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet.php',$urlparams);
 
@@ -59,7 +53,7 @@ $PAGE->set_title($strtitle);
 
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
-$indexparams['userid'] = $userid;
+//$indexparams['userid'] = $userid;
 $indexparams['id'] = $courseid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
@@ -67,13 +61,23 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_timesheet_form($context, $userid, $courseid, $month, $year);
+$mform = new timetracker_timesheet_form($context);
 
 if($mform->is_cancelled()){
     //User clicked cancel
     redirect($urlparams,'Cancelling form',2);
 } else if($formdata=$mform->get_data()){
-
+    $uid = $formdata->workerid[0];
+    print_object($formdata->workerid);
+    $cid = $formdata->id;
+    $format = $formdata->fileformat;
+    if($format == 'pdf'){
+        redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_pdf.php?id='.$cid.
+            '&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
+    } else {
+        redirect($wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
+            '&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
+    }
 } else {
     //Form is shown for the first time
     echo $OUTPUT->header();
@@ -97,4 +101,3 @@ if($mform->is_cancelled()){
     echo $OUTPUT->footer();
 }
 
-?>

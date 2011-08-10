@@ -251,7 +251,7 @@ if ($canmanage) { //supervisor
             
             $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
             $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".
-                sesskey().'&pendingid='.$pending->id;
+                sesskey().'&unitid='.$pending->id;
             $deleteurl = new moodle_url($baseurl.'/deletepending.php'.$paramstring);
             $deleteicon = new pix_icon('clock_delete', get_string('delete'),'block_timetracker');
             $deleteaction = $OUTPUT->action_icon(
