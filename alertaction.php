@@ -42,7 +42,7 @@ if(!$alertunit){
 $courseid = $alertunit->courseid;
 
 $indexparams['id'] = $courseid; 
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $indexparams);
 
 
 $course = $DB->get_record('course', array('id' => $alertunit->courseid), '*', MUST_EXIST);

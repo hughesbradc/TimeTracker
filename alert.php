@@ -199,6 +199,7 @@ if ($mform->is_cancelled()){
 
         $alertunit->timein = $formdata->timeinerror;
         $alertunit->timeout = $formdata->timeouterror;
+        $alertunit->message = $formdata->message;
 
         if($delete == 1)
             $alertunit->todelete = 1;
