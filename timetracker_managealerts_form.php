@@ -33,19 +33,22 @@ class timetracker_managealerts_form  extends moodleform {
         parent::__construct();
     }
 
+
     function definition() {
         global $CFG, $USER, $DB, $COURSE, $OUTPUT;
 
 
         $mform =& $this->_form; // Don't forget the underscore! 
+        $canmanage = false;
         if (!has_capability('block/timetracker:manageworkers', $this->context)) {
-            $mform->addElement('html','You don\'t have permission to view alerts'); 
-            return;
+            //$mform->addElement('html','You don\'t have permission to view alerts'); 
+            //return;
+            $canmanage = true;
         }
 
-        $isadmin = false;
+        $issiteadmin = false;
         if(has_capability('moodle/site:config',$this->context)){
-            $isadmin = true;
+            $issiteadmin = true;
         }
 
         $mform->addElement('header', 'general', get_string('managealerts','block_timetracker')); 
@@ -60,32 +63,45 @@ class timetracker_managealerts_form  extends moodleform {
         $mform->addElement('html', 
             '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
         
-        $mform->addElement('html',
+        $tblheaders=
             '<tr>
                 <th>'.$strfirstname.'</th>
                 <th>'.$strlastname.'</th>
                 <th>'.$strprev.'</th>
-                <th>'.$strproposed.'</th>
-                <th>'.get_string('action').'</th>
-             </tr>');
+                <th>'.$strproposed.'</th>';
+        if($canmanage)
+                $tblheaders .= '<th>'.get_string('action').'</th>';
+        $tblheaders .= '</tr>';
 
-        if(!$isadmin && !has_alerts($USER->id,$COURSE->id)){
+        $mform->addElement('html',$tblheaders);
+
+        if(!$issiteadmin && !has_alerts($USER->id,$COURSE->id)){
             $mform->addElement('html',
                 '<tr><td colspan="6" style="text-align: center">'.
                 get_string('noalerts','block_timetracker').'</td></tr></table>');
         } else {
-            if($isadmin && !has_course_alerts($COURSE->id)){
+            if($issiteadmin && !has_course_alerts($COURSE->id)){
                 $mform->addElement('html',
                     '<tr><td colspan="6" style="text-align: center">'.
                     get_string('noalerts','block_timetracker').'</td></tr></table>');
                 return;
             }
-            if($isadmin)
+            if($issiteadmin)
                 $alertlinks=get_course_alert_links($COURSE->id);
-            else 
+            else if($canmanage)
                 $alertlinks=get_alert_links($USER->id, $COURSE->id); 
-            $alerts = $DB->get_records('block_timetracker_alertunits', 
-                array('courseid'=>$COURSE->id), 'alerttime');
+
+            if($canmanage){
+                $alerts = $DB->get_records('block_timetracker_alertunits', 
+                    array('courseid'=>$COURSE->id), 'alerttime');
+            } else {
+                $ttuserid = $DB->get_field('block_timetracker_workerinfo',
+                    'id', array('mdluserid'=>$USER->id));
+                if(!$ttuserid) print_error('Error obtaining mdluserid from workerinfo for '.
+                    $USER->id);
+                $alerts = $DB->get_records('block_timetracker_alertunits',
+                    array('courseid'=>$COURSE->id,'userid'=>$ttuserid));
+            }
 
 
             foreach ($alerts as $alert){ 
@@ -135,8 +151,10 @@ class timetracker_managealerts_form  extends moodleform {
                     new confirm_action(
                     'Are you sure you want to delete this work unit?'));
     
-                $row .= '<td style="text-align: center">'.
-                    $approveaction . ' ' . $deleteaction. ' '.$editaction.'</td>';
+                if($canmanage){
+                    $row .= '<td style="text-align: center">'.
+                        $approveaction . ' ' . $deleteaction. ' '.$editaction.'</td>';
+                }
     
                 $row.='</tr>';
                 $mform->addElement('html',$row);

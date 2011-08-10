@@ -44,12 +44,19 @@ class timetracker_reports_form  extends moodleform {
         global $CFG, $USER, $DB, $OUTPUT;
         $mform =& $this->_form; // Don't forget the underscore! 
 
+        //userid of 0 means we want to see every worker.
+
         $canmanage = false;
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
             $canmanage = true;
         }
 
-        if($this->userid==0 && !$canmanage){
+        $issiteadmin = false;
+        if(has_capability('moodle/site:config',$this->context)){
+            $issiteadmin = true;
+        }
+
+        if($this->userid == 0 && !$canmanage){
             print_error('notpermissible','block_timetracker',
                 $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
         }

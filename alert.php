@@ -292,46 +292,8 @@ if ($mform->is_cancelled()){
     } else {
     //form is shown for the first time
     
-    if($workerrecord->timetrackermethod==0){
-        echo $OUTPUT->header();
-        $maintabs[] = new tabobject('home', $index, 'Main');
-        $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',
-            $urlparams), 'Reports');
-        $maintabs[] = new tabobject('alert', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',
-            $urlparams), 'Alert Supervisor');
-        if($canmanage){
-            $maintabs[] = new tabobject('manage', 
-                new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 
-                'Manage Workers');
-            $maintabs[] = new tabobject('alerts', 
-                new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 
-                'Alerts');
-            $maintabs[] = new tabobject('terms',
-                new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php',$urlparams), 
-                'Terms');
-
-        }
-    } else {
-        echo $OUTPUT->header();
-        $maintabs[] = new tabobject('home', $index, 'Main');
-        $maintabs[] = new tabobject('reports', new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',
-            $urlparams), 'Reports');
-        $maintabs[] = new tabobject('hourlog', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',
-            $urlparams), 'Hour Log');
-        $maintabs[] = new tabobject('alert', new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',
-            $urlparams), 'Alert Supervisor');
-        if($canmanage){
-            $maintabs[] = new tabobject('manage', 
-                new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 
-                'Manage Workers');
-            $maintabs[] = new tabobject('alerts', 
-                new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 
-                'Alerts');
-            $maintabs[] = new tabobject('terms',
-                new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php',$urlparams), 
-                'Terms');
-        }
-    }
+    echo $OUTPUT->header();
+    $maintabs = get_tabs($urlparams, $canmanage);
     
     $tabs = array($maintabs);
     print_tabs($tabs, 'alert');

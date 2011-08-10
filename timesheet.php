@@ -77,20 +77,7 @@ if($mform->is_cancelled()){
 } else {
     //Form is shown for the first time
     echo $OUTPUT->header();
-    $maintabs[] = new tabobject('home', $index, 'Main');
-    $maintabs[] = new tabobject('reports', 
-        new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
-    $maintabs[] = new tabobject('hourlog', 
-        new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams), 'Hour Log');
-    if($canmanage){
-        $maintabs[] = new tabobject('manage', 
-            new moodle_url($CFG->wwwroot.
-            '/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
-        $maintabs[] = new tabobject('alerts', 
-            new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 
-            'Alerts');
-    }
-    
+    $maintabs = get_tabs($urlparams, $canmange);
     $tabs = array($maintabs);
     print_tabs($tabs, 'hourlog');
     $mform->display();

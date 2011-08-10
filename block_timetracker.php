@@ -193,7 +193,7 @@
             }
 
             // Implement Icons - Hourlog Method
-            if($worker->timetrackermethod == 1){
+            if($worker->timetrackermethod == 1){ 
                 $ttuserid = $worker->id;
 
                 $urlparams['userid']=$ttuserid;
@@ -207,7 +207,7 @@
 
                 // Clock In Icon
                 $this->content->text .= '<div style="text-align: center">';
-                $clockinicon = new pix_icon('clock_in','Add work unit', 'block_timetracker');
+                $clockinicon = new pix_icon('clock_add','Add work unit', 'block_timetracker');
                 $clockinaction = $OUTPUT->action_icon($link, $clockinicon);
     
                 $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');

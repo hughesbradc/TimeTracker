@@ -37,7 +37,7 @@ $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparam
 
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    #print_object($course);
+    //print_object($course);
     $PAGE->set_course($course);
     $context = $PAGE->context;
 } else {
@@ -47,20 +47,16 @@ if($courseid){
 //error_log("in manage workers and $COURSE->id");
 
 
-if (!has_capability('block/timetracker:manageworkers', $context)) {
+$canmanage = false;
+
+if (has_capability('block/timetracker:manageworkers', $context)) {
+    $canmanage = true;
+} else {
     print_error('notpermissible','block_timetracker',
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 }
 
-$maintabs[] = new tabobject('home', $index, 'Main');
-$maintabs[] = new tabobject('reports', 
-    new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams), 'Reports');
-$maintabs[] = new tabobject('manage', 
-    new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php',$urlparams), 'Manage Workers');
-$maintabs[] = new tabobject('alerts', 
-    new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php',$urlparams), 'Alerts');
-$maintabs[] = new tabobject('terms',
-    new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php',$urlparams), 'Terms');
+$maintabs = get_tabs($urlparams, $canmanage);
 
 $manageworkerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
@@ -72,7 +68,7 @@ $strtitle = get_string('manageworkertitle','block_timetracker');
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
-#print_object($urlparams);
+//print_object($urlparams);
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 //$PAGE->navbar->add(get_string('blocks'));
@@ -96,7 +92,9 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     foreach($formdata->workerid as $idx){
         if(($formdata->activeid[$idx]==1 && $workers[$idx]->active==0) ||  //not the same
          ($formdata->activeid[$idx]==0 && $workers[$idx]->active == 1)){ //not the same
+
             $workers[$idx]->active = $formdata->activeid[$idx];
+            //print_object($workers[$idx]);
             //print_object($workers[$idx]);
             $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
          }
@@ -107,31 +105,6 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     redirect($manageworkerurl,'Changes saved successfully',2);
 
 } else {
-    //before displaying anything, add any enrolled users NOT in the WORKERINFO table.
-    //consider moving this to a 'refresh' link or something so it doesn't do it everytime?
-    //TODO
-    $config = get_timetracker_config($courseid);
-    $students = get_users_by_capability($context, 'mod/assignment:submit');
-    foreach ($students as $student){
-        if(!$DB->record_exists('block_timetracker_workerinfo',array('mdluserid'=>$student->id))){
-            $student->mdluserid = $student->id;
-            unset($student->id);
-            $student->courseid = $courseid;
-            $student->address = '0';
-            $student->position = $config['position'];
-            $student->currpayrate = $config['curr_pay_rate'];
-            $student->timetrackermethod = $config['trackermethod'];
-            $student->dept = $config['department'];
-            $student->budget = $config['budget'];
-            $student->supervisor = $config['supname'];
-            $student->institution = $config['institution'];
-            $student->maxtermearnings = $config['default_max_earnings'];
-            $res = $DB->insert_record('block_timetracker_workerinfo',$student);
-            if(!$res){
-                print_error("Error adding $student->firstname $student->lastname to TimeTracker");
-            }
-        }
-    }
 
     echo $OUTPUT->header();
     $tabs = array($maintabs);

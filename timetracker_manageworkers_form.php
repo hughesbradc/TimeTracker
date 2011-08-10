@@ -33,11 +33,14 @@ class timetracker_manageworkers_form  extends moodleform {
         parent::__construct();
     }
 
+
     function definition() {
         global $CFG, $USER, $DB, $COURSE, $OUTPUT;
 
 
         $mform =& $this->_form; // Don't forget the underscore! 
+
+        add_enrolled_users($this->context);
 
         $mform->addElement('header', 'general', get_string('manageworkers','block_timetracker')); 
 		$mform->addHelpButton('general','manageworkers','block_timetracker');
@@ -132,7 +135,7 @@ class timetracker_manageworkers_form  extends moodleform {
                     "?id=$COURSE->id&userid=$worker->id&mdluserid=$worker->mdluserid&sesskey=".sesskey();
     
                 $editurl = new moodle_url($baseurl.'/updateworkerinfo.php'.$paramstring);
-                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
+                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
                     get_string('edit'),'block_timetracker'));
     
                 $reportsurl = new moodle_url($baseurl.'/reports.php'.$paramstring);
@@ -140,7 +143,7 @@ class timetracker_manageworkers_form  extends moodleform {
                     'Reports','block_timetracker'));
     
                 $deleteurl = new moodle_url($baseurl.'/deleteworker.php'.$paramstring);
-                $deleteicon = new pix_icon('clock_delete', get_string('delete'),'block_timetracker');
+                $deleteicon = new pix_icon('user_delete', get_string('delete'),'block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action(

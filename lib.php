@@ -25,6 +25,96 @@
 defined('MOODLE_INTERNAL') || die();
 
 
+/**
+* Attempts to see if this workunit overlaps with any other workunits already submitted
+* for the current $COURSE
+* @return T if overlaps
+*/
+function overlaps($timein, $timeout, $userid, $unitid=-1){
+
+    global $CFG, $COURSE, $DB;
+
+    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        "$userid = userid AND $COURSE->id = courseid AND (".
+        "($timein < timein AND $timeout > timeout) OR 
+            (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR
+            ($timein > timein AND $timeout < timeout) AND $unitid != id)"; 
+
+    error_log($sql);
+
+    $numexistingunits = $DB->count_records_sql($sql);
+    error_log("existingunits is $numexistingunits with curr id: $unitid");
+
+    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_pending WHERE '.
+        "$userid = userid AND $COURSE->id = courseid AND ".
+        "timein BETWEEN $timein AND $timeout";
+
+    $numpending = $DB->count_records_sql($sql);
+
+    error_log("numpending is $numpending");
+
+    if($numexistingunits == 0 && $numpending == 0) return false;
+    return true;
+}
+
+/**
+*@return array of tabobjects 
+*/
+function get_tabs($urlparams, $canmanage = false){
+    global $CFG;
+    $tabs = array();
+    $tabs[] = new tabobject('home',
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams),
+        'Main');
+    $tabs[] = new tabobject('reports',
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',
+        $urlparams),'Reports');
+    if($canmanage){
+        $tabs[] = new tabobject('manage',
+            new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams),
+            'Manage Workers');
+        $tabs[] = new tabobject('terms',
+            new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php', $urlparams),
+            'Terms');
+    }
+    $tabs[] = new tabobject('alerts',
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams),
+        'Alerts');
+    return $tabs;
+}
+
+function add_enrolled_users($context){
+    global $COURSE,$DB;
+
+    //before displaying anything, add any enrolled users NOT in the WORKERINFO table.
+    //consider moving this to a 'refresh' link or something so it doesn't do it everytime?
+    //TODO
+    $config = get_timetracker_config($COURSE->id);
+    $students = get_users_by_capability($context, 'mod/assignment:submit');
+    foreach ($students as $student){
+        if(!$DB->record_exists('block_timetracker_workerinfo',array('mdluserid'=>$student->id))){
+            $student->mdluserid = $student->id;
+            unset($student->id);
+            $student->courseid = $COURSE->id;
+            $student->address = '0';
+            $student->position = $config['position'];
+            $student->currpayrate = $config['curr_pay_rate'];
+            $student->timetrackermethod = $config['trackermethod'];
+            $student->dept = $config['department'];
+            $student->budget = $config['budget'];
+            $student->supervisor = $config['supname'];
+            $student->institution = $config['institution'];
+            $student->maxtermearnings = $config['default_max_earnings'];
+            $res = $DB->insert_record('block_timetracker_workerinfo',$student);
+            if(!$res){
+                print_error("Error adding $student->firstname $student->lastname to TimeTracker");
+            }
+        }
+    }
+
+}
+
+
 
 /*
 * rounds to nearest 15 minutes (900 secs)

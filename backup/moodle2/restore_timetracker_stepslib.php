@@ -15,12 +15,16 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
         $paths[] = new restore_path_element('term', '/block/timetracker/term');
         $paths[] = new restore_path_element('config', '/block/timetracker/config');
         if($userinfo){
-            $paths[] = new restore_path_element('workerinfo', '/block/timetracker/workerinfo');
-            $paths[] = new restore_path_element('pending', '/block/timetracker/pending');
-            $paths[] = new restore_path_element('alertunits', '/block/timetracker/alertunits');
+            $paths[] = new restore_path_element('workerinfo', 
+                '/block/timetracker/workerinfo');
+            $paths[] = new restore_path_element('pending', 
+                '/block/timetracker/workerinfo/pending');
+            $paths[] = new restore_path_element('alertunits', 
+                '/block/timetracker/workerinfo/alertunits');
             $paths[] = new restore_path_element('alert_com', 
-                '/block/timetracker/alertunits/alert_com');
-            $paths[] = new restore_path_element('workunit', '/block/timetracker/workerinfo/workunit');
+                '/block/timetracker/workerinf/alertunits/alert_com');
+            $paths[] = new restore_path_element('workunit', 
+                '/block/timetracker/workerinfo/workunit');
         }
  
         // Return the paths wrapped into standard activity structure
@@ -41,7 +45,7 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
         }
 
         $term = (object)$data->timetracker[0]['term'];
-        print_object($data);
+        //print_object($data);
         if($term) {
             $term->courseid = $this->get_courseid();
             //error_log('Adding term '.$term->name);

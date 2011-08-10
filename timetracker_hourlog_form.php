@@ -95,6 +95,10 @@ class timetracker_hourlog_form  extends moodleform {
             $errors['timein'] = 'Time cannot be set in the future';    
         }
 
+        if(overlaps($data['timein'],$data['timeout'],$data['userid'])){
+            $errors['timein'] = 'Work unit overlaps with existing workunit';
+        }
+
         return $errors;
         
     }

@@ -101,7 +101,7 @@ class timetracker_editunit_form extends moodleform {
 
         if(!$this->ispending){
             $mform->addElement('html','<br />');
-            $mform->addElement('html',get_string('existingtimein','block_timetracker',
+            $mform->addElement('html',get_string('existingtimeout','block_timetracker',
                 userdate($unit->timeout, get_string('datetimeformat','block_timetracker'))));
             $mform->addElement('html','<br /><b>');
             $mform->addElement('html',get_string('existingduration','block_timetracker',
@@ -129,20 +129,39 @@ class timetracker_editunit_form extends moodleform {
             } else {
                 $mform->setDefault('timeout',$unit->timeout);
             }
+            $mform->addElement('text', 'payrate', 'Payrate $');
+            $mform->setDefault('payrate', $unit->payrate);
+            $mform->addRule('payrate', 'Numeric values only', 'numeric',
+               null, 'server', false, false);
         }
 		
         $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
     }
 
     function validation ($data){
+        global $COURSE;
+
         $errors = array();
-        if($data['timein'] > $data['timeout']){
-            $errors['timein'] = 'Time in cannot be before time out';    
+        
+
+        if(isset($data['timeout'])){
+            if($data['timein'] > $data['timeout']){
+                $errors['timein'] = 'Time in cannot be before time out';    
+            }
+    
+            if($data['timein'] > time() || $data['timeout'] > time()){
+                $errors['timein'] = 'Time cannot be set in the future';    
+            }
+    
+            if(overlaps($data['timein'],$data['timeout'],$data['userid'],$data['unitid'])){
+                $errors['timein'] = 'Work unit overlaps with existing workunit';
+            }
+
+            if(!isset($data['payrate']) || $data['payrate'] == ''){
+                $errors['payrate'] = 'Payrate cannot be empty';
+            }
         }
 
-        if($data['timein'] > time() || $data['timeout'] > time()){
-            $errors['timein'] = 'Time cannot be set in the future';    
-        }
 
         return $errors;
         

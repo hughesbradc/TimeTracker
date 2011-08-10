@@ -91,6 +91,7 @@ if($workerrecord->active == 0){
             $cin->timeout = $nowtime;
 
             $worked = $DB->insert_record('block_timetracker_workunit',$cin);
+
             if($worked){
                 $DB->delete_records('block_timetracker_pending', 
                     array('userid'=>$ttuserid,'courseid'=>$courseid));
@@ -124,3 +125,4 @@ if($workerrecord->active == 0){
 } 
 
 redirect($index,$status,2);
+
