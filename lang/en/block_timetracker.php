@@ -142,6 +142,7 @@ $string['positiontitle'] = 'Position Title';
 $string['budget'] = 'Budget Number';
 $string['firstname'] = 'First Name';
 $string['lastname'] = 'Last Name';
+$string['idnum'] = 'ID Number';
 $string['address'] = 'Address';
 $string['phone'] = 'Phone';
 $string['position'] = 'Position';
@@ -264,6 +265,7 @@ $string['showytdearnings_help'] = 'Shows the worker the total amount earned year
     <br /> No = Disabled';
 $string['showtotalearnings_help'] = 'Shows the worker the overall total amount earned. <br /> Yes = Enabled <
     br /> No = Disabled';
+$string['idnum_help'] = 'The worker\'s identification number';
 $string['department_help'] = 'The name of the department that employs the worker.';
 $string['position_help'] = 'The worker\'s position title.';
 $string['budget_help'] = 'The budget number that the worker\'s paycheck will be drafted from.';
