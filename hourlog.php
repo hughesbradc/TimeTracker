@@ -24,6 +24,7 @@
  */
 
 require_once('../../config.php');
+require_once('lib.php');
 require('timetracker_hourlog_form.php');
 
 global $CFG, $COURSE, $USER;
