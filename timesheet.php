@@ -67,7 +67,9 @@ $mform = new timetracker_timesheet_form($context);
 
 if($mform->is_cancelled()){
     //User clicked cancel
-    redirect($urlparams,'Cancelling form',2);
+    $reportsurl = new
+        moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams);
+    redirect($reportsurl);
 } else if($formdata=$mform->get_data()){
     $uid = $formdata->workerid[0];
     print_object($formdata->workerid);
@@ -83,7 +85,7 @@ if($mform->is_cancelled()){
 } else {
     echo $OUTPUT->header();
     $tabs = array($maintabs);
-    print_tabs($tabs, 'hourlog');
+    print_tabs($tabs, 'reports');
     $mform->display();
     echo $OUTPUT->footer();
 }
