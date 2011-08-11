@@ -267,6 +267,7 @@ if ($canmanage) { //supervisor
     
         $table->define_columns(array('timein', 'timeout', 'elapsed', 'action'));
         $table->define_headers(array('Time in', 'Time out', 'Elapsed', 'Action'));
+        $table->define_baseurl($CFG->wwwroot.'/blocks/timetracker/index.php');
         
         $table->set_attribute('cellspacing', '0');
         $table->set_attribute('class', 'generaltable generalbox');
