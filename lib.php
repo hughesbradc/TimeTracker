@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
 * Attempts to see if this workunit overlaps with any other workunits already submitted
-* for the current $COURSE
+* for user $userid in $COURSE
 * @return T if overlaps
 */
 function overlaps($timein, $timeout, $userid, $unitid=-1){
@@ -46,10 +46,10 @@ function overlaps($timein, $timeout, $userid, $unitid=-1){
       $sql.=")";
     }
 
-    error_log($sql);
+    //error_log($sql);
 
     $numexistingunits = $DB->count_records_sql($sql);
-    error_log("existingunits is $numexistingunits with curr id: $unitid");
+    //error_log("existingunits is $numexistingunits with curr id: $unitid");
 
     $sql = 'SELECT COUNT(*) FROM '.$CFG->prefix.'block_timetracker_pending WHERE '.
         "$userid = userid AND $COURSE->id = courseid AND ".
@@ -57,7 +57,7 @@ function overlaps($timein, $timeout, $userid, $unitid=-1){
 
     $numpending = $DB->count_records_sql($sql);
 
-    error_log("numpending is $numpending");
+    //error_log("numpending is $numpending");
 
     if($numexistingunits == 0 && $numpending == 0) return false;
     return true;
