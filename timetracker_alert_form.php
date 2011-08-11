@@ -95,6 +95,9 @@ class timetracker_alert_form  extends moodleform {
         $mform->addElement('html', '</b>'); 
 
         $teachers = get_users_by_capability($this->context, 'block/timetracker:manageworkers');
+        if(!$teachers){
+            print_error('No supervisor is enrolled in this course.  Please alert your Administrator.');
+        }
         foreach ($teachers as $teacher) {
             $mform->addElement('advcheckbox', 'teacherid['.$teacher->id.']', 
                 $teacher->firstname.' '.$teacher->lastname,  null, array('group' => 1, 'checked="checked"'));
