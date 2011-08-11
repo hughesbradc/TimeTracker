@@ -100,7 +100,7 @@ class timetracker_alert_form  extends moodleform {
         }
         foreach ($teachers as $teacher) {
             $mform->addElement('advcheckbox', 'teacherid['.$teacher->id.']', 
-                $teacher->firstname.' '.$teacher->lastname,  null, array('group' => 1, 'checked="checked"'));
+                $teacher->firstname.' '.$teacher->lastname,  null, array('group'=>1));
         }
         
         $this->add_checkbox_controller(1, null, null, 1);
@@ -164,17 +164,22 @@ class timetracker_alert_form  extends moodleform {
         $errors = array();
 
         $teachers = $data['teacherid'];
-        $firstteach = -1;
+
+        $hasteach = false;
         foreach($teachers as $teacherid=>$selectedval){
             //if($firstteach == -1) $firstteach = $teacherid; 
-            if($selectedval==1){ 
-                return $errors;
-            }
             $firstteach = $teacherid;
+            if($selectedval==1){ 
+                $hasteach = true;
+                break;
+            }
         }
+
         //if it gets here, we had no teachers selected. Use the first teacherid value to
         //place the error
-        $errors['teacherid['.$firstteach.']'] = 'You must select at least one supervisor.';
+        if(!$hasteach)
+            $errors['teacherid['.$firstteach.']'] = 'You didn\'t select any supervisors to alert. 
+            As default, all supervisors have been selected.';
 
         if($data['timeinerror'] > time()){
             $errors['timeinerror'] = 'Time cannot be set in the future.';
@@ -184,7 +189,7 @@ class timetracker_alert_form  extends moodleform {
             $errors['timeouterror'] = 'Time cannot be set in the future.';
         }
 
-        if($data['timeinerror'] > $data['timeout']){
+        if($data['timeinerror'] > $data['timeouterror']){
             $errors['timeinerror'] = 'Your time out cannot be before your time in.';
         }
 
