@@ -40,7 +40,7 @@ class timetracker_managealerts_form  extends moodleform {
 
         $mform =& $this->_form; // Don't forget the underscore! 
         $canmanage = false;
-        if (!has_capability('block/timetracker:manageworkers', $this->context)) {
+        if (has_capability('block/timetracker:manageworkers', $this->context)) {
             //$mform->addElement('html','You don\'t have permission to view alerts'); 
             //return;
             $canmanage = true;
@@ -59,6 +59,7 @@ class timetracker_managealerts_form  extends moodleform {
         $strlastname = get_string('lastname', 'block_timetracker');
         $strprev = get_string('previous', 'block_timetracker');
         $strproposed = get_string('proposed', 'block_timetracker');
+        $strmsg = get_string('message', 'block_timetracker');
 
         $mform->addElement('html', 
             '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
@@ -68,62 +69,58 @@ class timetracker_managealerts_form  extends moodleform {
                 <th>'.$strfirstname.'</th>
                 <th>'.$strlastname.'</th>
                 <th>'.$strprev.'</th>
-                <th>'.$strproposed.'</th>';
+                <th>'.$strproposed.'</th>
+                <th>'.$strmsg.'</th>';
         if($canmanage)
                 $tblheaders .= '<th>'.get_string('action').'</th>';
         $tblheaders .= '</tr>';
 
         $mform->addElement('html',$tblheaders);
 
-        if(!$issiteadmin && !has_alerts($USER->id,$COURSE->id)){
+        if($issiteadmin && !has_course_alerts($COURSE->id)){
             $mform->addElement('html',
                 '<tr><td colspan="6" style="text-align: center">'.
                 get_string('noalerts','block_timetracker').'</td></tr></table>');
+            return;
+        }
+
+        $alertlinks=get_course_alert_links($COURSE->id);
+        //print_object($alertlinks);
+
+        if($canmanage){
+            $alerts = $DB->get_records('block_timetracker_alertunits', 
+                array('courseid'=>$COURSE->id), 'alerttime');
         } else {
-            if($issiteadmin && !has_course_alerts($COURSE->id)){
-                $mform->addElement('html',
-                    '<tr><td colspan="6" style="text-align: center">'.
-                    get_string('noalerts','block_timetracker').'</td></tr></table>');
-                return;
-            }
-            if($issiteadmin)
-                $alertlinks=get_course_alert_links($COURSE->id);
-            else if($canmanage)
-                $alertlinks=get_alert_links($USER->id, $COURSE->id); 
-
-            if($canmanage){
-                $alerts = $DB->get_records('block_timetracker_alertunits', 
-                    array('courseid'=>$COURSE->id), 'alerttime');
-            } else {
-                $ttuserid = $DB->get_field('block_timetracker_workerinfo',
-                    'id', array('mdluserid'=>$USER->id));
-                if(!$ttuserid) print_error('Error obtaining mdluserid from workerinfo for '.
-                    $USER->id);
-                $alerts = $DB->get_records('block_timetracker_alertunits',
-                    array('courseid'=>$COURSE->id,'userid'=>$ttuserid));
-            }
+            $ttuserid = $DB->get_field('block_timetracker_workerinfo',
+                'id', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
+            if(!$ttuserid) print_error('Error obtaining mdluserid from workerinfo for '.
+                $USER->id);
+            $alerts = $DB->get_records('block_timetracker_alertunits',
+                array('courseid'=>$COURSE->id,'userid'=>$ttuserid));
+        }
 
 
-            foreach ($alerts as $alert){ 
-                $worker = $DB->get_record('block_timetracker_workerinfo',
-                    array('id'=>$alert->userid));
+        foreach ($alerts as $alert){ 
+            $worker = $DB->get_record('block_timetracker_workerinfo',
+                array('id'=>$alert->userid));
 
-                $mform->addElement('html','<tr>'); 
-                $row ='<td>'.$worker->lastname.'</td>';
-                $row.='<td>'.$worker->firstname.'</td>';
-                $row.='<td>In: '.userdate($alert->origtimein, 
+            $mform->addElement('html','<tr>'); 
+            $row ='<td>'.$worker->lastname.'</td>';
+            $row.='<td>'.$worker->firstname.'</td>';
+            $row.='<td>In: '.userdate($alert->origtimein, 
+                get_string('datetimeformat','block_timetracker'));
+
+            if($alert->origtimeout > 0){
+                $row.='<br />Out: '.userdate($alert->origtimeout, 
                     get_string('datetimeformat','block_timetracker'));
+                $row.='<br />Elapsed: '.format_elapsed_time($alert->origtimeout -
+                    $alert->origtimein);
+            } else {
+                $row.= '';
+            }
+            $row .='</td>';
 
-                if($alert->origtimein > 0){
-                    $row.='<br />Out: '.userdate($alert->origtimeout, 
-                        get_string('datetimeformat','block_timetracker'));
-                    $row.='<br />Elapsed: '.format_elapsed_time($alert->origtimeout -
-                        $alert->origtimein);
-                } else {
-                    $row.= '';
-                }
-
-                $row .='</td>';
+            if($alert->todelete == 0){
                 $row.='<td>In: '.userdate($alert->timein, 
                     get_string('datetimeformat','block_timetracker'));
 
@@ -134,6 +131,13 @@ class timetracker_managealerts_form  extends moodleform {
                     $alert->timein);
 
                 $row.='</td>';
+            } else {
+                $row.='<td><span style="color: red">User requests removal</span></td>';
+            }
+
+            $row.='<td>'.nl2br($alert->message).'</td>';
+    
+            if($canmanage){
 
                 $editurl = new moodle_url($alertlinks[$worker->id]['change']);
                 $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
@@ -141,31 +145,38 @@ class timetracker_managealerts_form  extends moodleform {
     
                 $approveurl = new moodle_url($alertlinks[$worker->id]['approve']);
                 $checkicon = new pix_icon('approve','Approve','block_timetracker');
-                $approveaction=$OUTPUT->action_icon($approveurl, $checkicon);
-    
+                if($alert->todelete){
+                    $approveaction=$OUTPUT->action_icon($approveurl, $checkicon,
+                    new confirm_action('Are you sure you want to delete this work unit
+                    as requested by the worker?'));
+                } else {
+                    $approveaction=$OUTPUT->action_icon($approveurl, $checkicon);
+                }
+        
                 $deleteurl = new moodle_url($alertlinks[$worker->id]['deny']);
                 $deleteicon = new pix_icon('clock_delete',
                     'Delete','block_timetracker');
+
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action(
-                    'Are you sure you want to delete this alert unit?'));
-    
-                if($canmanage){
-                    $row .= '<td style="text-align: center">'.
-                        $approveaction . ' ' . $deleteaction. ' '.$editaction.'</td>';
-                }
-    
-                $row.='</tr>';
-                $mform->addElement('html',$row);
-    
+                    'Are you sure you want to delete this alert unit?<br />The work unit 
+                    will be re-inserted into the worker\'s record as it originally
+                    appeared.'));
+
+                $row .= '<td style="text-align: center">'.
+                    $approveaction . ' ' . $deleteaction. ' '.$editaction.'</td>';
             }
     
-            $mform->addElement('html','</table>');
+            $row.='</tr>';
+            $mform->addElement('html',$row);
     
-            //$this->add_action_buttons(true, 'Save Changes');
+        }
     
-            }
-    }
+        $mform->addElement('html','</table>');
+    
+        //$this->add_action_buttons(true, 'Save Changes');
+    
+        }
 
 }
