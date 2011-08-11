@@ -43,6 +43,7 @@ if($courseid){
 }
 
 
+
 $maintabs = get_tabs($urlparams,
     has_capability('block/timetracker:manageworkers',$context));
 
