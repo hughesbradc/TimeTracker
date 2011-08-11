@@ -34,6 +34,7 @@ require_login();
 $alertid = required_param('alertid', PARAM_INTEGER); // Worker id
 $action = required_param('action', PARAM_ALPHA);
 $alertunit = $DB->get_record('block_timetracker_alertunits', array('id'=>$alertid));
+
 if(!$alertunit){
     //TODO Fix this to go to a pretty error page stating that the unit no longer needs action
     print_error('Alert unit no long exists');
@@ -44,7 +45,6 @@ $courseid = $alertunit->courseid;
 $indexparams['id'] = $courseid; 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $indexparams);
 
-
 $course = $DB->get_record('course', array('id' => $alertunit->courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
@@ -53,9 +53,16 @@ $urlparams['id'] = $alertunit->courseid;
 
 $nexturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
+echo $OUTPUT->header();
+$maintabs = get_tabs($urlparams, $canmanage);
+$tabs = array($maintabs);
+print_tabs($tabs, 'alert');
+
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
+} else {
+    print_error('notpermissible','block_timetracker');
 }
 
 //********** TODO **********//
@@ -361,15 +368,11 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             }
         } else {
             //form is shown for the first time
-            echo $OUTPUT->header();
-            $maintabs = get_tabs($urlparams, $canmanage);
-            $tabs = array($maintabs);
-            print_tabs($tabs, 'alert');
-
             $mform->display();
-            echo $OUTPUT->footer();
         }
     
     }
 }
+
+echo $OUTPUT->footer();
 ?>
