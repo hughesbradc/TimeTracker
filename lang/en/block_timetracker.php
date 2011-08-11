@@ -131,6 +131,10 @@ $string['selemployee'] = 'Select Employee';
 $string['aemployees'] = 'All Employees';
 
 
+//Add Unit Page
+$string['addunittitle'] = 'Add Work Unit for {$a}';
+
+
 // Strings for 'Update Worker Information' Page
 $string['emplinfo'] = 'Employee Information';
 $string['eidirection'] = 'Select an employee to edit';
