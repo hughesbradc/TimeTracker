@@ -77,6 +77,7 @@ $strtitle = get_string('editunittitle','block_timetracker',
     $workerrecord->firstname.' '.$workerrecord->lastname); 
 
 $PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
 
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
@@ -122,8 +123,11 @@ if ($mform->is_cancelled()){ //user clicked cancel
     //form is shown for the first time
     echo $OUTPUT->header();
     $tabs = get_tabs($urlparams, $canmanage);  
+    $tabs[] = new tabobject('editunit',
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php#', $urlparams),
+        'Edit Unit');
     $tabs = array($tabs);
-    print_tabs($tabs, '');
+    print_tabs($tabs,'editunit');
 
     $mform->display();
     echo $OUTPUT->footer();

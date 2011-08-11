@@ -183,7 +183,8 @@ class timetracker_reports_form  extends moodleform {
                     $editaction = $OUTPUT->action_icon($editurl, 
                         new pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
                 }
-                if($editaction){
+
+                if($canmanage){
                     $actions = $clockoutaction.' '.$editaction.' '.$deleteaction;
                 } else {
                     $actions = $clockoutaction.' '.$deleteaction;
@@ -226,9 +227,7 @@ class timetracker_reports_form  extends moodleform {
                     <th>Time out</th>
                     <th>Elapsed</th>
                 ';
-            if($canmanage){
-                    $headers .='<th>'.get_string('action').'</th>';
-            }
+            $headers .='<th>'.get_string('action').'</th>';
             $headers .='</tr>';
 
             $mform->addElement('html',$headers);
@@ -269,6 +268,19 @@ class timetracker_reports_form  extends moodleform {
     
                     $row .= '<td style="text-align: center">'.$editaction . ' '.$deleteaction.'</td>';
     
+                } else {
+                    $urlparams['id'] = $this->courseid;
+                    $urlparams['userid'] = $unit->userid;
+                    $urlparams['sesskey'] = sesskey();
+                    $urlparams['unitid'] = $unit->id;
+                    
+                    $alerturl = new moodle_url($baseurl.'/alert.php', $urlparams);
+                    $alerticon = new pix_icon('alert', 'Alert Supervisor of Error',
+                        'block_timetracker');
+                    $alertaction = $OUTPUT->action_icon($alerturl, $alerticon);
+
+                    $row .='<td style="text-align:center">'.$alertaction.'</td>';
+
                 }
                 $row .= '</tr>';
                 $mform->addElement('html',$row);

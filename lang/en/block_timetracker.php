@@ -188,6 +188,7 @@ $string['approvedsuccess'] = 'The error approval has been processed successfully
 //Manage Unit Alerts
 $string['previous'] = 'Current Work Unit';
 $string['proposed'] = 'Proposed Work Unit';
+$string['message'] = 'Message';
 $string['noalerts'] = 'No Alerts at this Time';
 $string['managealerts'] = 'Manage Alert Work Units';
 $string['managealerts_help'] = 'This page allows the supervisor or administrator to manage alerted work units

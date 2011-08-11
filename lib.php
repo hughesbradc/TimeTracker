@@ -27,31 +27,37 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
 * Attempts to see if this workunit overlaps with any other workunits already submitted
-* for the current $COURSE
+* for user $userid in $COURSE
 * @return T if overlaps
 */
 function overlaps($timein, $timeout, $userid, $unitid=-1){
 
     global $CFG, $COURSE, $DB;
-
-    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
+    
+    $sql = 'SELECT COUNT(*) FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
         "$userid = userid AND $COURSE->id = courseid AND (".
         "($timein < timein AND $timeout > timeout) OR 
-            (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR
-            ($timein > timein AND $timeout < timeout) AND $unitid != id)"; 
+            (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR 
+            ($timein > timein AND $timeout < timeout)";
 
-    error_log($sql);
+    if($unitid != -1){
+      $sql.=" AND $unitid != id)"; 
+    } else {
+      $sql.=")";
+    }
+
+    //error_log($sql);
 
     $numexistingunits = $DB->count_records_sql($sql);
-    error_log("existingunits is $numexistingunits with curr id: $unitid");
+    //error_log("existingunits is $numexistingunits with curr id: $unitid");
 
-    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_pending WHERE '.
+    $sql = 'SELECT COUNT(*) FROM '.$CFG->prefix.'block_timetracker_pending WHERE '.
         "$userid = userid AND $COURSE->id = courseid AND ".
         "timein BETWEEN $timein AND $timeout";
 
     $numpending = $DB->count_records_sql($sql);
 
-    error_log("numpending is $numpending");
+    //error_log("numpending is $numpending");
 
     if($numexistingunits == 0 && $numpending == 0) return false;
     return true;
@@ -195,10 +201,11 @@ function has_course_alerts($courseid){
     //check the alert* tables to see if there are any outstanding alerts:
     //$sql = 'SELECT COUNT('.$CFG->prefix.'block_timetracker_alertunits.*) FROM '.
     $sql = 'SELECT COUNT(*) FROM '.
-        $CFG->prefix.'block_timetracker_alertunits,'.
-        $CFG->prefix.'block_timetracker_alert_com WHERE courseid='.$courseid.
+        $CFG->prefix.'block_timetracker_alertunits'.
+        ' WHERE courseid='.$courseid.
             ' ORDER BY alerttime';
 
+    //error_log($sql);
     $numalerts = $DB->count_records_sql($sql);
     //error_log($numalerts." alerts found! CID: $courseid");
     return ($numalerts != 0);
@@ -210,19 +217,22 @@ function has_course_alerts($courseid){
 * @param $supervisorid of the supervisor in question
 * @param $courseid id of the course
 * @return T if alerts are pending, F if not.
+* @deprecated. Design decision to show ALL SUPERVISORS ALL ALERTS.
 */
 function has_alerts($supervisorid, $courseid){
+    /*
     global $CFG,$DB;
     //check the alert* tables to see if there are any outstanding alerts:
     //$sql = 'SELECT COUNT('.$CFG->prefix.'block_timetracker_alertunits.*) FROM '.
     $sql = 'SELECT COUNT(*) FROM '.
         $CFG->prefix.'block_timetracker_alertunits,'.
-        $CFG->prefix.'block_timetracker_alert_com WHERE mdluserid='.
-        $supervisorid.' AND courseid='.$courseid.' ORDER BY alerttime';
+        ' WHERE courseid='.$courseid.' ORDER BY alerttime';
 
     $numalerts = $DB->count_records_sql($sql);
     //error_log($numalerts." alerts found! USERID: $supervisorid CID: $courseid");
     return ($numalerts != 0);
+    */
+    return has_course_alerts($courseid);
 
 }
 
@@ -232,8 +242,10 @@ function has_alerts($supervisorid, $courseid){
 * @param $courseid id of the course
 * @return two-dimensional array of links. First index is the TT worker id, the second
 * index is either 'approve', 'deny', or 'change' for each of the corresponding links
+* @deprecated DO NOT USE!!!
 */
 function get_alert_links($supervisorid, $courseid){
+    /*
     global $CFG,$DB;
     //check the alert* tables to see if there are any outstanding alerts:
     $sql = 'SELECT '.$CFG->prefix.'block_timetracker_alertunits.* FROM '.
@@ -256,8 +268,9 @@ function get_alert_links($supervisorid, $courseid){
         $alertlinks[$alert->userid]['change'] = $url.$params."&action=change";
 
     }
+    */
 
-    return $alertlinks;
+    return get_course_alert_links($courseid);
 }
 
 /**
@@ -270,8 +283,8 @@ function get_course_alert_links($courseid){
     global $CFG,$DB;
     //check the alert* tables to see if there are any outstanding alerts:
     $sql = 'SELECT '.$CFG->prefix.'block_timetracker_alertunits.* FROM '.
-        $CFG->prefix.'block_timetracker_alertunits,'.
-        $CFG->prefix.'block_timetracker_alert_com WHERE courseid='.$courseid.
+        $CFG->prefix.'block_timetracker_alertunits '.
+        'WHERE courseid='.$courseid.
             ' ORDER BY alerttime';
     //print_object($sql);
 

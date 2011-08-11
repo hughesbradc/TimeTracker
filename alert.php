@@ -295,9 +295,13 @@ if ($mform->is_cancelled()){
     
     echo $OUTPUT->header();
     $maintabs = get_tabs($urlparams, $canmanage);
+
+    $maintabs[] = new tabobject('postalert',
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php#', $urlparams),
+        'Post alert');
     
     $tabs = array($maintabs);
-    print_tabs($tabs, 'alert');
+    print_tabs($tabs, 'postalert');
 
     $mform->display();
     echo $OUTPUT->footer();

@@ -43,13 +43,14 @@ if($courseid){
 }
 
 
+
 $maintabs = get_tabs($urlparams,
     has_capability('block/timetracker:manageworkers',$context));
 
 $alertsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams);
 
 $PAGE->set_url($alertsurl);
-$PAGE->set_pagelayout('base');
+$PAGE->set_pagelayout('course');
 
 $strtitle = get_string('manageworkertitle','block_timetracker');
 
@@ -63,7 +64,6 @@ $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$
 $PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
-
 $mform = new timetracker_managealerts_form($PAGE->context);
 
 if ($mform->is_cancelled()){ //user clicked 'cancel'
@@ -72,24 +72,6 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     // $urlparams has the correct id. TODO
     redirect($timetrackerurl); 
 } else if($formdata = $mform->get_data()){
-    //print_object($formdata);
-
-    /*
-    $workers = $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$COURSE->id));
-    //print_object($workers);
-
-    foreach($formdata->workerid as $idx){
-        if(($formdata->activeid[$idx]==1 && $workers[$idx]->active==0) ||  //not the same
-         ($formdata->activeid[$idx]==0 && $workers[$idx]->active == 1)){ //not the same
-            $workers[$idx]->active = $formdata->activeid[$idx];
-            //print_object($workers[$idx]);
-            $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
-         }
-    }
-    */
-
-    //content goes here
-    //redirect($alertsurl,'Changes saved successfully',2);
 
 } else {
     echo $OUTPUT->header();
