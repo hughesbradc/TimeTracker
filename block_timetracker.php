@@ -226,7 +226,7 @@
                     $this->config->block_timetracker_show_ytd_hours ||
                     $this->config->block_timetracker_show_total_hours) {
 
-                    $this->content->text .= '<span style=font-weight:bold; ">'.
+                    $this->content->text .= '<span style="font-weight: bold">'.
                         get_string('hourstitle','block_timetracker').'</span>';
 
                     $stats = get_worker_stats($ttuserid, $COURSE->id);
@@ -262,7 +262,7 @@
 				    $this->config->block_timetracker_show_total_earnings) {
 
 					$this->content->text .= '<br />';
-					$this->content->text .= '<span style="font-weight:bold; ">'.
+					$this->content->text .= '<span style="font-weight: bold">'.
                         get_string('earningstitle','block_timetracker').'</span>';
 
 					if ($this->config->block_timetracker_show_month_earnings){
