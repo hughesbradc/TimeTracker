@@ -66,6 +66,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $supname= $config['supname'];
 
         } else {
+            $idnum = $worker->idnum;
             $payrate = $worker->currpayrate;
             $maxearnings = $worker->maxtermearnings;
             $trackermethod = $worker->timetrackermethod;
@@ -105,6 +106,10 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $mform->setDefault('email',$worker->email);
 		$mform->addHelpButton('email','email','block_timetracker');
 
+        $mform->addElement('text','idnum',get_string('idnum','block_timetracker'), $opstring);
+        $mform->setDefault('idnum',$idnum);
+        $mform->addHelpButton('idnum','idnum','block_timetracker');
+        
         $mform->addElement('text','address',get_string('address','block_timetracker'));
         $mform->addRule('address', null, 'required', null, 'client', 'false');
 		$mform->addHelpButton('address','address','block_timetracker');
@@ -114,6 +119,10 @@ class timetracker_updateworkerinfo_form extends moodleform {
 		$mform->addHelpButton('phone','phone','block_timetracker');
    
         if ($canmanage){
+            $mform->addElement('text','maxtermearnings',get_string('maxtermearnings','block_timetracker'));
+            $mform->setDefault('maxtermearnings',$maxearnings);
+            $mform->addHelpButton('maxtermearnings','maxtermearnings','block_timetracker');
+
             $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'));
             $mform->setDefault('currpayrate',$payrate);
 			$mform->addHelpButton('currpayrate','currpayrate','block_timetracker');
@@ -145,6 +154,9 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $mform->setDefault('supervisor',$supname);
 			$mform->addHelpButton('supervisor','supname','block_timetracker');
         } else {
+            $mform->addElement('text','maxtermearnings',get_string('maxtermearnings','block_timetracker'),
+                'readonly="readonly"');
+            $mform->setDefault('maxtermearnings',$maxearnings);
             $mform->addElement('text','currpayrate',
                 get_string('currpayrate','block_timetracker'), 'readonly="readonly"');
             $mform->setDefault('currpayrate',$payrate);
