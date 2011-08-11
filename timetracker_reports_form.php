@@ -183,7 +183,8 @@ class timetracker_reports_form  extends moodleform {
                     $editaction = $OUTPUT->action_icon($editurl, 
                         new pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
                 }
-                if($editaction){
+
+                if($canmanage){
                     $actions = $clockoutaction.' '.$editaction.' '.$deleteaction;
                 } else {
                     $actions = $clockoutaction.' '.$deleteaction;

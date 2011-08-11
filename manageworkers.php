@@ -61,7 +61,7 @@ $maintabs = get_tabs($urlparams, $canmanage);
 $manageworkerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
 $PAGE->set_url($manageworkerurl);
-$PAGE->set_pagelayout('base');
+$PAGE->set_pagelayout('course');
 
 $strtitle = get_string('manageworkertitle','block_timetracker');
 

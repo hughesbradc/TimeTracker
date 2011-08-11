@@ -56,6 +56,8 @@ class timetracker_changealert_form extends moodleform {
             $mform->addElement('hidden', 'courseid', $alertunit->courseid);
             $mform->addElement('hidden', 'payrate', $alertunit->payrate);
             $mform->addElement('hidden', 'lasteditedby', $USER->id);
+            $mform->addElement('hidden', 'alertid', $alertunit->id);
+            $mform->addElement('hidden', 'action', $alertunit->id);
             $mform->addElement('header', 'general',  get_string('changealert','block_timetracker',
                 $userinfo->firstname.' '.$userinfo->lastname));
             $mform->addElement('html', get_string('emessage2','block_timetracker'));
@@ -91,7 +93,7 @@ class timetracker_changealert_form extends moodleform {
             $mform->addHelpButton('timein','timein','block_timetracker');
             $mform->addElement('date_time_selector','timeout',
                 get_string('timeouterror','block_timetracker'));
-            $mform->setDefault('timeout',$alertunit->timein);
+            $mform->setDefault('timeout',$alertunit->timeout);
             $mform->addHelpButton('timeout','timeout','block_timetracker');
             $mform->addElement('checkbox', 'deleteunit', get_string('deleteunit','block_timetracker'));
             $mform->addHelpButton('deleteunit', 'deleteunit', 'block_timetracker');
@@ -109,6 +111,11 @@ class timetracker_changealert_form extends moodleform {
         if($data['timein'] > $data['timeout']){
             $errors['timein'] = 'Time out cannot be set before time in.';
         }
+
+        if(overlaps($data['timein'],$data['timeout'],$data['userid'])){
+            $errors['timein'] = 'Work unit overlaps with existing workunit';
+        }
+
         return $errors;
     }
 }

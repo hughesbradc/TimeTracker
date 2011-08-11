@@ -37,31 +37,34 @@ $alertunit = $DB->get_record('block_timetracker_alertunits', array('id'=>$alerti
 
 if(!$alertunit){
     //TODO Fix this to go to a pretty error page stating that the unit no longer needs action
+    echo $OUTPUT->header();
     print_error('Alert unit no long exists');
 }
+$urlparams['id'] = $alertunit->courseid;
+$urlparams['action'] = $action;
+$urlparams['alertid'] = $alertid;
 
 $courseid = $alertunit->courseid;
 
 $indexparams['id'] = $courseid; 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $indexparams);
+$alertaction = new moodle_url($CFG->wwwroot.'/blocks/timetracker/alertaction.php', $urlparams);
 
 $course = $DB->get_record('course', array('id' => $alertunit->courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
+$PAGE->set_url($alertaction);
+$PAGE->set_pagelayout('course');
 $context = $PAGE->context;
 
-$urlparams['id'] = $alertunit->courseid;
 
-$nexturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
-
-echo $OUTPUT->header();
-$maintabs = get_tabs($urlparams, $canmanage);
-$tabs = array($maintabs);
-print_tabs($tabs, 'alert');
 
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
-} else {
+}
+
+
+if(!$canmanage){
     print_error('notpermissible','block_timetracker');
 }
 
@@ -167,12 +170,13 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 }
             } 
             // Remove record(s) from the 'alert_com' table
-            $DB->delete_records('block_timetracker_alert_com', array('alertid'=>$alertcomentry->alertid,'mdluserid'=>$alertcomentry->mdluserid));
+            $DB->delete_records('block_timetracker_alert_com', array('alertid'=>$alertcomentry->alertid,
+                'mdluserid'=>$alertcomentry->mdluserid));
         }
         $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertunit->id));
 
         $status = get_string('approvesuccess','block_timetracker');
-        redirect($index,$status,2);
+        redirect($index,$status,1);
     } else if ($action == 'deny'){
         if($alertunit->origtimeout == 0){
             /* 
@@ -269,7 +273,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 'mdluserid'=>$alertcomentry->mdluserid));
         }
         $status = get_string('denysuccess','block_timetracker');
-        redirect($index,$status,2);
+        redirect($index,$status,1);
     } else {
         // Supervisor wishes to change data in the error alert
         $mform = new timetracker_changealert_form($context, $alertid);
@@ -281,12 +285,12 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         } else if ($formdata=$mform->get_data()){
             //Form is submitted, add the unit to the 'workunit' database; email worker and any other
             //supervisors that the alert has been completed.
-           
             if(isset($formdata->deleteunit)){
                 $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertid));
             } else {
                 $formdata->lastedited = time();
-                $DB->insert_record('block_timetracker_workunit', $formdata);
+                $insertok = $DB->insert_record('block_timetracker_workunit', $formdata);
+                if(!$insertok) print_error('Error updating new work unit.');
 
                 $from = $USER; 
 
@@ -301,7 +305,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 $messagetext .= get_string('br2','block_timetracker'); 
                 $messagetext .= get_string('amessage2','block_timetracker');
                 $messagetext .= get_string('br2','block_timetracker'); 
-                $messagetext .= get_string('changemessage','block_timetracker');
+                $messagetext .= get_string('emessagechange','block_timetracker');
                 $messagetext .= get_string('br1','block_timetracker'); 
                 $messagetext .= get_string('emessage3','block_timetracker', userdate($alertunit->origtimein));
                 $messagetext .= get_string('br1','block_timetracker'); 
@@ -361,18 +365,27 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                             email_to_user($emailto, $from, $subject, $messagetext, $messagehtml);
                         }
                     } 
-                // Remove record(s) from the 'alert_com' table
-                $DB->delete_records('block_timetracker_alert_com', array('alertid'=>$alertcomentry->alertid,
-                    'mdluserid'=>$alertcomentry->mdluserid));
+                    // Remove record(s) from the 'alert_com' table
+                    $DB->delete_records('block_timetracker_alert_com', 
+                        array('alertid'=>$alertcomentry->alertid,
+                        'mdluserid'=>$alertcomentry->mdluserid));
                 }
+
+                // Remove record(s) from the 'alert_com' table
+                $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertunit->id));
             }
+            redirect($index);
         } else {
             //form is shown for the first time
+            echo $OUTPUT->header();
+            $maintabs = get_tabs($urlparams, $canmanage);
+            $tabs = array($maintabs);
+            print_tabs($tabs, 'alerts');
             $mform->display();
+            echo $OUTPUT->footer();
         }
     
     }
 }
 
-echo $OUTPUT->footer();
 ?>
