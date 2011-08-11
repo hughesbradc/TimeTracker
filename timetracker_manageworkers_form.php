@@ -52,16 +52,15 @@ class timetracker_manageworkers_form  extends moodleform {
         $stremail = get_string('email', 'block_timetracker');
 
         $mform->addElement('html', 
-            '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
+            '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">');
         
         $mform->addElement('html',
             '<tr>
-                <th>'.$stractive.'</th>
-                <th>'.$strfirstname.'</th>
-                <th>'.$strlastname.'</th>
-                <th>'.$stremail.'</th>
-                <th>Last work unit</th>
-                <th>'.get_string('action').'</th>
+                <td style="font-weight: bold">'.$stractive.'</td>
+                <td style="font-weight: bold">'.$strfirstname.'</td>
+                <td style="font-weight: bold">'.$strlastname.'</td>
+                <td style="font-weight: bold">'.$stremail.'</td>
+                <td style="font-weight: bold; text-align: center">'.get_string('action').'</td>
              </tr>');
 
 
@@ -107,6 +106,7 @@ class timetracker_manageworkers_form  extends moodleform {
                 $row.='<td>'.$worker->firstname.'</td>';
                 $row.='<td>'.$worker->email.'</td>';
 
+                /*
                 $row.='<td>';
 
                 $lastworkunit =
@@ -128,6 +128,7 @@ class timetracker_manageworkers_form  extends moodleform {
                 }
 
                 $row.='</td>';
+                */
 
 
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
