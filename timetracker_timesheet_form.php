@@ -59,7 +59,13 @@ class timetracker_timesheet_form  extends moodleform {
             $mform->addHelpButton('workerid','workerid','block_timetracker');
             $mform->addRule('workerid', null, 'required', null, 'client', 'false');
         } else {
-            $mform->addElement('hidden','workerid',$USER->id);    
+            $worker =
+                $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id,
+                'courseid'=>$COURSE->id));
+            if(!$worker){
+                print_error('Worker does not exist.');        
+            }
+            $mform->addElement('hidden','workerid',$worker->id);    
         }
 
         $months = array(
