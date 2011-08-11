@@ -210,7 +210,7 @@
                 $clockinicon = new pix_icon('clock_add','Add work unit', 'block_timetracker');
                 $clockinaction = $OUTPUT->action_icon($link, $clockinicon);
     
-                $timeclockdataicon = new pix_icon('timeclock_data', 'Manage', 'block_timetracker');
+                $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
                 $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
     
                 $this->content->text .= $clockinaction. $timeclockdataaction.'<br />';
