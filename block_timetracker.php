@@ -258,6 +258,16 @@
 
 
             if($worker){     
+                $stats = get_worker_stats($ttuserid, $COURSE->id);
+
+                //calculate if this user is within $50 of reaching maxtermearnings
+                $closetomax = false;
+                if($worker->maxtermearnings == 0 ||
+                    $stats['termearnings'] > $worker->maxtermearnings || 
+                    ($worker->maxtermearnings - $stats['termearnings']) <= 50){
+                    $closetomax = true; 
+                }
+
                 if($this->config->block_timetracker_show_month_hours ||
                     $this->config->block_timetracker_show_term_hours ||
                     $this->config->block_timetracker_show_ytd_hours ||
@@ -266,7 +276,6 @@
                     $this->content->text .= '<span style="font-weight: bold">'.
                         get_string('hourstitle','block_timetracker').'</span>';
 
-                    $stats = get_worker_stats($ttuserid, $COURSE->id);
 
 					if ($this->config->block_timetracker_show_month_hours){
 						$this->content->text .= '<br />';
@@ -276,8 +285,14 @@
 					
                     if ($this->config->block_timetracker_show_term_hours){
 						$this->content->text .= '<br />';
+                        if($closetomax){
+                            $this->content->text .= '<span style="color: red">';
+                        }
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
                         $this->content->text .= $stats['termhours'];
+                        if($closetomax){
+                            $this->content->text .= '</span>';
+                        }
 					
             
 					if ($this->config->block_timetracker_show_ytd_hours){
@@ -310,8 +325,14 @@
                     
 					if ($this->config->block_timetracker_show_term_earnings){
 						$this->content->text .= '<br />';
+                        if($closetomax){
+                            $this->content->text .= '<span style="color: red">';
+                        }
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
                         $this->content->text .= '$'.$stats['termearnings'];
+                        if($closetomax){
+                            $this->content->text .= '</span>';
+                        }
 					}
                     
 					if ($this->config->block_timetracker_show_ytd_earnings){
