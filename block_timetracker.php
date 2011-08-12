@@ -111,7 +111,9 @@
                     }
                 }                    
             } else {
+               $this->content->text .= '<center>';
                $this->content->text .= 'Click the icon above to manage/view worker data'; 
+               $this->content->text .= '</center>';
             }
             $this->content->text .='</ul>';
 
