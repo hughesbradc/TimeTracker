@@ -72,10 +72,10 @@ class timetracker_reports_form  extends moodleform {
 
         }  else {
 
-            $usersid = $DB->get_record('block_timetracker_workerinfo',
-                array('id'=>$this->userid), 'id');
+            $user = $DB->get_record('block_timetracker_workerinfo',
+                array('id'=>$this->userid));
 
-            if(!$usersid && $usersid->id != $this->userid && !$canmanage){
+            if(!$user && $user->id != $this->userid && !$canmanage){
                 print_error('notpermissible','block_timetracker',
                     $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
             }
@@ -235,8 +235,8 @@ class timetracker_reports_form  extends moodleform {
             $mform->addElement('html','No completed work units<br />');
         } else { //if they do have some
             $mform->addElement('html', '
-                <table align="center" border="1" cellspacing="10px" 
-                cellpadding="5px" width="95%">');
+                <table align="center" cellspacing="10px" 
+                cellpadding="5px" width="95%" style="border: 1px solid #000;" >');
         
             $headers = '<tr>';
             if($canmanage){
@@ -263,6 +263,10 @@ class timetracker_reports_form  extends moodleform {
                         '/reports.php?id='.$this->courseid.'&userid='.$unit->userid.'">'.
                         $workers[$unit->userid]->lastname.', '.
                         $workers[$unit->userid]->firstname.'</a></td>';
+                } else if($canmanage){
+                    $row .='<td>'.
+                        $user->lastname.', '.
+                        $user->firstname.'</td>';
                 }
                 $row.='<td style="text-align: center">'.
                     userdate($unit->timein,
