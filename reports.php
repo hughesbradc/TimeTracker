@@ -99,7 +99,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     //echo $OUTPUT->heading($strtitle, 2);
     echo $OUTPUT->header();
 
-    $maintabs = get_tabs($urlparams, $canmanage);
+    $maintabs = get_tabs($urlparams, $canmanage, $courseid);
     $tabs = array($maintabs);
 
     print_tabs($tabs, 'reports');

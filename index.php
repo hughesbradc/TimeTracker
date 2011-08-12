@@ -70,7 +70,7 @@ $PAGE->set_pagelayout('base');
 echo $OUTPUT->header();
 
 
-$tabs = get_tabs($urlparams, $canmanage);
+$tabs = get_tabs($urlparams, $canmanage, $courseid);
 $tabs = array($tabs);
 print_tabs($tabs, 'home');
 

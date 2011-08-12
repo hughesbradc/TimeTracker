@@ -45,7 +45,7 @@ if($courseid){
 
 
 $maintabs = get_tabs($urlparams,
-    has_capability('block/timetracker:manageworkers',$context));
+    has_capability('block/timetracker:manageworkers',$context), $courseid);
 
 $alertsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams);
 

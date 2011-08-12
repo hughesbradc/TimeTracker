@@ -122,7 +122,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
 } else {
     //form is shown for the first time
     echo $OUTPUT->header();
-    $tabs = get_tabs($urlparams, $canmanage);  
+    $tabs = get_tabs($urlparams, $canmanage, $courseid);  
     $tabs[] = new tabobject('editunit',
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php#', $urlparams),
         'Edit Unit');
