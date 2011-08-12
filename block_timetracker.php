@@ -58,6 +58,7 @@
             return $this->content;
 
         }
+        $baseurl = $CFG->wwwroot.'/blocks/timetracker';
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
 
             //if config is setup to show term hours/earnings AND
@@ -161,7 +162,6 @@
                     array('userid'=>$ttuserid,'courseid'=>$courseid));
 
                 if(!$pendingrecord){ 
-                    $baseurl = $CFG->wwwroot.'/blocks/timetracker';
 
                     $urlparams['userid']=$ttuserid;
                     $urlparams['id']=$courseid;
