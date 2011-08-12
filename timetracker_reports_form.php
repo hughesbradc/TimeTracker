@@ -112,8 +112,11 @@ class timetracker_reports_form  extends moodleform {
         $mform->addElement('submit', 'datechange', 'Get work units');
 
 
+        $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
+
         //************** PENDING WORK UNITS SECTION ****************//
         //which workers to see?
+        /*
         $endtime = $this->reportend + ((60*60*23)+60*59); //23:59
         $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_pending WHERE timein BETWEEN '.
             $this->reportstart.' AND '.$endtime.' ';
@@ -134,7 +137,6 @@ class timetracker_reports_form  extends moodleform {
         $sql .= ' ORDER BY timein DESC';
         $pendingunits = $DB->get_records_sql($sql);
 
-        $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
 
         $mform->addElement('header', 'general', 'Pending work units');
         if(!$pendingunits){ //if they don't have them.
@@ -209,6 +211,7 @@ class timetracker_reports_form  extends moodleform {
             }
             $mform->addElement('html','</table>');
         } 
+        */
 
         //************** WORK UNITS SECTION ****************//
 
@@ -235,14 +238,18 @@ class timetracker_reports_form  extends moodleform {
                 <table align="center" border="1" cellspacing="10px" 
                 cellpadding="5px" width="95%">');
         
-            $headers = 
-                '<tr>
-                    <td style="font-weight: bold">Name</td>
-                    <td style="font-weight: bold; text-align: center">Time in</td>
+            $headers = '<tr>';
+            if($canmanage){
+                $headers .='<td style="font-weight: bold">Name</td>';
+
+            }
+            $headers .=
+                    '<td style="font-weight: bold; text-align: center">Time in</td>
                     <td style="font-weight: bold; text-align: center">Time out</td>
                     <td style="font-weight: bold; text-align: center">Elapsed</td>
                 ';
-            $headers .='<th>'.get_string('action').'</th>';
+            $headers .='<td style="font-weight: bold; text-align: center">'.
+                get_string('action').'</td>';
             $headers .='</tr>';
 
             $mform->addElement('html',$headers);
@@ -311,15 +318,18 @@ class timetracker_reports_form  extends moodleform {
                 $row .= '</tr>';
                 $mform->addElement('html',$row);
             }
-            $mform->addElement('html',
-                '<tr>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
+            $finalrow = '<tr>';
+            if($canmanage){
+                $finalrow .= '<td>&nbsp;</td>';
+            }
+            $finalrow.=
+                    '<td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td style="text-align: center; border-top: 1px solid black"><b>Total: 
                     </b>'.
                 format_elapsed_time($total).'</td>
-                    <td>&nbsp;</td></tr></table>');
+                    <td>&nbsp;</td></tr></table>';
+            $mform->addElement('html',$finalrow);
 
         } 
     
