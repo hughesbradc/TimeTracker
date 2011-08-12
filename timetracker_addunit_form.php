@@ -77,7 +77,7 @@ class timetracker_addunit_form  extends moodleform {
 		    
             $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
         } else {
-            print_error('You do not have permission to access this feature.');
+            print_error('notpermissible', 'block_timetracker');
         }
     }
 

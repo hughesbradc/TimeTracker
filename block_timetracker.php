@@ -60,6 +60,21 @@
         }
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
 
+            //if config is setup to show term hours/earnings AND
+            //terms are not configured, provide a link to the terms page.
+            if($this->config->block_timetracker_show_term_hours == 1 ||
+                $this->config->block_timetracker_show_term_earnings == 1){
+
+                $numterms = $DB->count_records('block_timetracker_term',
+                    array('courseid'=>$COURSE->id));
+                if($numterms == 0){
+                    $this->content->text .= '<b><center><a style="color: red" href="'.
+                        $CFG->wwwroot.'/blocks/timetracker/terms.php?id='.$COURSE->id.
+                        '">**Configure terms**</center></b></a>';
+                    $this->content->text .= "<br /><br />";
+                }
+            }
+
             $hasalerts = has_alerts($USER->id,$COURSE->id);
             if(has_capability('moodle/site:config',$this->context)){
                 $hasalerts = has_course_alerts($COURSE->id);
@@ -146,16 +161,19 @@
                     array('userid'=>$ttuserid,'courseid'=>$courseid));
 
                 if(!$pendingrecord){ 
+                    $baseurl = $CFG->wwwroot.'/blocks/timetracker';
+
                     $urlparams['userid']=$ttuserid;
                     $urlparams['id']=$courseid;
                     $urlparams['clockin']=1;
+
                     $indexparams['userid'] = $ttuserid;
                     $indexparams['id'] = $courseid;
-                    $link = new moodle_url($CFG->wwwroot.
-                        '/blocks/timetracker/timeclock.php', $urlparams);
-                    $index = new moodle_url($CFG->wwwroot.
-                        '/blocks/timetracker/index.php', $indexparams);
-    
+
+                    $link = new moodle_url($baseurl.'/timeclock.php', $urlparams);
+
+                    $index = new moodle_url($baseurl.'/index.php', $indexparams);
+                     
                     // Clock In Icon
                     $this->content->text .= '<div style="text-align: center">';
                     //$clockinicon = new pix_icon('clock_in','Clock in', 'block_timetracker');
@@ -164,9 +182,16 @@
         
                     $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
                     $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
+
+                    $editurl = new moodle_url($baseurl.'/updateworkerinfo.php',$indexparams);
+                    $editurl->params(array('mdluserid'=>$USER->id));
+                    $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
+                        get_string('edit'),'block_timetracker'));
         
-                    $this->content->text .= $clockinaction. ' '.$timeclockdataaction.'<br />';
+                    $this->content->text .= $clockinaction. ' '.$timeclockdataaction.' '.
+                        $editaction.'<br />';
                     $this->content->text .= '</div>';
+
                 } else {
                     $urlparams['userid']=$ttuserid;
                     $urlparams['id']=$courseid;
@@ -196,7 +221,7 @@
                     $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
                     
                     $this->content->text .= $clockoutaction. ' '.
-                        $timeclockdataaction. ' '.$alertaction. '<br />';
+                        $timeclockdataaction. ' '.$alertaction. '<br /><br />';
     
                     $this->content->text .= '<b>';
                     $this->content->text .= '</b>';
@@ -204,7 +229,6 @@
                         array('userid'=>$ttuserid,'courseid'=>$courseid));
                     $this->content->text .= 'Clock in: '.userdate($pendingtimestamp->timein,
                         get_string('datetimeformat','block_timetracker')).'<br />';
-                    $this->content->text .= '<br />';
                     $this->content->text .= '</div>';
                     $this->content->text .= '<hr>';
                 }
@@ -242,6 +266,16 @@
 
 
             if($worker){     
+                $stats = get_worker_stats($ttuserid, $COURSE->id);
+
+                //calculate if this user is within $50 of reaching maxtermearnings
+                $closetomax = false;
+                if($worker->maxtermearnings == 0 ||
+                    $stats['termearnings'] > $worker->maxtermearnings || 
+                    ($worker->maxtermearnings - $stats['termearnings']) <= 50){
+                    $closetomax = true; 
+                }
+
                 if($this->config->block_timetracker_show_month_hours ||
                     $this->config->block_timetracker_show_term_hours ||
                     $this->config->block_timetracker_show_ytd_hours ||
@@ -250,7 +284,6 @@
                     $this->content->text .= '<span style="font-weight: bold">'.
                         get_string('hourstitle','block_timetracker').'</span>';
 
-                    $stats = get_worker_stats($ttuserid, $COURSE->id);
 
 					if ($this->config->block_timetracker_show_month_hours){
 						$this->content->text .= '<br />';
@@ -260,8 +293,14 @@
 					
                     if ($this->config->block_timetracker_show_term_hours){
 						$this->content->text .= '<br />';
+                        if($closetomax){
+                            $this->content->text .= '<span style="color: red">';
+                        }
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
                         $this->content->text .= $stats['termhours'];
+                        if($closetomax){
+                            $this->content->text .= '</span>';
+                        }
 					
             
 					if ($this->config->block_timetracker_show_ytd_hours){
@@ -294,8 +333,14 @@
                     
 					if ($this->config->block_timetracker_show_term_earnings){
 						$this->content->text .= '<br />';
+                        if($closetomax){
+                            $this->content->text .= '<span style="color: red">';
+                        }
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
                         $this->content->text .= '$'.$stats['termearnings'];
+                        if($closetomax){
+                            $this->content->text .= '</span>';
+                        }
 					}
                     
 					if ($this->config->block_timetracker_show_ytd_earnings){

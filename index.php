@@ -82,7 +82,9 @@ if ($canmanage) { //supervisor
     echo $OUTPUT->box_end();
 
     echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">';
+    //echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">';
+    echo '<table align="center" cellspacing="10px" 
+                cellpadding="5px" width="95%" style="border: 1px solid #000;">';
     echo '<tr><th colspan=5">Last 10 Work Units</th></tr>'."\n";
     echo '<tr>
             <td style="font-weight: bold">Worker name</td>
@@ -153,16 +155,17 @@ if ($canmanage) { //supervisor
 
     //now print out roster
     echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">';
+    echo '<table align="center" cellspacing="10px" 
+                cellpadding="5px" width="95%" style="border: 1px solid #000;">';
     echo '<tr><th colspan="7">Worker Roster</th></tr>'."\n";
     echo '<tr>
             <td style="font-weight: bold">Worker name</td>
             <td style="font-weight: bold">Last unit</td>
-            <td style="font-weight: bold">Current rate</td>
-            <td style="font-weight: bold">Pay/Hours this month</td>
-            <td style="font-weight: bold">Pay/Hours this term</td>
-            <td style="font-weight: bold">Pay/Hours this year</td>
-            <td style="font-weight: bold">Total pay/hours</td>
+            <td style="font-weight: bold; text-align: center">Current rate</td>
+            <td style="font-weight: bold; text-align: center">Pay/Hours month</td>
+            <td style="font-weight: bold; text-align: center">Pay/Hours term</td>
+            <td style="font-weight: bold; text-align: center">Pay/Hours year</td>
+            <td style="font-weight: bold; text-align: center">Total</td>
             </tr>
          ';
     

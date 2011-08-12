@@ -66,7 +66,7 @@ function overlaps($timein, $timeout, $userid, $unitid=-1){
 /**
 *@return array of tabobjects 
 */
-function get_tabs($urlparams, $canmanage = false){
+function get_tabs($urlparams, $canmanage = false, $courseid = -1){
     global $CFG;
     $tabs = array();
     $tabs[] = new tabobject('home',
@@ -75,6 +75,7 @@ function get_tabs($urlparams, $canmanage = false){
     $tabs[] = new tabobject('reports',
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',
         $urlparams),'Reports');
+    $numalerts = '';
     if($canmanage){
         $tabs[] = new tabobject('manage',
             new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams),
@@ -82,10 +83,16 @@ function get_tabs($urlparams, $canmanage = false){
         $tabs[] = new tabobject('terms',
             new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php', $urlparams),
             'Terms');
+        if($courseid != -1){
+            //getnumalerts from $courseid
+            $numalerts = '('.has_course_alerts($courseid).')';
+        }
+
     }
     $tabs[] = new tabobject('alerts',
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams),
-        'Alerts');
+        'Alerts'.$numalerts);
+
     return $tabs;
 }
 
@@ -98,10 +105,12 @@ function add_enrolled_users($context){
     $config = get_timetracker_config($COURSE->id);
     $students = get_users_by_capability($context, 'mod/assignment:submit');
     foreach ($students as $student){
-        if(!$DB->record_exists('block_timetracker_workerinfo',array('mdluserid'=>$student->id))){
+        if(!$DB->record_exists('block_timetracker_workerinfo',array('mdluserid'=>$student->id,
+            'courseid'=>$COURSE->id))){
             $student->mdluserid = $student->id;
             unset($student->id);
             $student->courseid = $COURSE->id;
+            $student->idnum = $student->username;
             $student->address = '0';
             $student->position = $config['position'];
             $student->currpayrate = $config['curr_pay_rate'];
@@ -111,7 +120,7 @@ function add_enrolled_users($context){
             $student->supervisor = $config['supname'];
             $student->institution = $config['institution'];
             $student->maxtermearnings = $config['default_max_earnings'];
-            $res = $DB->insert_record('block_timetracker_workerinfo',$student);
+            $res = $DB->insert_record('block_timetracker_workerinfo', $student);
             if(!$res){
                 print_error("Error adding $student->firstname $student->lastname to TimeTracker");
             }
@@ -194,7 +203,7 @@ function get_total_earnings($userid, $courseid){
 /**
 * Determine if the course has alerts waiting
 * @param $courseid id of the course
-* @return T if alerts are pending, F if not.
+* @return 0 if no alerts are pending, # of alerts if they exist.
 */
 function has_course_alerts($courseid){
     global $CFG,$DB;
@@ -208,7 +217,7 @@ function has_course_alerts($courseid){
     //error_log($sql);
     $numalerts = $DB->count_records_sql($sql);
     //error_log($numalerts." alerts found! CID: $courseid");
-    return ($numalerts != 0);
+    return $numalerts;
 
 }
 
@@ -645,7 +654,7 @@ function get_workers_stats($courseid){
 
 
     $workers = $DB->get_records('block_timetracker_workerinfo',
-        array('courseid'=>$courseid),'lastname DESC');
+        array('courseid'=>$courseid),'lastname ASC');
 
     if(!$workers) return null;
     $workerstats = array();
@@ -666,7 +675,7 @@ function get_workers_stats($courseid){
                 '<br />'.
                 userdate($u->timeout,get_string('datetimeformat','block_timetracker')).
                 '<br />'.
-                format_elapsed_time($u->timeout - $u->timein);
+                number_format(get_hours($u->timeout - $u->timein),2).' hours';
         }
 
         $worker->lastunit = $lu;

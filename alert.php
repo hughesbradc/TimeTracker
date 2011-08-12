@@ -287,7 +287,7 @@ if ($mform->is_cancelled()){
     }
 
         $status = get_string('emessagesent','block_timetracker');
-        redirect($index,$status,2);
+        redirect($index,$status,1);
 
     
     } else {

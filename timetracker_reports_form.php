@@ -72,10 +72,10 @@ class timetracker_reports_form  extends moodleform {
 
         }  else {
 
-            $usersid = $DB->get_record('block_timetracker_workerinfo',
-                array('id'=>$this->userid), 'id');
+            $user = $DB->get_record('block_timetracker_workerinfo',
+                array('id'=>$this->userid));
 
-            if(!$usersid && $usersid->id != $this->userid && !$canmanage){
+            if(!$user && $user->id != $this->userid && !$canmanage){
                 print_error('notpermissible','block_timetracker',
                     $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
             }
@@ -112,8 +112,11 @@ class timetracker_reports_form  extends moodleform {
         $mform->addElement('submit', 'datechange', 'Get work units');
 
 
+        $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
+
         //************** PENDING WORK UNITS SECTION ****************//
         //which workers to see?
+        /*
         $endtime = $this->reportend + ((60*60*23)+60*59); //23:59
         $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_pending WHERE timein BETWEEN '.
             $this->reportstart.' AND '.$endtime.' ';
@@ -134,7 +137,6 @@ class timetracker_reports_form  extends moodleform {
         $sql .= ' ORDER BY timein DESC';
         $pendingunits = $DB->get_records_sql($sql);
 
-        $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
 
         $mform->addElement('header', 'general', 'Pending work units');
         if(!$pendingunits){ //if they don't have them.
@@ -209,6 +211,7 @@ class timetracker_reports_form  extends moodleform {
             }
             $mform->addElement('html','</table>');
         } 
+        */
 
         //************** WORK UNITS SECTION ****************//
 
@@ -232,17 +235,21 @@ class timetracker_reports_form  extends moodleform {
             $mform->addElement('html','No completed work units<br />');
         } else { //if they do have some
             $mform->addElement('html', '
-                <table align="center" border="1" cellspacing="10px" 
-                cellpadding="5px" width="95%">');
+                <table align="center" cellspacing="10px" 
+                cellpadding="5px" width="95%" style="border: 1px solid #000;" >');
         
-            $headers = 
-                '<tr>
-                    <td style="font-weight: bold">Name</td>
-                    <td style="font-weight: bold; text-align: center">Time in</td>
+            $headers = '<tr>';
+            if($canmanage){
+                $headers .='<td style="font-weight: bold">Name</td>';
+
+            }
+            $headers .=
+                    '<td style="font-weight: bold; text-align: center">Time in</td>
                     <td style="font-weight: bold; text-align: center">Time out</td>
                     <td style="font-weight: bold; text-align: center">Elapsed</td>
                 ';
-            $headers .='<th>'.get_string('action').'</th>';
+            $headers .='<td style="font-weight: bold; text-align: center">'.
+                get_string('action').'</td>';
             $headers .='</tr>';
 
             $mform->addElement('html',$headers);
@@ -256,6 +263,10 @@ class timetracker_reports_form  extends moodleform {
                         '/reports.php?id='.$this->courseid.'&userid='.$unit->userid.'">'.
                         $workers[$unit->userid]->lastname.', '.
                         $workers[$unit->userid]->firstname.'</a></td>';
+                } else if($canmanage){
+                    $row .='<td>'.
+                        $user->lastname.', '.
+                        $user->firstname.'</td>';
                 }
                 $row.='<td style="text-align: center">'.
                     userdate($unit->timein,
@@ -311,15 +322,18 @@ class timetracker_reports_form  extends moodleform {
                 $row .= '</tr>';
                 $mform->addElement('html',$row);
             }
-            $mform->addElement('html',
-                '<tr>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
+            $finalrow = '<tr>';
+            if($canmanage){
+                $finalrow .= '<td>&nbsp;</td>';
+            }
+            $finalrow.=
+                    '<td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td style="text-align: center; border-top: 1px solid black"><b>Total: 
                     </b>'.
                 format_elapsed_time($total).'</td>
-                    <td>&nbsp;</td></tr></table>');
+                    <td>&nbsp;</td></tr></table>';
+            $mform->addElement('html',$finalrow);
 
         } 
     

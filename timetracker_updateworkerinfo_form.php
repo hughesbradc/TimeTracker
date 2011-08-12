@@ -35,7 +35,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
    }
 
     function definition() {
-        global $CFG, $DB, $COURSE;
+        global $CFG, $DB, $COURSE, $USER;
 
         $mform =& $this->_form;
 
@@ -64,6 +64,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $budget= $config['budget'];
             $institution= $config['institution'];
             $supname= $config['supname'];
+            $idnum = $USER->username;
 
         } else {
             $idnum = $worker->idnum;

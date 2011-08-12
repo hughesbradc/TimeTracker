@@ -85,7 +85,7 @@ $string['finaid'] = 'Financial Aid Work Study Coordinator';
 
 // Strings for Employee Hourlog Page
 $string['hourlogtitle'] = 'Hourlog for {$a}';
-$string['addentry'] = 'Add Entry';
+$string['addentry'] = 'Add work unit';
 $string['date'] = 'Date';
 $string['timein'] = 'Time In';
 $string['timeout'] = 'Time Out'; // For context-sensitive help

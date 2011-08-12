@@ -65,7 +65,7 @@ if($USER->id != $workerrecord->mdluserid && !$canmanage){
     print_error('You do not have permissions to add hours for this user');
 } else if(!$canmanage && $workerrecord->timetrackermethod==0){
     $status = 'You are not authorized to use the hourlog interface.';
-    redirect($index,$status,2);
+    redirect($index,$status,1);
 }
 
 
@@ -108,7 +108,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $formdata->lasteditedby = $formdata->editedby;
         $DB->insert_record('block_timetracker_workunit', $formdata);
     $status = 'Hourlog entry saved successfully.'; 
-    redirect($index,$status,2);
+    redirect($index,$status,1);
 
 } else {
     //form is shown for the first time

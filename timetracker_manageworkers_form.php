@@ -121,9 +121,16 @@ class timetracker_manageworkers_form  extends moodleform {
                 $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('report', 
                     'Reports','block_timetracker'));
     
+                $adduniturl = new moodle_url($baseurl.'/addunit.php', $urlparams);
+                $addunitaction = $OUTPUT->action_icon($adduniturl,
+                    new pix_icon('clock_add', 
+                    get_string('addentry', 'block_timetracker'), 'block_timetracker'));
+
+
                 $deleteurl = new moodle_url($baseurl.'/deleteworker.php', $urlparams);
                 $deleteicon = new pix_icon('user_delete', get_string('delete'),
                     'block_timetracker');
+
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action(
@@ -131,7 +138,8 @@ class timetracker_manageworkers_form  extends moodleform {
                     ' work units?'));
     
                 $row .= '<td style="text-align: center">'.
-                    $editaction . ' ' . $deleteaction. ' '.$reportsaction.'</td>';
+                    $editaction . ' ' . $deleteaction. ' '.$addunitaction.' '.$reportsaction.
+                    '</td>';
     
     
                 $row.='</tr>';
