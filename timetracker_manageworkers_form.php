@@ -109,7 +109,7 @@ class timetracker_manageworkers_form  extends moodleform {
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
 
                 $urlparams['id'] = $COURSE->id;
-                $urlparams['userid'] = $worker->id
+                $urlparams['userid'] = $worker->id;
                 $urlparams['mdluserid'] = $worker->mdluserid;
                 $urlparams['sesskey'] = sesskey();
     

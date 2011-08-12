@@ -47,7 +47,7 @@ $context = $PAGE->context;
 //error_log("In terms.php line 47 and COURSE is $COURSE->id");
 
 $PAGE->set_url($termsURL);
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('base');
 
 if (!has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     print_error(get_string('notpermissible','block_timetracker'));

@@ -124,5 +124,5 @@ if($workerrecord->active == 0){
     }
 } 
 
-redirect($index,$status,2);
+redirect($index,$status,1);
 

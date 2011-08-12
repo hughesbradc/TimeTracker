@@ -41,7 +41,7 @@ $PAGE->set_course($course);
 $context = $PAGE->context;
 
 $PAGE->set_url($timesheeturl);
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('base');
 
 $canmanage = false;
 if(has_capability('block/timetracker:manageworkers', $context)){

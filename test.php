@@ -48,7 +48,7 @@ $strtitle = 'TimeTracker';
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('base');
 
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor

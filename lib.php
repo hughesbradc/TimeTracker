@@ -603,8 +603,7 @@ function get_earnings_this_term($userid,$courseid){
 */
 function get_worker_stats($userid,$courseid){
     global $DB;
-    
-    $stats = array();
+
     $stats['totalhours'] = get_total_hours($userid,$courseid);
     $stats['monthhours'] = get_hours_this_month($userid, $courseid);
     $stats['yearhours'] = get_hours_this_year($userid, $courseid);
@@ -615,8 +614,68 @@ function get_worker_stats($userid,$courseid){
     $stats['yearearnings'] = number_format(get_earnings_this_year($userid,$courseid),2);
     $stats['termearnings'] = number_format(get_earnings_this_term($userid,$courseid),2);
 
+
     return $stats; 
 }
+
+/**
+* @see get_worker_stats
+* @return an object array like this:
+Array{
+    [userid as index] => stdClassObject
+        {
+            [id] = TT user id
+            [mdluserid] = moodle user id
+            .
+            .  (all other workerinfo fields
+            .
+            [totalhours] = 
+            [monthhours] = 
+            .
+            . (all other from get_worker_stats())
+            .
+        }
+    [next userid as index] => stdClassObject
+        {
+            etc
+}
+*/
+function get_workers_stats($courseid){
+    global $DB; 
+
+
+    $workers = $DB->get_records('block_timetracker_workerinfo',
+        array('courseid'=>$courseid),'lastname DESC');
+
+    if(!$workers) return null;
+    $workerstats = array();
+    foreach($workers as $worker){
+        
+        //XXX this is bad; multiple DB calls. Should do all in one call for efficiency
+        $stats = get_worker_stats($worker->id, $courseid);
+        foreach($stats as $stat=>$val){
+            $worker->$stat = $val;
+        }
+
+        $lastunit = $DB->get_records('block_timetracker_workunit',
+            array('userid'=>$worker->id, 'courseid'=>$courseid), 'timeout DESC LIMIT 1');
+        $lu = '';
+        foreach($lastunit as $u){
+            $lu = 
+                userdate($u->timein,get_string('datetimeformat','block_timetracker')).
+                '<br />'.
+                userdate($u->timeout,get_string('datetimeformat','block_timetracker')).
+                '<br />'.
+                format_elapsed_time($u->timeout - $u->timein);
+        }
+
+        $worker->lastunit = $lu;
+        $workerstats[$worker->id] = $worker;
+    }
+
+    return $workerstats;
+}
+
 
 
 /**

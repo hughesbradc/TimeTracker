@@ -53,7 +53,7 @@ $alertaction = new moodle_url($CFG->wwwroot.'/blocks/timetracker/alertaction.php
 $course = $DB->get_record('course', array('id' => $alertunit->courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $PAGE->set_url($alertaction);
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('base');
 $context = $PAGE->context;
 
 
