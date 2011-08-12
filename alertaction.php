@@ -378,7 +378,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         } else {
             //form is shown for the first time
             echo $OUTPUT->header();
-            $maintabs = get_tabs($urlparams, $canmanage);
+            $maintabs = get_tabs($urlparams, $canmanage, $courseid);
             $tabs = array($maintabs);
             print_tabs($tabs, 'alerts');
             $mform->display();

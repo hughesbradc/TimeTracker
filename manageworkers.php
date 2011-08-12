@@ -56,7 +56,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) {
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 }
 
-$maintabs = get_tabs($urlparams, $canmanage);
+$maintabs = get_tabs($urlparams, $canmanage, $courseid);
 
 $manageworkerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 

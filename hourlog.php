@@ -113,7 +113,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
 } else {
     //form is shown for the first time
     echo $OUTPUT->header();
-    $tabs = get_tabs($urlparams, $canmanage);
+    $tabs = get_tabs($urlparams, $canmanage, $courseid);
     
     $tabs = array($tabs);
     print_tabs($tabs, 'hourlog');

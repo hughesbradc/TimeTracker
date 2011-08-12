@@ -85,7 +85,10 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
             'Terms');
         if($courseid != -1){
             //getnumalerts from $courseid
-            $numalerts = '('.has_course_alerts($courseid).')';
+            $n = has_course_alerts($courseid);
+            if($n > 0){
+                $numalerts = '('.$n.')';
+            }
         }
 
     }

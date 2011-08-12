@@ -30,14 +30,14 @@ require_once('lib.php');
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
-$userid = optional_param('userid',0, PARAM_INTEGER);
+//$userid = optional_param('userid',0, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
-$urlparams['userid'] = $userid;
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
+
 
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
@@ -48,6 +48,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id, 
     'courseid'=>$course->id));
 
+
 if(!$canmanage && !$worker){
     print_error('usernotexist', 'block_timetracker',
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
@@ -57,6 +58,9 @@ if(!$canmanage && $USER->id != $worker->mdluserid){
     print_error('notpermissible', 'block_timetracker',
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
 }
+
+$urlparams['userid'] = $worker->id;
+$userid = $worker->id;
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
@@ -70,7 +74,7 @@ $PAGE->set_pagelayout('base');
 echo $OUTPUT->header();
 
 
-$tabs = get_tabs($urlparams, $canmanage);
+$tabs = get_tabs($urlparams, $canmanage, $courseid);
 $tabs = array($tabs);
 print_tabs($tabs, 'home');
 

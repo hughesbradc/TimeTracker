@@ -48,7 +48,7 @@ if(has_capability('block/timetracker:manageworkers', $context)){
     $canmanage = true;
 }
 
-$maintabs = get_tabs($urlparams, $canmanage);
+$maintabs = get_tabs($urlparams, $canmanage, $courseid);
 
 $strtitle = get_string('timesheettitle','block_timetracker');
 $PAGE->set_title($strtitle);

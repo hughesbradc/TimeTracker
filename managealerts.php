@@ -30,8 +30,6 @@ require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 
-$urlparams['id'] = $courseid;
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -42,10 +40,13 @@ if($courseid){
     $PAGE->set_context($context);
 }
 
+$urlparams['id'] = $courseid;
+//$urlparams['userid'] = $
+
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
 
-$maintabs = get_tabs($urlparams,
-    has_capability('block/timetracker:manageworkers',$context));
+
 
 $alertsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams);
 
@@ -75,6 +76,8 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 
 } else {
     echo $OUTPUT->header();
+    $maintabs = get_tabs($urlparams,
+        has_capability('block/timetracker:manageworkers',$context), $courseid);
     $tabs = array($maintabs);
     print_tabs($tabs, 'alerts');
     //echo $OUTPUT->heading($strtitle, 2);

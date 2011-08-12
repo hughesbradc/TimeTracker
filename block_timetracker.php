@@ -212,6 +212,11 @@
                     
                     $clockouticon = new pix_icon('clock_stop','Clock out','block_timetracker');
                     $clockoutaction = $OUTPUT->action_icon($link, $clockouticon);
+
+                    $editurl = new moodle_url($baseurl.'/updateworkerinfo.php',$indexparams);
+                    $editurl->params(array('mdluserid'=>$USER->id));
+                    $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
+                        get_string('edit'),'block_timetracker'));
                     
                     $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
                     $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
@@ -221,7 +226,7 @@
                     $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
                     
                     $this->content->text .= $clockoutaction. ' '.
-                        $timeclockdataaction. ' '.$alertaction. '<br /><br />';
+                        $timeclockdataaction. ' '.$alertaction.' '.$editaction.'<br /><br />';
     
                     $this->content->text .= '<b>';
                     $this->content->text .= '</b>';
