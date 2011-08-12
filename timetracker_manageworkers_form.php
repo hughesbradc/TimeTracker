@@ -145,10 +145,10 @@ class timetracker_manageworkers_form  extends moodleform {
                 $row.='</tr>';
                 $mform->addElement('html',$row);
 
-                $this->add_checkbox_controller(1,null,null,1);
     
                 $mform->addElement('hidden','workerid['.$worker->id.']', $worker->id);
             }
+            $this->add_checkbox_controller(1,null,null,1);
     
             $mform->addElement('html','</table>');
     
