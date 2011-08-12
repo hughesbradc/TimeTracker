@@ -102,7 +102,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 
     //echo $OUTPUT->heading($strtitle, 2);
     //content goes here
-    redirect($manageworkerurl,'Changes saved successfully',2);
+    redirect($manageworkerurl,'Changes saved successfully',1);
 
 } else {
 

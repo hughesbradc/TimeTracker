@@ -70,7 +70,7 @@ $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparam
 if($USER->id != $workerrecord->mdluserid && !$canmanage){
     print_error('You do not have permissions to add hours for this user');
 } else if(!$canmanage && $workerrecord->timetrackermethod==0){
-    redirect($index,$status,2);
+    redirect($index,$status,1);
 }
 
 $strtitle = get_string('editunittitle','block_timetracker',
@@ -117,7 +117,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $DB->update_record('block_timetracker_workunit', $formdata);
 
         $status = 'Workunit edited successfully.'; 
-        redirect($index,$status,2);
+        redirect($index,$status,1);
 
 } else {
     //form is shown for the first time

@@ -49,7 +49,7 @@ class timetracker_changealert_form extends moodleform {
         $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
             array('id'=>$alertunit->courseid,'userid'=>$alertunit->userid));
         if(!$canmanage && $USER->id != $userinfo->mdluserid){
-            redirect($index,'You do not have permission to change this alert.',2);
+            redirect($index,'You do not have permission to change this alert.', 1);
         } else {
         
             $mform->addElement('hidden', 'userid', $alertunit->userid);
