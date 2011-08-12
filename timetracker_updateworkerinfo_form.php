@@ -106,7 +106,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $mform->setDefault('email',$worker->email);
 		$mform->addHelpButton('email','email','block_timetracker');
 
-        $mform->addElement('text','idnum',get_string('idnum','block_timetracker'), $opstring);
+        $mform->addElement('text','idnum',get_string('idnum','block_timetracker'));
         $mform->setDefault('idnum',$idnum);
         $mform->addHelpButton('idnum','idnum','block_timetracker');
         
