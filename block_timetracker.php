@@ -159,6 +159,8 @@
                     array('userid'=>$ttuserid,'courseid'=>$courseid));
 
                 if(!$pendingrecord){ 
+                    $baseurl = $CFG->wwwroot.'/blocks/timetracker';
+
                     $urlparams['userid']=$ttuserid;
                     $urlparams['id']=$courseid;
                     $urlparams['clockin']=1;
@@ -166,11 +168,9 @@
                     $indexparams['userid'] = $ttuserid;
                     $indexparams['id'] = $courseid;
 
-                    $link = new moodle_url($CFG->wwwroot.
-                        '/blocks/timetracker/timeclock.php', $urlparams);
+                    $link = new moodle_url($baseurl.'/timeclock.php', $urlparams);
 
-                    $index = new moodle_url($CFG->wwwroot.
-                        '/blocks/timetracker/index.php', $indexparams);
+                    $index = new moodle_url($baseurl.'/index.php', $indexparams);
                      
                     // Clock In Icon
                     $this->content->text .= '<div style="text-align: center">';
@@ -180,8 +180,14 @@
         
                     $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
                     $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
+
+                    $editurl = new moodle_url($baseurl.'/updateworkerinfo.php',$indexparams);
+                    $editurl->params(array('mdluserid'=>$USER->id));
+                    $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
+                        get_string('edit'),'block_timetracker'));
         
-                    $this->content->text .= $clockinaction. ' '.$timeclockdataaction.'<br />';
+                    $this->content->text .= $clockinaction. ' '.$timeclockdataaction.' '.
+                        $editaction.'<br />';
                     $this->content->text .= '</div>';
 
                 } else {
