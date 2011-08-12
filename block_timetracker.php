@@ -60,6 +60,21 @@
         }
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
 
+            //if config is setup to show term hours/earnings AND
+            //terms are not configured, provide a link to the terms page.
+            if($this->config->block_timetracker_show_term_hours == 1 ||
+                $this->config->block_timetracker_show_term_earnings == 1){
+
+                $numterms = $DB->count_records('block_timetracker_term',
+                    array('courseid'=>$COURSE->id));
+                if($numterms == 0){
+                    $this->content->text .= '<b><center><a style="color: red" href="'.
+                        $CFG->wwwroot.'/blocks/timetracker/terms.php?id='.$COURSE->id.
+                        '">**Configure terms**</center></b></a>';
+                    $this->content->text .= "<br /><br />";
+                }
+            }
+
             $hasalerts = has_alerts($USER->id,$COURSE->id);
             if(has_capability('moodle/site:config',$this->context)){
                 $hasalerts = has_course_alerts($COURSE->id);
@@ -147,13 +162,16 @@
                     $urlparams['userid']=$ttuserid;
                     $urlparams['id']=$courseid;
                     $urlparams['clockin']=1;
+
                     $indexparams['userid'] = $ttuserid;
                     $indexparams['id'] = $courseid;
+
                     $link = new moodle_url($CFG->wwwroot.
                         '/blocks/timetracker/timeclock.php', $urlparams);
+
                     $index = new moodle_url($CFG->wwwroot.
                         '/blocks/timetracker/index.php', $indexparams);
-    
+                     
                     // Clock In Icon
                     $this->content->text .= '<div style="text-align: center">';
                     //$clockinicon = new pix_icon('clock_in','Clock in', 'block_timetracker');
@@ -165,6 +183,7 @@
         
                     $this->content->text .= $clockinaction. ' '.$timeclockdataaction.'<br />';
                     $this->content->text .= '</div>';
+
                 } else {
                     $urlparams['userid']=$ttuserid;
                     $urlparams['id']=$courseid;
@@ -194,7 +213,7 @@
                     $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
                     
                     $this->content->text .= $clockoutaction. ' '.
-                        $timeclockdataaction. ' '.$alertaction. '<br />';
+                        $timeclockdataaction. ' '.$alertaction. '<br /><br />';
     
                     $this->content->text .= '<b>';
                     $this->content->text .= '</b>';
@@ -202,7 +221,6 @@
                         array('userid'=>$ttuserid,'courseid'=>$courseid));
                     $this->content->text .= 'Clock in: '.userdate($pendingtimestamp->timein,
                         get_string('datetimeformat','block_timetracker')).'<br />';
-                    $this->content->text .= '<br />';
                     $this->content->text .= '</div>';
                     $this->content->text .= '<hr>';
                 }
