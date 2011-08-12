@@ -44,7 +44,7 @@ $PAGE->set_course($course);
 $context = $PAGE->context;
 
 $PAGE->set_url($url);
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('base');
 
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
     array('id'=>$userid,'courseid'=>$courseid));
@@ -57,31 +57,21 @@ if(!$workerrecord){
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
+    //print_error('nopermissionserror', 'block_timetracker');
+   
 }
-
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
-
-/*
-if($USER->id != $workerrecord->mdluserid && !$canmanage){
-    print_error('You do not have permissions to add hours for this user');
-} else if(!$canmanage && $workerrecord->timetrackermethod==0){
-    $status = 'You are not authorized to use the hourlog interface.';
-    redirect($index,$status,2);
-}
-*/
 
 $strtitle = get_string('addunittitle','block_timetracker',
     $workerrecord->firstname.' '.$workerrecord->lastname); 
+
 $PAGE->set_title($strtitle);
 
-$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
-
-$indexparams['userid'] = $userid;
-$indexparams['id'] = $courseid;
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
+$urlparams['userid'] = $userid;
+$urlparams['id'] = $courseid;
+$manage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
 $PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
+$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $manage);
 $PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_addunit_form($context, $userid, $courseid);
@@ -104,8 +94,8 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $formdata->lastedited = time();
         $formdata->lasteditedby = $formdata->editedby;
         $DB->insert_record('block_timetracker_workunit', $formdata);
-    $status = 'Work Unit added successfully.'; 
-    redirect($index,$status,2);
+    $status = 'Work unit added successfully.'; 
+    redirect($manage,$status,1);
 
 } else {
     //form is shown for the first time
@@ -113,7 +103,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
     $tabs = get_tabs($urlparams, $canmanage);
     
     $tabs = array($tabs);
-    print_tabs($tabs, 'Add Unit');
+    print_tabs($tabs, 'manage');
 
     $mform->display();
     echo $OUTPUT->footer();
