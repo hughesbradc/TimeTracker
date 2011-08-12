@@ -102,6 +102,7 @@ function add_enrolled_users($context){
             $student->mdluserid = $student->id;
             unset($student->id);
             $student->courseid = $COURSE->id;
+            $student->idnum = $student->username;
             $student->address = '0';
             $student->position = $config['position'];
             $student->currpayrate = $config['curr_pay_rate'];
@@ -111,7 +112,7 @@ function add_enrolled_users($context){
             $student->supervisor = $config['supname'];
             $student->institution = $config['institution'];
             $student->maxtermearnings = $config['default_max_earnings'];
-            $res = $DB->insert_record('block_timetracker_workerinfo',$student);
+            $res = $DB->insert_record('block_timetracker_workerinfo', $student);
             if(!$res){
                 print_error("Error adding $student->firstname $student->lastname to TimeTracker");
             }
@@ -666,7 +667,7 @@ function get_workers_stats($courseid){
                 '<br />'.
                 userdate($u->timeout,get_string('datetimeformat','block_timetracker')).
                 '<br />'.
-                format_elapsed_time($u->timeout - $u->timein);
+                number_format(get_hours($u->timeout - $u->timein),2).' hours';
         }
 
         $worker->lastunit = $lu;
