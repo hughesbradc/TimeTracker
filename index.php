@@ -45,32 +45,27 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $urlparams['userid']=0;
 }
 
-
-$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id, 'courseid'=>$course->id));
+$worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id, 
+    'courseid'=>$course->id));
 
 if(!$canmanage && !$worker){
-    print_error('usernotexist', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
+    print_error('usernotexist', 'block_timetracker',
+        $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
 }
 
 if(!$canmanage && $USER->id != $worker->mdluserid){
-    print_error('notpermissible', 'block_timetracker',$CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
+    print_error('notpermissible', 'block_timetracker',
+        $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
 }
-
-
-
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
+$strtitle = get_string('pluginname','block_timetracker');
+
 $PAGE->set_url($index);
-
-$strtitle = 'TimeTracker';
-
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
-
-$PAGE->set_pagelayout('course');
-
-
+$PAGE->set_pagelayout('base');
 
 echo $OUTPUT->header();
 
@@ -81,24 +76,29 @@ print_tabs($tabs, 'home');
 
 if ($canmanage) { //supervisor
     echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo 'Welcome, supervisor!<br />'; 
-    echo '<br />Below you will find the last 10 work units by your employees<br />';
+    echo '<h2>Welcome, supervisor!</h2>'; 
+    echo '<br />Below you will find the last 10 work units by your employees 
+        as well as a roster of your workers and summary data for each.<br /><br />';
     echo $OUTPUT->box_end();
 
-    echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">';
+    echo $OUTPUT->box_start('generalbox boxaligncenter');
+    echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">';
     echo '<tr><th colspan=5">Last 10 Work Units</th></tr>'."\n";
     echo '<tr>
-            <th>Worker name</th>
-            <th>Time in</th>
-            <th>Time out</th>
-            <th>Elapsed</th>
-            <th>Action</th>
+            <td style="font-weight: bold">Worker name</td>
+            <td style="font-weight: bold">Time in</td>
+            <td style="font-weight: bold">Time out</td>
+            <td style="font-weight: bold">Elapsed</td>
+            <td style="font-weight: bold; text-align: center">Action</td>
          ';
 
     $last10unitssql = 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.
-        $CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
-        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.
+        $CFG->prefix.'block_timetracker_workerinfo.lastname, '.
+        $CFG->prefix.'block_timetracker_workunit.* FROM '.
+        $CFG->prefix.'block_timetracker_workerinfo,'.
+        $CFG->prefix.'block_timetracker_workunit WHERE '.
+        $CFG->prefix.'block_timetracker_workunit.userid='.
+        $CFG->prefix.'block_timetracker_workerinfo.id AND '.
         $CFG->prefix.'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
         $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
 
@@ -109,43 +109,114 @@ if ($canmanage) { //supervisor
     } else {
         foreach($last10units as $unit){
                 $row='<tr>';
-                $row.='<td style="text-align: center"><a href="'.
-                    $CFG->wwwroot.'/blocks/timetracker/reports.php?id='.$courseid.'&userid='.$unit->userid.'">'.
+                $row.='<td><a href="'.
+                    $CFG->wwwroot.'/blocks/timetracker/reports.php?id='.
+                    $courseid.'&userid='.$unit->userid.'">'.
                     $unit->firstname. ' '.$unit->lastname.'</a></td>';
-                $row.='<td style="text-align: center">'.userdate($unit->timein,get_string('datetimeformat','block_timetracker')).'</td>';
-                $row.='<td style="text-align: center">'.userdate($unit->timeout,get_string('datetimeformat','block_timetracker')).'</td>';
+                $row.='<td>'.userdate($unit->timein,
+                    get_string('datetimeformat','block_timetracker')).'</td>';
+                $row.='<td>'.userdate($unit->timeout,
+                    get_string('datetimeformat','block_timetracker')).'</td>';
                 $currelapsed = $unit->timeout - $unit->timein;  
-                $row.='<td style="text-align: center">'.format_elapsed_time($currelapsed).'</td>';
+                $row.='<td>'.
+                    format_elapsed_time($currelapsed).'</td>';
 
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
-                $paramstring = "?id=$unit->courseid&userid=$unit->userid&sesskey=".
-                    sesskey().'&unitid='.$unit->id.'&next=1';
+
+                $urlparams['id'] = $unit->courseid;
+                $urlparams['userid'] = $unit->userid;
+                $urlparams['sesskey'] = sesskey();
+                $urlparams['unitid'] = $unit->id;
+                $urlparams['next'] = 1;
     
-                $editurl = new moodle_url($baseurl.'/editunit.php'.$paramstring);
+                $editurl = new moodle_url($baseurl.'/editunit.php', $urlparams);
                 $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
                     get_string('edit'),'block_timetracker'));
 
-                $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php'.$paramstring);
-                $deleteicon = new pix_icon('clock_delete', get_string('delete'),'block_timetracker');
+                $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php', $urlparams);
+                $deleteicon = new pix_icon('clock_delete', 
+                    get_string('delete'),'block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action('Are you sure you want to delete this work unit?'));
     
-                $row .= '<td style="text-align: center">'.$editaction . ' '.$deleteaction.'</td>';
+                $row .= '<td style="text-align: center">'.$editaction . ' '.
+                    $deleteaction.'</td>';
     
                 $row .= '</tr>';
                 echo $row."\n";
         }
     }
     echo '</table>';
+    echo $OUTPUT->box_end();
+
+
+    //now print out roster
+    echo $OUTPUT->box_start('generalbox boxaligncenter');
+    echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">';
+    echo '<tr><th colspan="7">Worker Roster</th></tr>'."\n";
+    echo '<tr>
+            <td style="font-weight: bold">Worker name</td>
+            <td style="font-weight: bold">Last unit</td>
+            <td style="font-weight: bold">Current rate</td>
+            <td style="font-weight: bold">Pay/Hours this month</td>
+            <td style="font-weight: bold">Pay/Hours this term</td>
+            <td style="font-weight: bold">Pay/Hours this year</td>
+            <td style="font-weight: bold">Total pay/hours</td>
+            </tr>
+         ';
+    
+    $workers = get_workers_stats($courseid);
+    if(!$workers){
+        echo '<tr><td colspan="7" style="text-align: center">
+            No workers at this time</td></tr>';
+    } else {
+        foreach($workers as $worker){
+            $html = '<tr>';
+            $html .= '<td>'.$worker->lastname.', '.$worker->firstname.'</td>';
+            $html .= '<td>'.$worker->lastunit.'</td>';
+            $html .= '<td style="text-align: center">$'.
+                number_format($worker->currpayrate, 2).'</td>';
+            $html .= '<td style="text-align: center">'.
+                $worker->monthhours.' / $'.$worker->monthearnings
+                .'</td>';
+
+            if($worker->termearnings > $worker->maxtermearnings ||
+                ($worker->maxtermearnings - $worker->termearnings) <= 50){
+                $html .= '<td style="text-align:center"><span style="color: red">'.
+                    $worker->termhours.' / $'.$worker->termearnings
+                    .'</span></td>';
+            } else {
+                $html .= '<td style="text-align: center">'.
+                    $worker->termhours.' / $'.$worker->termearnings
+                    .'</td>';
+            }
+
+            $html .= '<td style="text-align: center">'.
+                $worker->yearhours.' / $'.$worker->yearearnings
+                .'</td>';
+            $html .= '<td style="text-align: center">'.
+                $worker->totalhours.' / $'.$worker->totalearnings
+                .'</td>';
+
+            $html .= '</tr>';
+            echo $html;
+        }
+    }
+
+    echo '</table>';
+    echo $OUTPUT->box_end();
 
 } else { //worker
     if(!$worker){
-        print_error('User is not known to TimeTracker. Please register on the course main page');
+        print_error('User is not known to TimeTracker. '.
+            'Please register on the course main page');
     }
 
-    $userUnits = $DB->get_records('block_timetracker_workunit',array('userid'=>$worker->id),'timeout DESC','*',0,10);
-    $userPending = $DB->get_records('block_timetracker_pending', array('userid'=>$worker->id));
+    $userUnits = $DB->get_records('block_timetracker_workunit',
+        array('userid'=>$worker->id),'timeout DESC','*',0,10);
+    $userPending = $DB->get_records('block_timetracker_pending', 
+        array('userid'=>$worker->id));
 
     //add clockin/clockout box
     if($worker->active == 0){
@@ -153,7 +224,8 @@ if ($canmanage) { //supervisor
     } else {
         if(!$userPending && $worker->timetrackermethod==0){ //timeclock
             $clockinicon = new pix_icon('clock_play','Clock in', 'block_timetracker');
-            $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',$urlparams);
+            $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',
+                $urlparams);
             $clockinurl->params(array('clockin'=>1));
             $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
             echo $OUTPUT->box_start('generalbox boxaligncenter');
@@ -164,16 +236,19 @@ if ($canmanage) { //supervisor
             echo $OUTPUT->box_end();
         } else if(!$userPending && $worker->timetrackermethod==1){ //hourlog
             $clockinicon = new pix_icon('clock_add','Add work unit', 'block_timetracker');
-            $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams);
+            $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',
+                $urlparams);
             $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
             echo $OUTPUT->box_start('generalbox boxaligncenter');
             echo '<h2>';
             echo $clockinaction;
             echo 'Add Hours?</h2>';
-            echo "Would you like to add some hours now? Click the icon to add work units.<br />";
+            echo 'Would you like to add some hours now? Click the icon to '.
+                'add work units.<br />';
             echo $OUTPUT->box_end();
         }
     }
+
 
     //summary data
     echo $OUTPUT->box_start('generalbox boxaligncenter');
@@ -181,10 +256,11 @@ if ($canmanage) { //supervisor
     $stats = get_worker_stats($userid, $courseid);
 
     $statstable = new flexible_table('timetracker-display-worker-summary');
-    $statstable->define_columns(array('perid', 'hvalue','evalue'));
+    $statstable->define_columns(array('period', 'hvalue','evalue'));
     $statstable->define_headers(array('Period', 'Hours', 'Earnings'));
     $statstable->define_baseurl($CFG->wwwroot.'/blocks/timetracker/index.php');
     $statstable->set_attribute('cellspacing', '0');
+    //$statstable->set_attribute('width', '95%');
     $statstable->setup();
 
     $statstable->add_data(array(
@@ -221,10 +297,12 @@ if ($canmanage) { //supervisor
         $table->set_attribute('cellspacing', '0');
         $table->set_attribute('class', 'generaltable generalbox');
         $table->define_baseurl($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+        //$table->set_attribute('width', '95%');
 
         $table->setup();
         
-        $clockouturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', $urlparams);
+        $clockouturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php', 
+            $urlparams);
         $clockouturl->params(array('clockout'=>1));
         foreach ($userPending as $pending){
             $clockouticon = new pix_icon('clock_stop','Clock out','block_timetracker');
@@ -233,19 +311,27 @@ if ($canmanage) { //supervisor
             $urlparams['ispending']=true;
             $urlparams['unitid'] = $pending->id;
 
-            $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
+            $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', 
+                $urlparams);
             
             $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
-            $paramstring = "?id=$pending->courseid&userid=$pending->userid&sesskey=".
-                sesskey().'&unitid='.$pending->id;
-            $deleteurl = new moodle_url($baseurl.'/deletepending.php'.$paramstring);
-            $deleteicon = new pix_icon('clock_delete', get_string('delete'),'block_timetracker');
+
+            $urlparams['id'] = $pending->courseid;
+            $urlparams['userid'] = $pending->userid;
+            $urlparams['sesskey'] = sesskey();
+            $urlparams['unitid'] = $pending->id;
+
+            $deleteurl = new moodle_url($baseurl.'/deletepending.php', $urlparams);
+            $deleteicon = new pix_icon('clock_delete', get_string('delete'),
+                'block_timetracker');
             $deleteaction = $OUTPUT->action_icon(
                 $deleteurl, $deleteicon, 
-                new confirm_action('Are you sure you want to delete this pending work unit?'));
+                new confirm_action(
+                'Are you sure you want to delete this pending work unit?'));
             $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
             $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);
-            $table->add_data(array(userdate($pending->timein,get_string('datetimeformat','block_timetracker')),$clockoutaction.' '.$deleteaction.' '.$alertaction));
+            $table->add_data(array(userdate($pending->timein,get_string('datetimeformat',
+                'block_timetracker')),$clockoutaction.' '.$deleteaction.' '.$alertaction));
         }
         
         unset($urlparams['ispending']);
@@ -260,7 +346,6 @@ if ($canmanage) { //supervisor
 
     if($userUnits){
 
-
         echo $OUTPUT->box_start('generalbox boxaligncenter');
         echo '<h2>Last 10 Work Units</h2>';
         $table = new flexible_table('timetracker-display-worker-index');
@@ -270,29 +355,28 @@ if ($canmanage) { //supervisor
         $table->define_baseurl($CFG->wwwroot.'/blocks/timetracker/index.php');
         
         $table->set_attribute('cellspacing', '0');
+        //$table->set_attribute('width', '95%');
         $table->set_attribute('class', 'generaltable generalbox');
 
         $table->setup();
 
         //TODO Look at this for spanning?
-        //$titlerow = new html_table_cell();
-        //print_object($userUnits);
         foreach ($userUnits as $unit){
             $urlparams['unitid'] = $unit->id;
-            $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', $urlparams);
+            $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', 
+                $urlparams);
             $alerticon= new pix_icon('alert','Alert Supervisor of Error','block_timetracker');
             $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);        
     
             $table->add_data(array(
-                userdate($unit->timein,get_string('datetimeformat','block_timetracker')),
-                userdate($unit->timeout,get_string('datetimeformat','block_timetracker')),
+                userdate($unit->timein, get_string('datetimeformat','block_timetracker')),
+                userdate($unit->timeout, get_string('datetimeformat','block_timetracker')),
                 format_elapsed_time($unit->timeout - $unit->timein),
-                    $alertaction));
+                $alertaction));
         }
         unset($urlparams['unitid']);
 
         $table->print_html();
-
 
         echo $OUTPUT->box_end();
     }

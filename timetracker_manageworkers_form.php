@@ -42,7 +42,8 @@ class timetracker_manageworkers_form  extends moodleform {
 
         add_enrolled_users($this->context);
 
-        $mform->addElement('header', 'general', get_string('manageworkers','block_timetracker')); 
+        $mform->addElement('header', 'general', get_string('manageworkers',
+            'block_timetracker')); 
 		$mform->addHelpButton('general','manageworkers','block_timetracker');
 
 
@@ -52,16 +53,17 @@ class timetracker_manageworkers_form  extends moodleform {
         $stremail = get_string('email', 'block_timetracker');
 
         $mform->addElement('html', 
-            '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
+            '<table align="center" border="1" cellspacing="10px" '.
+            'cellpadding="5px" width="75%">');
         
         $mform->addElement('html',
             '<tr>
-                <th>'.$stractive.'</th>
-                <th>'.$strfirstname.'</th>
-                <th>'.$strlastname.'</th>
-                <th>'.$stremail.'</th>
-                <th>Last work unit</th>
-                <th>'.get_string('action').'</th>
+                <td style="font-weight: bold">'.$stractive.'</td>
+                <td style="font-weight: bold">'.$strfirstname.'</td>
+                <td style="font-weight: bold">'.$strlastname.'</td>
+                <td style="font-weight: bold">'.$stremail.'</td>
+                <td style="font-weight: bold; text-align: center">'.
+                get_string('action').'</td>
              </tr>');
 
 
@@ -69,7 +71,8 @@ class timetracker_manageworkers_form  extends moodleform {
             array('courseid'=>$COURSE->id),'active DESC, lastname ASC')){
 
             $mform->addElement('html',
-                '<tr><td colspan="6" style="text-align: center">No workers registered</td></tr></table>');
+                '<tr><td colspan="6" style="text-align: center">No workers registered'.
+                '</td></tr></table>');
 
         } else {
 
@@ -81,23 +84,19 @@ class timetracker_manageworkers_form  extends moodleform {
                 $mform->addElement('html','<tr><td>'); 
                 if($worker->active){
                     if($canactivate){
-                        //$mform->addElement('advcheckbox', 'activeid['.$worker->id.']','','',
-                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', null,
-                            array('checked="checked"','group'=>1));
+                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', 
+                            null, array('checked="checked"','group'=>1));
                     } else {
-                        //$mform->addElement('advcheckbox', 'activeid['.$worker->id.']','','',
-                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', null,
-                            array('checked="checked"','disabled="disabled"'));
+                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', 
+                            null, array('checked="checked"','disabled="disabled"'));
                     }
                 } else {
                     if($canactivate){
-                        //$mform->addElement('advcheckbox', 'activeid['.$worker->id.']','','',
-                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', null,
-                            array('group' => 1));
+                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', 
+                            null, array('group' => 1));
                     } else {
-                        //$mform->addElement('advcheckbox', 'activeid['.$worker->id.']', '','',
-                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']', '', null,
-                            array('disabled="disabled"'));
+                        $mform->addElement('advcheckbox', 'activeid['.$worker->id.']', '', 
+                            null, array('disabled="disabled"'));
                     }
                 }
 
@@ -107,47 +106,29 @@ class timetracker_manageworkers_form  extends moodleform {
                 $row.='<td>'.$worker->firstname.'</td>';
                 $row.='<td>'.$worker->email.'</td>';
 
-                $row.='<td>';
-
-                $lastworkunit =
-                    $DB->get_records('block_timetracker_workunit',array('userid'=>$worker->id),
-                        'timeout DESC','*',0,1);
-                if(!$lastworkunit){
-                    $row .='None';
-                } else {
-                    //print_object($lastworkunit);
-                    foreach ($lastworkunit as $u){
-                        $elapsed = format_elapsed_time($u->timeout - $u->timein);
-                        $row .='<b>Time in: </b>'.
-                            userdate($u->timein, get_string('datetimeformat','block_timetracker')).
-                                '<br /><b>Time out: </b>'.
-                            userdate($u->timeout,
-                            get_string('datetimeformat','block_timetracker')).'<br /><b>Elapsed: </b>'.
-                            $elapsed;
-                    }
-                }
-
-                $row.='</td>';
-
-
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
-                $paramstring = 
-                    "?id=$COURSE->id&userid=$worker->id&mdluserid=$worker->mdluserid&sesskey=".sesskey();
+
+                $urlparams['id'] = $COURSE->id;
+                $urlparams['userid'] = $worker->id;
+                $urlparams['mdluserid'] = $worker->mdluserid;
+                $urlparams['sesskey'] = sesskey();
     
-                $editurl = new moodle_url($baseurl.'/updateworkerinfo.php'.$paramstring);
+                $editurl = new moodle_url($baseurl.'/updateworkerinfo.php',$urlparams);
                 $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
                     get_string('edit'),'block_timetracker'));
     
-                $reportsurl = new moodle_url($baseurl.'/reports.php'.$paramstring);
+                $reportsurl = new moodle_url($baseurl.'/reports.php', $urlparams);
                 $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('report', 
                     'Reports','block_timetracker'));
     
-                $deleteurl = new moodle_url($baseurl.'/deleteworker.php'.$paramstring);
-                $deleteicon = new pix_icon('user_delete', get_string('delete'),'block_timetracker');
+                $deleteurl = new moodle_url($baseurl.'/deleteworker.php', $urlparams);
+                $deleteicon = new pix_icon('user_delete', get_string('delete'),
+                    'block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action(
-                    'Are you sure you want to delete this worker and all this worker\'s work units?'));
+                    'Are you sure you want to delete this worker and all this worker\'s'.
+                    ' work units?'));
     
                 $row .= '<td style="text-align: center">'.
                     $editaction . ' ' . $deleteaction. ' '.$reportsaction.'</td>';

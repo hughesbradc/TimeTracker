@@ -59,7 +59,7 @@ if($reportend) $urlparams['repend'] = $reportend;
 $reportsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
 
 $PAGE->set_url($reportsurl);
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('base');
 $strtitle = 'TimeTracker : Reports';
 
 if( $userid != 0){
