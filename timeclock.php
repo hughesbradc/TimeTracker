@@ -47,32 +47,34 @@ $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
     array('id'=>$ttuserid,'courseid'=>$courseid));
 
-if(!$workerrecord){ print_error("NO WORKER FOUND!"); die; }
+if(!$workerrecord){
+    print_error("NO WORKER FOUND!");
+    die;
+}
 
-if($workerrecord->active == 0){ $status = get_string('notactiveerror','block_timetracker'); } else
-    if($clockin == 1){ $status = 'Clock in successful';
+if($workerrecord->active == 0){
+    $status = get_string('notactiveerror','block_timetracker');
+} else if($clockin == 1){
+        $status = 'Clock in successful';
         //protect against refreshing a 'clockin' screen
         $pendingrecord= $DB->record_exists('block_timetracker_pending',
-        array('userid'=>$ttuserid,'courseid'=>$courseid)); 
-        if(!$pendingrecord){ 
-            $cin = new stdClass(); 
-            $cin->userid = $ttuserid; 
-            $cin->timein = time(); 
+            array('userid'=>$ttuserid,'courseid'=>$courseid));
+        if(!$pendingrecord){
+            $cin = new stdClass();
+            $cin->userid = $ttuserid;
+            $cin->timein = time();
             $cin->courseid = $courseid;
+            $cisuccess = $DB->insert_record('block_timetracker_pending', $cin);
+            if($cisuccess){
+                add_to_log($COURSE->id, '', 'TimeTracker clock-in.', '','TimeTracker clock-in.');
+            } else {
+                print_error('You tried to clock-in, but something went wrong.  We have logged the
+                    error.  Please contact your supervisor.');
+                add_to_log($COURSE->id, '', 'ERROR: TimeTracker clock-in failed.', ''.$COURSE->id, 
+                    'ERROR:  TimeTracker clock-in failed.');
+
+            }
         }
-        
-        $clockincheck = $DB->insert_record('block_timetracker_pending', $cin); 
-        
-        if($clockincheck){
-            add_to_log($COURSE->id, 'TimeTracker', 'Clock-in', 'index.php?id='.$COURSE->id, 
-                'Worker clocked in');
-        } else {
-            add_to_log($COURSE->id, 'TimeTracker', 'Clock-in failed', 'index.php?id='.$COURSE->id, 
-                'Worker attempted to clock in, but something happened.');
-            print_error('Something happened and TimeTracker was unable to clock you in. This error
-            has been logged.  Please see your supervisor.')
-        }
-        
 
 } else if ($clockout == 1){
     $status = 'Clock out successful';
@@ -102,13 +104,11 @@ if($workerrecord->active == 0){ $status = get_string('notactiveerror','block_tim
             if($worked){
                 $DB->delete_records('block_timetracker_pending', 
                     array('userid'=>$ttuserid,'courseid'=>$courseid));
-                add_to_log($COURSE->id, 'TimeTracker', 'Clock-out', 'index.php?id='.$COURSE->id, 
-                    'Worker clocked out');
+                add_to_log($COURSE->id, '', 'TimeTracker clock-out.', '', 'TimeTracker clock-out.');
             } else {
-                add_to_log($COURSE->id, 'TimeTracker', 'Clock-out failed', 'index.php?id='.$COURSE->id, 
-                    'Worker attempted to clock out, but something happened.');
-                print_error('Something happened and TimeTracker was unable to clock you out. This error
-                    has been logged.  Please see your supervisor.')
+                print_error('You tried to clock-out, but something went wrong.  We have logged the
+                    error.  Please contact your supervisor.');
+                add_to_log($COURSE->id, '', 'ERROR: User clock-out failed.', '', 'ERROR:  User clock-out failed.');
             }
         } else { //spans multiple days
             $tomidnight = 86400 + usergetmidnight($cin->timein) - 1 - ($cin->timein);
