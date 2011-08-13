@@ -450,15 +450,15 @@
         global $COURSE;
 
         $config = get_timetracker_config($COURSE->id);
-        $myconfig = new stdClass();
-
-        foreach($config as $key=>$value){
-            $key = 'block_timetracker_'.$key;
-            $myconfig->$key = $value;
+        if($config){
+            $myconfig = new stdClass();
+            foreach($config as $key=>$value){
+                $key = 'block_timetracker_'.$key;
+                $myconfig->$key = $value;
+            }
+            //print_object($myconfig);
+            $this->config = $myconfig;
         }
-        //print_object($myconfig);
-
-        $this->config = $myconfig;
 
     }
 
