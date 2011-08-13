@@ -20,7 +20,7 @@ if(($handle = fopen("/tmp/jobs.csv", "r")) !== FALSE){
         $full = 'Work-Study - '.$data[0];
         $short = 'WorkStudy_'.$data[1];
 
-        $cid = create_cwsp_course($full, $short, 3);
+        $cid = create_cwsp_course($full, $short, 2);
 
 
         //after creating course
@@ -72,7 +72,8 @@ function create_cwsp_course($fullname, $shortname, $categoryid = 2){
     global $CFG, $USER, $DB;
 
     //$backupdir = $CFG->dataroot.'/temp/backup/35d6415125249264f1bf81ae131874e2';
-    $backupdir = '35d6415125249264f1bf81ae131874e2';
+	 $backupdir = 'fde3a9c54543ef236d60ba0fa4aba028';
+    //$backupdir = '35d6415125249264f1bf81ae131874e2';
     $transaction = $DB->start_delegated_transaction();
     echo $fullname.' '.$shortname."\n";
     
