@@ -153,21 +153,22 @@ foreach (range(1,7) as $i){
 }
 
 // Header Data
-$worksheet[1]->write_string(2,0,"$workerrecord->lastname, $workerrecord->firstname", $format_bold);
+$worksheet[1]->write_string(2,0,'WORKER: '.strtoupper($workerrecord->lastname).', '
+    .strtoupper($workerrecord->firstname), $format_bold);
 $worksheet[1]->merge_cells(2,0,2,3);
-$worksheet[1]->write_string(3,0,"$mdluser->username", $format_bold);
+$worksheet[1]->write_string(3,0,"ID: $mdluser->username", $format_bold);
 $worksheet[1]->merge_cells(3,0,3,3);
-$worksheet[1]->write_string(4,0,"$workerrecord->address", $format_bold);
+$worksheet[1]->write_string(4,0,"ADDRESS: $workerrecord->address", $format_bold);
 $worksheet[1]->merge_cells(4,0,4,3);
-$worksheet[1]->write_string(5,0,'YTD Earnings: $'.get_earnings_this_year($userid,$courseid), $format_bold);
+$worksheet[1]->write_string(5,0,'YTD Earnings: $'.number_format(get_earnings_this_year($userid,$courseid),2), $format_bold);
 $worksheet[1]->merge_cells(5,0,5,3);
-$worksheet[1]->write_string(2,4,$conf['supname'], $format_bold);
+$worksheet[1]->write_string(2,4,'SUPERVISOR: '.$conf['supname'], $format_bold);
 $worksheet[1]->merge_cells(2,4,2,7);
-$worksheet[1]->write_string(3,4,$conf['department'], $format_bold);
+$worksheet[1]->write_string(3,4,'DEPARTMENT: '.$conf['department'], $format_bold);
 $worksheet[1]->merge_cells(3,4,3,7);
-$worksheet[1]->write_string(4,4,$conf['position'], $format_bold);
+$worksheet[1]->write_string(4,4,'POSITION: '.$conf['position'], $format_bold);
 $worksheet[1]->merge_cells(4,4,4,7);
-$worksheet[1]->write_string(5,4,$conf['budget'], $format_bold);
+$worksheet[1]->write_string(5,4,'BUDGET: '.$conf['budget'], $format_bold);
 $worksheet[1]->merge_cells(5,4,5,7);
 
 
@@ -283,10 +284,10 @@ for($currentrow = 8; $currentrow < 20; $currentrow += 2){
 
 // Write footer data
 $worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n" .'$'.
-    $workerrecord->currpayrate,$format_footer);
+    number_format($workerrecord->currpayrate,2),$format_footer);
 $worksheet[1]->merge_cells(20,0,20,3);
 $worksheet[1]->write_string(20,4,'Total Hours for '.$monthinfo['monthname'].', '.
-    $year.":\n".$monthsum,$format_footer);
+    $year.":\n".number_format($monthsum,2),$format_footer);
 $worksheet[1]->merge_cells(20,4,20,7);
 $worksheet[1]->write_string(21,0,'Supervisor Signature/Date',$format_footer);
 $worksheet[1]->merge_cells(21,0,21,3);

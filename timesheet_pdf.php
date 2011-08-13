@@ -118,14 +118,15 @@ $htmldoc = '
 
 <table cellspacing="0" cellpadding="0">
     <tr>
-        <td><font size="8"><b>'.$workerrecord->lastname.', '.$workerrecord->firstname.'<br />'.
-        $workerrecord->idnum.'<br />'.
-        $workerrecord->address.'<br />
-        YTD Earnings: $ '.get_earnings_this_year($userid,$courseid).'</b></font></td>
-        <td><font size="8"><b>'.$conf['supname'].'<br />'.
-        $conf['department'].'<br />'.
-        $conf['position'].'<br />'.
-        $conf['budget'].'</b></font></td>
+        <td><font size="8"><b>WORKER: '.strtoupper($workerrecord->lastname).', '
+            .strtoupper($workerrecord->firstname).'<br />'
+        .'ID: '.$workerrecord->idnum.'<br />'
+        .'ADDRESS: '.$workerrecord->address.'<br />
+        YTD Earnings: $ '.number_format(get_earnings_this_year($userid,$courseid), 2).'</b></font></td>
+        <td><font size="8"><b>SUPERVISOR: '.$conf['supname'].'<br />'
+        .'DEPARTMENT: '.$conf['department'].'<br />'
+        .'POSITION: '.$conf['position'].'<br />'
+        .'BUDGET: '.$conf['budget'].'</b></font></td>
     </tr>
 </table>
 
@@ -258,9 +259,9 @@ $htmldoc = '
 <table border="1" cellpadding="5px">
 <tr>
     <td style="height: 35px"><font size="13"><b>Payrate or Stipend Amout</font><br />
-        <font size="12">$'.$workerrecord->currpayrate.'</b></font></td>
+        <font size="12">$'.number_format($workerrecord->currpayrate, 2).'</b></font></td>
     <td style="height: 35px"><font size="13"><b>Total Hours for '.$monthinfo['monthname'].', '.$year.'
-        </font><br /><font size="12">'.$monthsum.'</b></font></td>
+        </font><br /><font size="12">'.number_format($monthsum, 2).'</b></font></td>
 </tr>
 <tr>
     <td style="height: 50px"><font size="13"><b>Worker Signature/Date</b></font></td>
