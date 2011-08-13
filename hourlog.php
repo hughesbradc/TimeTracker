@@ -98,7 +98,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    //TODO Redirect user to the home page
+    redirect($index,$status,1);
 
 } else if ($formdata=$mform->get_data()){
         $formdata->courseid = $formdata->id;
@@ -108,16 +108,12 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $formdata->lasteditedby = $formdata->editedby;
         $addhourlog = $DB->insert_record('block_timetracker_workunit', $formdata);
         if($addhourlog){
+            add_to_log($COURSE->id, '', 'TimeTracker work unit added.', '', 'TimeTracker work unit added.');
             $status = 'Hourlog entry saved successfully.'; 
-            add_to_log($COURSE->id, 'TimeTracker', 'Add work unit to hourlog', 'index.php?id='.$COURSE->id, 
-                'Worker added work unit to hourlog');
-
         } else {
+            add_to_log($COURSE->id, '', 'TimeTracker worker tried to add work unit, but was unsuccessful.', 
+                '', 'TimeTracker worker tried to add work unit, but was unsuccessful.');
             $status = 'There was an error.  Please see your supervisor.';
-            add_to_log($COURSE->id, 'TimeTracker', 'Add work unit to hourlog failed', 
-                'index.php?id='.$COURSE->id, 'Worker tried to add work unit to hourlog, but was
-                unsuccessful.');
-
         }
 
     redirect($index,$status,1);
