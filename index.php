@@ -295,7 +295,7 @@ if ($canmanage) { //supervisor
     //clockin/clockout box
     if($userPending){
         echo $OUTPUT->box_start('generalbox boxaligncenter');
-        echo '<h2>Pending Clock-ins</h2>';
+        echo '<h2>Pending Clock-in</h2>';
 
         $table = new flexible_table('timetracker-display-worker-index');
     
