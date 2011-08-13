@@ -114,10 +114,11 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $mform->addElement('text','address',get_string('address','block_timetracker'));
         $mform->addRule('address', null, 'required', null, 'client', 'false');
 		$mform->addHelpButton('address','address','block_timetracker');
-		
         $mform->setDefault('address', $worker->address);
-        $mform->addElement('text','phone',get_string('phone','block_timetracker'));
-		$mform->addHelpButton('phone','phone','block_timetracker');
+
+        $mform->addElement('text','phonenumber',get_string('phone','block_timetracker'));
+		$mform->addHelpButton('phonenumber','phone','block_timetracker');
+        $mform->setDefault('phonenumber', $worker->phonenumber);
    
         if ($canmanage){
             $mform->addElement('text','maxtermearnings',get_string('maxtermearnings','block_timetracker'));

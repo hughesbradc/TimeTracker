@@ -31,6 +31,10 @@
         $this->title = get_string('blocktitle', 'block_timetracker');
     }
 
+    function preferred_width() {
+        return 210;
+    }
+
     function get_content() {
         global $CFG, $DB, $USER, $OUTPUT, $COURSE;
         $clockin = optional_param('clockin', 0,PARAM_INTEGER);
@@ -190,6 +194,7 @@
         
                     $this->content->text .= $clockinaction. ' '.$timeclockdataaction.' '.
                         $editaction.'<br />';
+
                     $this->content->text .= '</div>';
 
                 } else {
@@ -252,8 +257,6 @@
                     $urlparams);
                 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', 
                     $indexparams);
-                $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', 
-                    $indexparams);
 
                 // Clock In Icon
                 $this->content->text .= '<div style="text-align: center">';
@@ -262,8 +265,16 @@
     
                 $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
                 $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
+
+                $editurl = new moodle_url($baseurl.'/updateworkerinfo.php',$indexparams);
+                $editurl->params(array('mdluserid'=>$USER->id));
+                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
+                    get_string('edit'),'block_timetracker'));
+
+                //goes here MJG
     
-                $this->content->text .= $clockinaction. ' '.$timeclockdataaction.'<br />';
+                $this->content->text .= $clockinaction. ' '.$timeclockdataaction.' '.
+                    $editaction.'<br />';
                 $this->content->text .= '</div>';
                 $this->content->text .= '<hr>';
                 }

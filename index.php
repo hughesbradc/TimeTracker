@@ -30,7 +30,7 @@ require_once('lib.php');
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
-//$userid = optional_param('userid',0, PARAM_INTEGER);
+$userid = optional_param('userid',0, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 
@@ -58,9 +58,10 @@ if(!$canmanage && $USER->id != $worker->mdluserid){
     print_error('notpermissible', 'block_timetracker',
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
 }
-
-$urlparams['userid'] = $worker->id;
-$userid = $worker->id;
+if($worker){
+    $urlparams['userid'] = $worker->id;
+    $userid = $worker->id;
+}
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
