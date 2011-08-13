@@ -44,7 +44,7 @@
         //error_log("in block_tt and cid is $courseid");
         $worker = $DB->get_record('block_timetracker_workerinfo', 
             array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
-
+        
         if ($this->content !== NULL) {
             return $this->content;
         }
