@@ -79,6 +79,8 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
                         $unit = (object)$unit;
                         unset($unit->id);
                         $unit->userid = $newinfoid;
+                        $unit->courseid = $this->get_courseid();
+                        //print_object($unit);
                         $DB->insert_record('block_timetracker_workunit',$unit);
                     }
                 }
