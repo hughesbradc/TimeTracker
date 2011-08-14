@@ -59,8 +59,8 @@ class timetracker_manageworkers_form  extends moodleform {
         $mform->addElement('html',
             '<tr>
                 <td style="font-weight: bold">'.$stractive.'</td>
-                <td style="font-weight: bold">'.$strfirstname.'</td>
                 <td style="font-weight: bold">'.$strlastname.'</td>
+                <td style="font-weight: bold">'.$strfirstname.'</td>
                 <td style="font-weight: bold">'.$stremail.'</td>
                 <td style="font-weight: bold; text-align: center">'.
                 get_string('action').'</td>
