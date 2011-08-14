@@ -167,9 +167,9 @@ if ($canmanage) { //supervisor
             <td style="font-weight: bold">Worker name</td>
             <td style="font-weight: bold">Last unit</td>
             <td style="font-weight: bold; text-align: center">Current rate</td>
-            <td style="font-weight: bold; text-align: center">Pay/Hours month</td>
-            <td style="font-weight: bold; text-align: center">Pay/Hours term</td>
-            <td style="font-weight: bold; text-align: center">Pay/Hours year</td>
+            <td style="font-weight: bold; text-align: center">Hours/Pay month</td>
+            <td style="font-weight: bold; text-align: center">Hours/Pay term</td>
+            <td style="font-weight: bold; text-align: center">Hours/Pay year</td>
             <td style="font-weight: bold; text-align: center">Total</td>
             </tr>
          ';
@@ -190,7 +190,7 @@ if ($canmanage) { //supervisor
                 .'</td>';
 
             if($worker->termearnings > $worker->maxtermearnings ||
-                ($worker->maxtermearnings - $worker->termearnings) <= 50){
+                ($worker->maxtermearnings - $worker->termearnings) <= 50 && $worker->termhours != 0){
                 $html .= '<td style="text-align:center"><span style="color: red">'.
                     $worker->termhours.' / $'.$worker->termearnings
                     .'</span></td>';
