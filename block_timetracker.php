@@ -37,6 +37,7 @@
 
     function get_content() {
         global $CFG, $DB, $USER, $OUTPUT, $COURSE;
+        //$this->config = get_timetracker_config($COURSE->id);
         $clockin = optional_param('clockin', 0,PARAM_INTEGER);
         $clockout = optional_param('clockout',0, PARAM_INTEGER);
         $courseid = $COURSE->id;
@@ -437,6 +438,27 @@
         //global $CFG, $DB, $USER;
 
         //what would we need to do? Send reminders if last day of month?
+
+    }
+
+
+    /**
+    * override the load instance to use our config tables rather than theirs;
+    */
+    function _load_instance($instance, $page){
+        parent::_load_instance($instance, $page);
+        global $COURSE;
+
+        $config = get_timetracker_config($COURSE->id);
+        if($config){
+            $myconfig = new stdClass();
+            foreach($config as $key=>$value){
+                $key = 'block_timetracker_'.$key;
+                $myconfig->$key = $value;
+            }
+            //print_object($myconfig);
+            $this->config = $myconfig;
+        }
 
     }
 
