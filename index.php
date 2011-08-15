@@ -81,7 +81,7 @@ print_tabs($tabs, 'home');
 
 if ($canmanage) { //supervisor
     echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo '<h2>Welcome, supervisor!</h2>'; 
+    echo '<h2>Welcome, ' .$USER->firstname .'!</h2>'; 
     echo '<br />Below you will find the last 10 work units by your employees 
         as well as a roster of your workers and summary data for each.<br /><br />';
     echo $OUTPUT->box_end();
