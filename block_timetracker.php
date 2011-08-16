@@ -486,4 +486,38 @@
 
         }
     }
+
+    //
+    function instance_delete() {
+        //remove the necessary data
+        global $DB, $COURSE;
+        error_log('in before_delete()');
+        $DB->delete_records('block_timetracker_workerinfo',
+            array('courseid'=>$COURSE->id));
+
+        $DB->delete_records('block_timetracker_alertunits',
+            array('courseid'=>$COURSE->id));
+        $alertunits = $DB->get_records('block_timetracker_alertunits',
+            array('courseid'=>$COURSE->id));
+        if($alertunits){
+            foreach ($alertunits as $au){
+                $DB->delete_records('block_timetracker_alert_com',
+                    array('alertid'=>$au->id));
+            }
+            $DB->delete_records('block_timetracker_alertunits',
+                array('courseid'=>$COURSE->id));
+        }
+
+        $DB->delete_records('block_timetracker_workunit',
+            array('courseid'=>$COURSE->id));
+
+        $DB->delete_records('block_timetracker_pending',
+            array('courseid'=>$COURSE->id));
+
+        $DB->delete_records('block_timetracker_term',
+            array('courseid'=>$COURSE->id));
+
+        $DB->delete_records('block_timetracker_config',
+            array('courseid'=>$COURSE->id));
+    }
 }
