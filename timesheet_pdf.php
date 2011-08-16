@@ -260,8 +260,9 @@ $htmldoc = '
 <tr>
     <td style="height: 35px"><font size="13"><b>Payrate or Stipend Amout</font><br />
         <font size="12">$'.number_format($workerrecord->currpayrate, 2).'</b></font></td>
-    <td style="height: 35px"><font size="13"><b>Total Hours for '.$monthinfo['monthname'].', '.$year.'
-        </font><br /><font size="12">'.number_format($monthsum, 2).'</b></font></td>
+    <td style="height: 35px"><font size="13"><b>Total Hours/Earnings for '.$monthinfo['monthname'].', '.$year.'
+        </font><br /><font size="12">'.number_format($monthsum, 2).' / $'.($monthsum * $workerrecord->currpayrate)
+        .'</b></font></td>
 </tr>
 <tr>
     <td style="height: 50px"><font size="13"><b>Worker Signature/Date</b></font></td>
