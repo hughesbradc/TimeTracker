@@ -99,6 +99,36 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
     return $tabs;
 }
 
+/**
+* Zip all files in the basepath directory and ouptut to the OS temp directory
+*/
+/**
+function zip_files($files){
+    global $COURSE;
+
+    $tempfile = '/tmp/';
+
+    // Get the list of files in directory
+    $filestemp = get_directory_list($tempfile, '', false, true, true);
+    $files = array();
+    foreach ($filestemp as $file){ 
+        //Add zip paths and fs paths to all of them
+        $files[$file] = $tempfile . '/' . $file;
+    }
+
+    // Calculate the zip fullpath
+    $zipfile = $tempfile . '/timesheets_' .$COURSE->shortname .'.zip';
+
+    // Create zip packer
+    //$zipper = new zip_packer();
+    $zippacker = get_file_packer('application/zip');
+
+    // Zip files
+    $zippacker->archive_to_pathname($files, $zipfile);
+
+}
+*/
+
 function add_enrolled_users($context){
     global $COURSE,$DB;
 

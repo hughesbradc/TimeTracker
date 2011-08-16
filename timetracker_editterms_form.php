@@ -111,7 +111,7 @@ class timetracker_editterms_form extends moodleform {
             $mform->setDefault('termname'.$i , $termname[$i]);
             $mform->addRule('termname'.$i, null, 'required', null, 'client', 'false');
 
-            $mform->addElement('select', 'month'.$i, 'Start day', $months);
+            $mform->addElement('select', 'month'.$i, 'Start month', $months);
             $mform->setDefault('month'.$i, $termmonth[$i]);
 
             $mform->addElement('select', 'day'.$i, 'Start day', $days);
