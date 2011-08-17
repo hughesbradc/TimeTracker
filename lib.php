@@ -685,9 +685,8 @@ Array{
 function get_workers_stats($courseid){
     global $DB; 
 
-
     $workers = $DB->get_records('block_timetracker_workerinfo',
-        array('courseid'=>$courseid),'lastname ASC');
+        array('courseid'=>$courseid),'lastname ASC, firstname ASC');
 
     if(!$workers) return null;
     $workerstats = array();
