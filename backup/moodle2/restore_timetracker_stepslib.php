@@ -47,6 +47,7 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
         $term = (object)$data->timetracker[0]['term'];
         //print_object($data);
         if($term) {
+            unset($term->id);
             $term->courseid = $this->get_courseid();
             //error_log('Adding term '.$term->name);
             $DB->insert_record('block_timetracker_term',$term);
@@ -68,7 +69,8 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
                 $workerinfo->courseid = $this->get_courseid();
                 $oldid = $workerinfo->id;
                 unset($workerinfo->id);
-                error_log("inserting worker $worker->firstname $worker->lastname $worker->oldid");
+                error_log("inserting worker 
+                    $worker->firstname $worker->lastname $worker->oldid");
                 $newinfoid = $DB->insert_record('block_timetracker_workerinfo',$workerinfo);
 
                 if(!$newinfoid){
@@ -86,6 +88,16 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
                     }
                 }
 
+                if(isset($worker['pending'])){
+                    foreach($worker['pending'] as $pending){
+                        $pending = (object)$pending;
+                        unset($pending->id);
+                        $pending->userid = $newinfoid;
+                        $pending->courseid = $this->get_courseid();
+                        $DB->insert_record('block_timetracker_pending',$pending);
+                    }
+                }
+
                 /*
                 if(isset($worker['alertunits'])){
                     foreach($worker['alertunits'] as $aunit){
@@ -97,16 +109,6 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
                    } 
                 }
                 */
-
-                if(isset($worker['pending'])){
-                    foreach($worker['pending'] as $pending){
-                        $pending = (object)$pending;
-                        unset($pending->id);
-                        $pending->userid = $newinfoid;
-                        $pending->courseid = $this->get_courseid();
-                        $DB->insert_record('block_timetracker_pending',$pending);
-                    }
-                }
 
                 /*
                 if(isset($worker['alertcom'])){
