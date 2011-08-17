@@ -71,8 +71,10 @@ if($mform->is_cancelled()){
         moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams);
     redirect($reportsurl);
 } else if($formdata=$mform->get_data()){
-    $uid = $formdata->workerid[0];
-    print_object($formdata->workerid);
+
+    //$uid = $formdata->workerid[0];
+	 $uid = $formdata->workerid;
+    //error_log($formdata->workerid.'  and uid is '.$uid);
     $cid = $formdata->id;
     $format = $formdata->fileformat;
     if($format == 'pdf'){

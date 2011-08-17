@@ -99,8 +99,12 @@ class timetracker_alert_form  extends moodleform {
             print_error('No supervisor is enrolled in this course.  Please alert your Administrator.');
         }
         foreach ($teachers as $teacher) {
-            $mform->addElement('advcheckbox', 'teacherid['.$teacher->id.']', 
-                $teacher->firstname.' '.$teacher->lastname,  null, array('group'=>1));
+            if(is_enrolled($this->context, $teacher->id)){
+                //!has_capability('moodle/category:manage',$this->context,$teacher) &&
+                //is_enrolled($this->context, $teacher->id)){
+                $mform->addElement('advcheckbox', 'teacherid['.$teacher->id.']', 
+                    $teacher->firstname.' '.$teacher->lastname,  null, array('group'=>1));
+            }
         }
         
         $this->add_checkbox_controller(1, null, null, 1);
