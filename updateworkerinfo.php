@@ -76,7 +76,12 @@ $PAGE->navbar->add($strtitle);
 $mform = new timetracker_updateworkerinfo_form($context, $courseid, $mdluserid);
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    redirect($CFG->wwwroot. '/course/view.php?id='.$COURSE->id);
+    if($canmanage){
+        redirect($CFG->wwwroot. '/blocks/timetracker/manageworkers.php?id=' .$COURSE->id
+            .'&userid='.$USER->id);
+    } else {
+        redirect($CFG->wwwroot. '/course/view.php?id='.$COURSE->id);
+    }
 
 } else if ($formdata=$mform->get_data()){
 
