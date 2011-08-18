@@ -257,7 +257,7 @@ $pdf->writeHTML($htmldoc, true, false, false, false, '');
 $htmldoc = '
 <table border="1" cellpadding="5px">
 <tr>
-    <td style="height: 50px"><font size="13"><b>Payrate or Stipend Amout</b></font><br /><br />
+    <td style="height: 50px"><font size="13"><b>Payrate or Stipend Amount</b></font><br /><br />
         <font size="12">$'.number_format($workerrecord->currpayrate, 2).'</font></td>
     <td style="height: 50px"><font size="13"><b>Total Hours/Earnings for '.
 	 	$monthinfo['monthname'].', '.$year.'</b></font><br /><br /><font size="12">'.number_format($monthsum, 2).' / $'.
