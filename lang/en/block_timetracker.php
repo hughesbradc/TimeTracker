@@ -29,7 +29,7 @@ $string['timetracker:manageworkers'] = 'Manage Workers';
 $string['timetracker:activateworkers'] = 'Activate Workers';
 $string['notactiveerror'] = 'You are not authorized to work.  Please contact your supervisor.';
 $string['defaultworkerconfig'] = 'Default Worker Configuration';
-
+$string['workername'] = 'Worker Name';
 
 //Strings for Block Settings
 $string['workerdisplaysettings'] = 'Worker Display Settings';
