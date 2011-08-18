@@ -90,6 +90,7 @@ class timetracker_timesheet_form  extends moodleform {
         $earliestyear = $DB->get_record_sql($sql);
 
         $earliestyear = date("Y", $earliestyear->timein);
+        if(!$earliestyear) $earliestyear = date("Y"); 
         
         $years = array();
         foreach(range($earliestyear,date("Y")) as $year){
@@ -106,7 +107,7 @@ class timetracker_timesheet_form  extends moodleform {
             // Show File Format Dropdown
             $formats = array(
                 'pdf' => 'PDF',
-                'xls' => 'Spreadsheet');
+                'xls' => 'XLS');
             $mform->addElement('select', 'fileformat', 
                 get_string('fileformat','block_timetracker'), $formats);
             $mform->addHelpButton('fileformat','fileformat','block_timetracker');
