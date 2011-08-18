@@ -59,8 +59,7 @@ class timetracker_manageworkers_form  extends moodleform {
         $mform->addElement('html',
             '<tr>
                 <td style="font-weight: bold">'.$stractive.'</td>
-                <td style="font-weight: bold">'.$strlastname.'</td>
-                <td style="font-weight: bold">'.$strfirstname.'</td>
+                <td style="font-weight: bold">Worker name</td>
                 <td style="font-weight: bold">'.$stremail.'</td>
                 <td style="font-weight: bold; text-align: center">'.
                 get_string('action').'</td>
@@ -71,7 +70,7 @@ class timetracker_manageworkers_form  extends moodleform {
             array('courseid'=>$COURSE->id),'active DESC, lastname ASC')){
 
             $mform->addElement('html',
-                '<tr><td colspan="6" style="text-align: center">No workers registered'.
+                '<tr><td colspan="4" style="text-align: center">No workers registered'.
                 '</td></tr></table>');
 
         } else {
@@ -102,8 +101,7 @@ class timetracker_manageworkers_form  extends moodleform {
 
     
                 $row='</td>';
-                $row.='<td>'.$worker->lastname.'</td>';
-                $row.='<td>'.$worker->firstname.'</td>';
+                $row.='<td>'.$worker->lastname.', '.$worker->firstname.'</td>';
                 $row.='<td>'.$worker->email.'</td>';
 
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 

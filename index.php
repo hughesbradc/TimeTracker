@@ -119,7 +119,7 @@ if ($canmanage) { //supervisor
                 $row.='<td><a href="'.
                     $CFG->wwwroot.'/blocks/timetracker/reports.php?id='.
                     $courseid.'&userid='.$unit->userid.'">'.
-                    $unit->firstname. ' '.$unit->lastname.'</a></td>';
+                    $unit->lastname. ', '.$unit->firstname.'</a></td>';
                 $row.='<td>'.userdate($unit->timein,
                     get_string('datetimeformat','block_timetracker')).'</td>';
                 $row.='<td>'.userdate($unit->timeout,
@@ -189,8 +189,16 @@ if ($canmanage) { //supervisor
                 $worker->monthhours.' / $'.$worker->monthearnings
                 .'</td>';
 
-            if($worker->termearnings > $worker->maxtermearnings ||
-                ($worker->maxtermearnings - $worker->termearnings) <= 50 && $worker->termhours != 0){
+            //error_log($worker->maxtermearnings);
+            /*
+            if($worker->maxtermearnings > 0)
+                error_log("true");
+            else
+                error_log("false");
+                */
+            if($worker->maxtermearnings > 0 && ($worker->termearnings > $worker->maxtermearnings ||
+                ($worker->maxtermearnings - $worker->termearnings) <= 50 && $worker->termhours != 0)){
+                error_log("in the 'if'");
                 $html .= '<td style="text-align:center"><span style="color: red">'.
                     $worker->termhours.' / $'.$worker->termearnings
                     .'</span></td>';

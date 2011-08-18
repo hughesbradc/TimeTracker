@@ -86,6 +86,7 @@ if($workerrecord->active == 0){
 
 if ($mform->is_cancelled()){ //user clicked cancel
     //TODO Redirect user to the home page
+	 redirect($manage);
 
 } else if ($formdata=$mform->get_data()){
         $formdata->courseid = $formdata->id;

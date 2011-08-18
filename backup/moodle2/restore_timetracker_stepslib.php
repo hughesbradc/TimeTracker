@@ -44,12 +44,16 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
             return;
         }
 
-        $term = (object)$data->timetracker[0]['term'];
+        $terms = (object)$data->timetracker[0]['term'];
         //print_object($data);
-        if($term) {
-            $term->courseid = $this->get_courseid();
-            //error_log('Adding term '.$term->name);
-            $DB->insert_record('block_timetracker_term',$term);
+        if($terms) {
+            foreach($terms as $term){
+                $term = (object)$term;
+                unset($term->id);
+                $term->courseid = $this->get_courseid();
+                //error_log('Adding term '.$term->name);
+                $DB->insert_record('block_timetracker_term',$term);
+            }
         }
 
         $config = (object)$data->timetracker[0]['config'];
@@ -62,65 +66,71 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
         }
         
         if($userinfo){
+            //if no workers, 'workerinfo' is undefined. How do we check? isset? TODO
             $workerlist = $data->timetracker[0]['workerinfo'];
-            foreach($workerlist as $worker){
-                $workerinfo = (object) $worker;
-                $workerinfo->courseid = $this->get_courseid();
-                $oldid = $workerinfo->id;
-                unset($workerinfo->id);
-                error_log("inserting worker $worker->firstname $worker->lastname $worker->oldid");
-                $newinfoid = $DB->insert_record('block_timetracker_workerinfo',$workerinfo);
-
-                if(!$newinfoid){
-                    return;
-                }
-
-                if(isset($worker['workunit'])){
-                    foreach($worker['workunit'] as $unit){
-                        $unit = (object)$unit;
-                        unset($unit->id);
-                        $unit->userid = $newinfoid;
-                        $unit->courseid = $this->get_courseid();
-                        //print_object($unit);
-                        $DB->insert_record('block_timetracker_workunit',$unit);
+            if($workerlist){
+                foreach($workerlist as $worker){
+                    $workerinfo = (object) $worker;
+                    $workerinfo->courseid = $this->get_courseid();
+                    $oldid = $workerinfo->id;
+                    unset($workerinfo->id);
+                    error_log("inserting worker 
+                        $worker->firstname $worker->lastname $worker->oldid");
+                    $newinfoid = $DB->insert_record('block_timetracker_workerinfo',
+                        $workerinfo);
+    
+                    if(!$newinfoid){
+                        return;
                     }
-                }
-
-                /*
-                if(isset($worker['alertunits'])){
-                    foreach($worker['alertunits'] as $aunit){
-                        $aunit = (object) $aunit;
-                        unset($aunit->id);
-                        $aunit->userid = $newinfoid;
-                        $aunit->courseid=$this->get_courseid();
-                        $DB->insert_record('block_timetracker_alertunits',$aunit);
-                   } 
-                }
-                */
-
-                if(isset($worker['pending'])){
-                    foreach($worker['pending'] as $pending){
-                        $pending = (object)$pending;
-                        unset($pending->id);
-                        $pending->userid = $newinfoid;
-                        $pending->courseid = $this->get_courseid();
-                        $DB->insert_record('block_timetracker_pending',$pending);
+    
+                    if(isset($worker['workunit'])){
+                        foreach($worker['workunit'] as $unit){
+                            $unit = (object)$unit;
+                            unset($unit->id);
+                            $unit->userid = $newinfoid;
+                            $unit->courseid = $this->get_courseid();
+                            //print_object($unit);
+                            $DB->insert_record('block_timetracker_workunit',$unit);
+                        }
                     }
-                }
+    
+                    if(isset($worker['pending'])){
+                        foreach($worker['pending'] as $pending){
+                            $pending = (object)$pending;
+                            unset($pending->id);
+                            $pending->userid = $newinfoid;
+                            $pending->courseid = $this->get_courseid();
+                            $DB->insert_record('block_timetracker_pending',$pending);
+                        }
+                    }
+    
+                    /*
+                    if(isset($worker['alertunits'])){
+                        foreach($worker['alertunits'] as $aunit){
+                            $aunit = (object) $aunit;
+                            unset($aunit->id);
+                            $aunit->userid = $newinfoid;
+                            $aunit->courseid=$this->get_courseid();
+                            $DB->insert_record('block_timetracker_alertunits',$aunit);
+                    } 
+                    }
+                    */
+    
+                    /*
+                    if(isset($worker['alertcom'])){
+                        foreach($worker['alertcom'] as $com){
+                            //question about mdluserid here -- not sure
+                            //how to ensure these align! 
+                            //Might be best to not back these up. TODO
+                            $com = (object) $com;
+                            unset($com->id);
+                            $com->userid = $newinfoid;
+                            //$DB->insert_record('block_timetracker_alert_com',$com);
+                        } 
+                    }
+                    */
 
-                /*
-                if(isset($worker['alertcom'])){
-                    foreach($worker['alertcom'] as $com){
-                        //question about mdluserid here -- not sure
-                        //how to ensure these align! Might be best to not back these up. TODO
-                        $com = (object) $com;
-                        unset($com->id);
-                        $com->userid = $newinfoid;
-                        //$DB->insert_record('block_timetracker_alert_com',$com);
-                   } 
                 }
-                */
-
             }
         }
     }

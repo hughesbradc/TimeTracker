@@ -288,6 +288,7 @@ $worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n" .'$'.
 $worksheet[1]->merge_cells(20,0,20,3);
 $worksheet[1]->write_string(20,4,'Total Hours/Earnings for '.$monthinfo['monthname'].', '
     .$year.":\n".number_format($monthsum,2) .' / $' .($monthsum * $workerrecord->currpayrate),$format_footer);
+
 $worksheet[1]->merge_cells(20,4,20,7);
 $worksheet[1]->write_string(21,0,'Supervisor Signature/Date',$format_footer);
 $worksheet[1]->merge_cells(21,0,21,3);
