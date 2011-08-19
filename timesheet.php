@@ -25,6 +25,8 @@
 
 require_once('../../config.php');
 require_once('timetracker_timesheet_form.php');
+require_once('timesheet_pdf.php');
+require_once('timesheet_xls.php');
 
 global $CFG, $COURSE, $USER, $DB;
 
@@ -72,18 +74,54 @@ if($mform->is_cancelled()){
     redirect($reportsurl);
 } else if($formdata=$mform->get_data()){
 
-    //$uid = $formdata->workerid[0];
-	 $uid = $formdata->workerid;
-    //error_log($formdata->workerid.'  and uid is '.$uid);
     $cid = $formdata->id;
     $format = $formdata->fileformat;
-    if($format == 'pdf'){
-        redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_pdf.php?id='.$cid.
-            '&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
-    } else {
-        redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
-            '&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
+    if(!is_array($formdata->workerid) || count($formdata->workerid)==1){ // a single id?
+
+	    $uid = $formdata->workerid;
+        if($format == 'pdf'){
+            generate_pdf($formdata->month, $formdata->year, $uid, $cid);
+        } else {
+            redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
+                '&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
+        }
+    } else { //have multiple selected
+        //create all the timesheets
+        $files = array();
+        $basepath = $CFG->dataroot.'/temp/timetracker/'.$cid.'_'.$USER->id.'_'.sesskey();
+
+        $status = check_dir_exists($basepath,true);
+        if (!$status) {
+            print_error('Error creating backup temp directories. Exiting.');
+            return;
+        }
+
+        if($format == 'pdf'){
+            foreach($formdata->workerid as $id){
+                $fn = generate_pdf($formdata->month, $formdata->year, $id, $cid, 
+                    'F', $basepath);
+                $files[$fn] = $basepath.'/'.$fn;
+            }
+        } else if ($format == 'xls') {
+            foreach($formdata->workerid as $id){
+                $fn = generate_xls($formdata->month, $formdata->year, $id, $cid, 
+                    'F', $basepath);
+                $files[$fn] = $basepath.'/'.$fn;
+            }
+        }
+    
+        //zip them up, give them to the user
+        $fn = $formdata->year.'_'.($formdata->month<10?'0'.
+            $formdata->month:$formdata->month).'Timesheets.zip';
+        $zipfile = $basepath.'/'.$fn;
+    
+        $zippacker = get_file_packer('application/zip');
+        $zippacker->archive_to_pathname($files, $zipfile);
+            
+        send_file($basepath.'/'.$fn, $fn, 'default', '0', false, false, '', true);
+        fulldelete($basepath);
     }
+    
 } else {
     echo $OUTPUT->header();
     $tabs = array($maintabs);
