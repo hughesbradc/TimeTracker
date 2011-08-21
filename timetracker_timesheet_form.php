@@ -55,7 +55,7 @@ class timetracker_timesheet_form  extends moodleform {
             }
             $select = &$mform->addElement('select','workerid',
                 get_string('workerid','block_timetracker'), $workerlist, 'size="5"');
-            $select->setMultiple(false);
+            $select->setMultiple(true);
             $mform->addHelpButton('workerid','workerid','block_timetracker');
             $mform->addRule('workerid', null, 'required', null, 'client', 'false');
         } else {
