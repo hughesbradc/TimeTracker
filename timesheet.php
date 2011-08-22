@@ -78,7 +78,7 @@ if($mform->is_cancelled()){
     $format = $formdata->fileformat;
     if(!is_array($formdata->workerid) || count($formdata->workerid)==1){ // a single id?
 
-	    $uid = $formdata->workerid;
+	    $uid = $formdata->workerid[0];
         if($format == 'pdf'){
             generate_pdf($formdata->month, $formdata->year, $uid, $cid);
         } else {
