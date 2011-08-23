@@ -183,7 +183,7 @@ function round_time($totalsecs=0){
 }
 
 /*
-* @return number of hours in decimal format
+* @return number of hours in decimal format, rounded to the nearest .25 hour
 */
 function get_hours($totalsecs=0){
     $totalsecs = round_time($totalsecs);
@@ -572,7 +572,7 @@ function get_term_boundaries($courseid){
 * @return hours (in decimal) for the current term
 *
 */
-function get_hours_this_term($userid,$courseid){
+function get_hours_this_term($userid, $courseid){
 
     global $CFG, $DB;
     $boundaries = get_term_boundaries($courseid);
