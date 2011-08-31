@@ -268,5 +268,4 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
     $pdf->Output($base.'/'.$fn, $method);
     return $fn;    
 }
-
 ?>

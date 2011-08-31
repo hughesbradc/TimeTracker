@@ -55,8 +55,7 @@ class timetracker_managealerts_form  extends moodleform {
 		$mform->addHelpButton('general','managealerts','block_timetracker');
 
 
-        $strfirstname = get_string('firstname', 'block_timetracker');
-        $strlastname = get_string('lastname', 'block_timetracker');
+        $strname = get_string('workername', 'block_timetracker');
         $strprev = get_string('previous', 'block_timetracker');
         $strproposed = get_string('proposed', 'block_timetracker');
         $strmsg = get_string('message', 'block_timetracker');
@@ -66,8 +65,7 @@ class timetracker_managealerts_form  extends moodleform {
         
         $tblheaders=
             '<tr>
-                <th>'.$strfirstname.'</th>
-                <th>'.$strlastname.'</th>
+                <th>'.$strname.'</th>
                 <th>'.$strprev.'</th>
                 <th>'.$strproposed.'</th>
                 <th>'.$strmsg.'</th>';
@@ -79,7 +77,7 @@ class timetracker_managealerts_form  extends moodleform {
 
         if($issiteadmin && !has_course_alerts($COURSE->id)){
             $mform->addElement('html',
-                '<tr><td colspan="6" style="text-align: center">'.
+                '<tr><td colspan="5" style="text-align: center">'.
                 get_string('noalerts','block_timetracker').'</td></tr></table>');
             return;
         }
@@ -105,8 +103,7 @@ class timetracker_managealerts_form  extends moodleform {
                 array('id'=>$alert->userid));
 
             $mform->addElement('html','<tr>'); 
-            $row ='<td>'.$worker->lastname.'</td>';
-            $row.='<td>'.$worker->firstname.'</td>';
+            $row ='<td>'.$worker->lastname.', '.$worker->firstname .'</td>';
             $row.='<td>In: '.userdate($alert->origtimein, 
                 get_string('datetimeformat','block_timetracker'));
 

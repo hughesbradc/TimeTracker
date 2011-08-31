@@ -32,8 +32,9 @@ if(($handle = fopen("/tmp/sss_activate.csv", "r")) !== FALSE){
         }
 
         if($courseid < 0){
-            $currentworker = $DB->count_records('block_timetracker_workerinfo', 
-                array('email'=>$email));
+            //TODO -- hack because some users already enrolled in SSS course
+            $currentworker = $DB->count_records_select('block_timetracker_workerinfo', 
+                'email=\''.$email.'\' AND courseid<>76');
         } else {
             $currentworker = $DB->count_records('block_timetracker_workerinfo', 
                 array('email'=>$email,'courseid'=>$courseid));
@@ -45,8 +46,9 @@ if(($handle = fopen("/tmp/sss_activate.csv", "r")) !== FALSE){
             echo '****No matching record. Skipping '."$email\n";
         } else {
             if($courseid < 0){
-                $worker = $DB->get_record('block_timetracker_workerinfo', 
-                    array('email'=>$email));
+                //TODO -- hack because some users already enrolled in SSS course
+                $worker = $DB->get_record_select('block_timetracker_workerinfo', 
+                    'email=\''.$email.'\' AND courseid<>76');
             } else {
                 $worker = $DB->get_record('block_timetracker_workerinfo', 
                     array('email'=>$email,'courseid'=>$courseid));
@@ -62,7 +64,9 @@ if(($handle = fopen("/tmp/sss_activate.csv", "r")) !== FALSE){
     
                 if(!$res){
                     echo 'ERROR activating worker: '."$data[0]\n";
-                }
+                } else {
+                    echo 'Successfully activated: '."$data[0]\n";
+			    }
                 */
             } else {
 

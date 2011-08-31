@@ -82,14 +82,17 @@ class timetracker_timesheet_form  extends moodleform {
             11=>'November',
             12=>'December');
 
-        $mform->addElement('select', 'month', get_string('month','block_timetracker'), $months);
+        $mform->addElement('select', 'month', 
+            get_string('month','block_timetracker'), $months);
         $mform->setDefault('month', date("m"));
         $mform->addHelpButton('month','month','block_timetracker');
 
-        $sql = 'SELECT timein FROM '.$CFG->prefix.'block_timetracker_workunit ORDER BY timein LIMIT 1';
+        $sql = 'SELECT timein FROM '.$CFG->prefix.
+            'block_timetracker_workunit ORDER BY timein LIMIT 1';
         $earliestyear = $DB->get_record_sql($sql);
 
         $earliestyear = date("Y", $earliestyear->timein);
+        if(!$earliestyear) $earliestyear = date("Y"); 
         
         $years = array();
         foreach(range($earliestyear,date("Y")) as $year){
@@ -106,7 +109,7 @@ class timetracker_timesheet_form  extends moodleform {
             // Show File Format Dropdown
             $formats = array(
                 'pdf' => 'PDF',
-                'xls' => 'Spreadsheet');
+                'xls' => 'XLS');
             $mform->addElement('select', 'fileformat', 
                 get_string('fileformat','block_timetracker'), $formats);
             $mform->addHelpButton('fileformat','fileformat','block_timetracker');
