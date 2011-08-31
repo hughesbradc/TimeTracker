@@ -49,7 +49,7 @@ class timetracker_timesheet_form  extends moodleform {
             $workerlist = array();
             $workers =
                 $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$COURSE->id),
-                'lastname DESC');
+                'lastname ASC');
             foreach($workers as $worker){
                 $workerlist[$worker->id] = $worker->firstname.' '.$worker->lastname;
             }

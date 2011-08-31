@@ -46,6 +46,7 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
         array('id'=>$userid,'courseid'=>$courseid));
     
     if(!$workerrecord){
+        //error_log('can find user with id: '.$userid.' and courseid: '.$courseid);
         print_error('usernotexist', 'block_timetracker',
             $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
     }
