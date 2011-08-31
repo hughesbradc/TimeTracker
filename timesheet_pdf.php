@@ -190,8 +190,6 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
             //end of print work units
             
             //if day of week = 7, copy value over and reset weekly sum to 0.        
-            //what about when we reach the end of the month? Still need to put totals!!!
-            //XXX XXX XXX XXX
         
             // Calculate total hours
     
@@ -207,7 +205,8 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
                     $weeksum.'</b><br /></font></td>';
                 $weeksum = 0;
             } else if ($date == $monthinfo['lastday']){
-                while($dayofweek != 6){
+                //what about when we reach the end of the month? Still need to put totals!!!
+                while($dayofweek != 6){ //pad to the rightmost column
                     $days[] = '<td style="height: 10px">&nbsp;</td>';
                     $vals[] = '<td style="height: 75px">&nbsp;</td>';
                     $dayofweek++;

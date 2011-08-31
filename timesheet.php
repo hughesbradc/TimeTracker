@@ -82,8 +82,10 @@ if($mform->is_cancelled()){
         if($format == 'pdf'){
             generate_pdf($formdata->month, $formdata->year, $uid, $cid);
         } else {
-            redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
-                '&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
+            //redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
+                //'&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
+            generate_xls($formdata->month, $formdata->year, $uid, $cid);
+                
         }
     } else { //have multiple selected
         //create all the timesheets
