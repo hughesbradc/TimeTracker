@@ -66,11 +66,13 @@ if($workerrecord->active == 0){
             $cin->courseid = $courseid;
             $cisuccess = $DB->insert_record('block_timetracker_pending', $cin);
             if($cisuccess){
-                add_to_log($COURSE->id, '', 'clock-in', "blocks/timetracker/index.php?id=$course->id&userid=$USER->id",'TimeTracker clock-in.');
+                add_to_log($COURSE->id, '', 'add clock-in', 
+                "blocks/timetracker/index.php?id=$course->id&userid=$USER->id",
+                'TimeTracker clock-in.');
             } else {
                 print_error('You tried to clock-in, but something went wrong.  We have logged the
                     error.  Please contact your supervisor.');
-                add_to_log($COURSE->id, '', 'ERROR: clock-in', ''.$COURSE->id, 
+                add_to_log($COURSE->id, '', 'error adding clock-in', ''.$COURSE->id, 
                     'ERROR:  TimeTracker clock-in failed.');
 
             }
@@ -104,11 +106,11 @@ if($workerrecord->active == 0){
             if($worked){
                 $DB->delete_records('block_timetracker_pending', 
                     array('userid'=>$ttuserid,'courseid'=>$courseid));
-                add_to_log($COURSE->id, '', 'clock-out.', '', 'TimeTracker clock-out.');
+                add_to_log($COURSE->id, '', 'add clock-out', '', 'TimeTracker clock-out.');
             } else {
                 print_error('You tried to clock-out, but something went wrong.  We have logged the
                     error.  Please contact your supervisor.');
-                add_to_log($COURSE->id, '', 'ERROR: clock-out.', '', 'ERROR:  User clock-out failed.');
+                add_to_log($COURSE->id, '', 'error clocking-out', '', 'ERROR:  User clock-out failed.');
             }
         } else { //spans multiple days
             $tomidnight = 86400 + usergetmidnight($cin->timein) - 1 - ($cin->timein);

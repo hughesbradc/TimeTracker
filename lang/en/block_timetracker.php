@@ -27,7 +27,7 @@ $string['trackermethod'] = 'Which timetracking method would you like to use?';
 $string['pluginname'] = 'TimeTracker';
 $string['timetracker:manageworkers'] = 'Manage Workers';
 $string['timetracker:activateworkers'] = 'Activate Workers';
-$string['notactiveerror'] = 'You are not authorized to work.  Please contact your supervisor.';
+$string['notactiveerror'] = 'This worker is not authorized to work.';
 $string['defaultworkerconfig'] = 'Default Worker Configuration';
 $string['workername'] = 'Worker Name';
 

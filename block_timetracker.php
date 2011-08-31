@@ -147,10 +147,10 @@
                     '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id.
                     '&mdluserid='.$USER->id;
                 $action = null; 
-                $this->content->text = '<center>';
+                $this->content->text = '<center><font style="red">';
                 $this->content->text .= $OUTPUT->action_link($link, 
                     get_string('registerinfo', 'block_timetracker'), $action);
-                $this->content->text .= '</center>';
+                $this->content->text .= '</font></center>';
                 return $this->content;
             } else {
                   

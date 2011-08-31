@@ -44,6 +44,8 @@ if($courseid){
     $context = get_context_instance(CONTEXT_SYSTEM);
     $PAGE->set_context($context);
 }
+
+//print_object($context);
 //error_log("in manage workers and $COURSE->id");
 
 
@@ -96,6 +98,13 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
             $workers[$idx]->active = $formdata->activeid[$idx];
             //print_object($workers[$idx]);
             //print_object($workers[$idx]);
+            add_to_log($courseid, '','update status',
+                //$CFG->wwwroot.'/blocks/timetracker/'.
+                'manageworkers.php?id='.$courseid,
+                'Change Status for '.$workers[$idx]->firstname.' '.
+                $workers[$idx]->lastname.' to '.$workers[$idx]->active.
+                ' course '.$courseid);
+
             $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
          }
     }
