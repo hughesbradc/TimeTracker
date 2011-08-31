@@ -179,7 +179,7 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
                     if(($unit->timeout - $unit->timein) > 449){
                         $wustr .= "In: $in<br />Out: $out<br />";
                         $weeksum += get_hours(($unit->timeout - $unit->timein));
-                        error_log('current weeksum is: '.$weeksum);
+                        //error_log('current weeksum is: '.$weeksum);
                     }
                 } else {
                     break;
