@@ -176,9 +176,10 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
                         get_string('timeformat','block_timetracker'));
                     $out = userdate($unit->timeout,
                         get_string('timeformat','block_timetracker'));
-                    if(($unit->timeout - $unit->timein) >449){
+                    if(($unit->timeout - $unit->timein) > 449){
                         $wustr .= "In: $in<br />Out: $out<br />";
                         $weeksum += get_hours(($unit->timeout - $unit->timein));
+                        error_log('current weeksum is: '.$weeksum);
                     }
                 } else {
                     break;

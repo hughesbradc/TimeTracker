@@ -108,8 +108,11 @@ class timetracker_timesheet_form  extends moodleform {
         if($canmanage){
             // Show File Format Dropdown
             $formats = array(
-                'pdf' => 'PDF',
+                'pdf' => 'PDF');
+                /*
+                //dirty hack for right now
                 'xls' => 'XLS');
+            */
             $mform->addElement('select', 'fileformat', 
                 get_string('fileformat','block_timetracker'), $formats);
             $mform->addHelpButton('fileformat','fileformat','block_timetracker');
