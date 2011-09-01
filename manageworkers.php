@@ -88,25 +88,28 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 } else if($formdata = $mform->get_data()){
     //print_object($formdata);
 
-    $workers = $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$COURSE->id));
-    //print_object($workers);
-
-    foreach($formdata->workerid as $idx){
-        if(($formdata->activeid[$idx]==1 && $workers[$idx]->active==0) ||  //not the same
-         ($formdata->activeid[$idx]==0 && $workers[$idx]->active == 1)){ //not the same
-
-            $workers[$idx]->active = $formdata->activeid[$idx];
-            //print_object($workers[$idx]);
-            //print_object($workers[$idx]);
-            add_to_log($courseid, '','update status',
-                //$CFG->wwwroot.'/blocks/timetracker/'.
-                'manageworkers.php?id='.$courseid,
-                'Change Status for '.$workers[$idx]->firstname.' '.
-                $workers[$idx]->lastname.' to '.$workers[$idx]->active.
-                ' course '.$courseid);
-
-            $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
-         }
+    if (has_capability('block/timetracker:activateworkers', $context)) {
+        $workers = $DB->get_records('block_timetracker_workerinfo',
+            array('courseid'=>$COURSE->id));
+        //print_object($workers);
+    
+        foreach($formdata->workerid as $idx){
+            if(($formdata->activeid[$idx]==1 && $workers[$idx]->active==0) ||  //not the same
+            ($formdata->activeid[$idx]==0 && $workers[$idx]->active == 1)){ //not the same
+    
+                $workers[$idx]->active = $formdata->activeid[$idx];
+                //print_object($workers[$idx]);
+                //print_object($workers[$idx]);
+                add_to_log($courseid, '','update status',
+                    //$CFG->wwwroot.'/blocks/timetracker/'.
+                    'manageworkers.php?id='.$courseid,
+                    'Change Status for '.$workers[$idx]->firstname.' '.
+                    $workers[$idx]->lastname.' to '.$workers[$idx]->active.
+                    ' course '.$courseid);
+    
+                $DB->update_record('block_timetracker_workerinfo', $workers[$idx]);
+            }
+        }
     }
 
     //echo $OUTPUT->heading($strtitle, 2);
