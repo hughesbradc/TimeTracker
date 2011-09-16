@@ -284,8 +284,8 @@ function get_total_earnings($userid, $courseid){
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
             'block_timetracker_workerinfo.id AND '.
         $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
-        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+            'block_timetracker_workunit.courseid='.$courseid;
+
     $workerunits = $DB->get_recordset_sql($sql);
 
     if(!$workerunits) return 0;
@@ -428,8 +428,7 @@ function get_total_hours($userid, $courseid){
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
             'block_timetracker_workerinfo.id AND '.
         $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
-        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+            'block_timetracker_workunit.courseid='.$courseid;
 
     $workerunits = $DB->get_recordset_sql($sql);
 
@@ -461,8 +460,7 @@ function get_earnings_this_month($userid,$courseid){
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
             'block_timetracker_workerinfo.id AND '.
         $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
-        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+            'block_timetracker_workunit.courseid='.$courseid;
 
     $units = $DB->get_recordset_sql($sql);
 
@@ -519,8 +517,7 @@ function get_hours_this_month($userid,$courseid){
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
             'block_timetracker_workerinfo.id AND '.
         $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
-        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+            'block_timetracker_workunit.courseid='.$courseid;
 
     $units = $DB->get_recordset_sql($sql);
 
@@ -549,8 +546,7 @@ function get_earnings_this_year($userid,$courseid){
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
             'block_timetracker_workerinfo.id AND '.
         $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
-        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+            'block_timetracker_workunit.courseid='.$courseid;
 
     $units = $DB->get_recordset_sql($sql);
 
@@ -579,8 +575,7 @@ function get_hours_this_year($userid,$courseid){
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
             'block_timetracker_workerinfo.id AND '.
         $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
-        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+            'block_timetracker_workunit.courseid='.$courseid;
 
     $units = $DB->get_recordset_sql($sql);
 
@@ -650,8 +645,7 @@ function get_hours_this_term($userid, $courseid){
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
             'block_timetracker_workerinfo.id AND '.
         $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
-        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+            'block_timetracker_workunit.courseid='.$courseid;
 
     $units = $DB->get_recordset_sql($sql);
 
@@ -676,8 +670,7 @@ function get_earnings_this_term($userid,$courseid){
         $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
             'block_timetracker_workerinfo.id AND '.
         $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid.' ORDER BY '.
-        $CFG->prefix.'block_timetracker_workunit.timeout DESC LIMIT 10';
+            'block_timetracker_workunit.courseid='.$courseid;
 
     $units = $DB->get_recordset_sql($sql);
 
