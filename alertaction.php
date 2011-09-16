@@ -93,7 +93,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             //Add to 'workunit' table and delete from 'alertunits' and notify everyone
             $alertunit->lastedited = time();
             $alertunit->lasteditedby = $USER->id;
-            $result = $DB->insert_record('block_timetracker_workunit', $alertunit);
+            //$result = $DB->insert_record('block_timetracker_workunit', $alertunit);
+            $result = add_unit($alertunit);
         
             if(!$result){
                 print_error('Something happened');       
@@ -187,7 +188,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             unset($alertunit->id);
             $alertunit->timein = $alertunit->origtimein;
             $alertunit->timeout = $alertunit->origtimein;
-            $DB->insert_record('block_timetracker_workunit', $alertunit);
+            //$DB->insert_record('block_timetracker_workunit', $alertunit);
+            add_unit($alertunit);
         } else {
             $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertunit->id));
 
@@ -195,7 +197,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             unset($alertunit->id);
             $alertunit->timein = $alertunit->origtimein;
             $alertunit->timeout = $alertunit->origtimeout;
-            $DB->insert_record('block_timetracker_workunit', $alertunit);
+            //$DB->insert_record('block_timetracker_workunit', $alertunit);
+            add_unit($alertunit);
         }
 
         // Email worker and any other supervisor(s) that the work unit has been approved
@@ -289,7 +292,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertid));
             } else {
                 $formdata->lastedited = time();
-                $insertok = $DB->insert_record('block_timetracker_workunit', $formdata);
+                $insertok = add_unit($formdata);
+                //$insertok = $DB->insert_record('block_timetracker_workunit', $formdata);
                 if(!$insertok) print_error('Error updating new work unit.');
 
                 $from = $USER; 

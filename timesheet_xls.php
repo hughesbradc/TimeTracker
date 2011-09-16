@@ -237,7 +237,7 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
             $eod = (86400 * ($date -1)) + ($monthinfo['firstdaytimestamp'] + 86399);
     
             foreach($units as $unit){
-                if($unit->timein < $eod && $unit->timein > $mid){
+                if($unit->timein < $eod && $unit->timein >= $mid){
                     $in = userdate($unit->timein,get_string('timeformat','block_timetracker'));
                     $out = userdate($unit->timeout,get_string('timeformat','block_timetracker'));
                     if(($unit->timeout - $unit->timein) >449){

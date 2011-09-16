@@ -24,6 +24,7 @@
  */
 
  require_once($CFG->dirroot.'/blocks/timetracker/lib.php');
+ require_once('lib.php');
 
  class block_timetracker extends block_base {
 
@@ -399,7 +400,8 @@
 
                             unset($cin->id);
 
-                            $worked = $DB->insert_record('block_timetracker_workunit',$cin);
+                            //$worked = $DB->insert_record('block_timetracker_workunit',$cin);
+                            $worked = add_unit($cin);
                             if($worked){
                                 $DB->delete_records('block_timetracker_pending', 
                                     array('userid'=>$ttuserid,'courseid'=>$courseid));
@@ -491,7 +493,7 @@
     function instance_delete() {
         //remove the necessary data
         global $DB, $COURSE;
-        error_log('in before_delete()');
+        //error_log('in before_delete()');
         $DB->delete_records('block_timetracker_workerinfo',
             array('courseid'=>$COURSE->id));
 

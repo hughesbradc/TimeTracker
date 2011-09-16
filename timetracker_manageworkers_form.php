@@ -67,7 +67,7 @@ class timetracker_manageworkers_form  extends moodleform {
 
 
         if(!$workers = $DB->get_records('block_timetracker_workerinfo',
-            array('courseid'=>$COURSE->id),'active DESC, lastname ASC')){
+            array('courseid'=>$COURSE->id),'lastname ASC, firstname ASC')){
 
             $mform->addElement('html',
                 '<tr><td colspan="4" style="text-align: center">No workers registered'.

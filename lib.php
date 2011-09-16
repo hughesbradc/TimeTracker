@@ -26,6 +26,106 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
+* Given an object that holds all of the values necessary from block_timetracker_workunit,
+* Add it to the workunit table, splitting across multiple days if necessary
+* @return true if worked, false if failed
+*/
+function add_unit($unit){
+    global $DB;
+
+    if(!is_object($unit)) return 0;    
+    if(isset($unit->id)) unset($unit->id);
+    $nowtime = time();
+    $timein = usergetdate($unit->timein);
+    $timeout = usergetdate($unit->timeout);
+
+    //check to see if in and out are on the same day
+    if($timein['year'] == $timeout['year'] && 
+        $timein['month'] == $timeout['month'] &&
+        $timein['mday'] == $timeout['mday']){
+
+        $unitid = $DB->insert_record('block_timetracker_workunit', $unit);
+        if($unitid){
+            add_to_log($unit->courseid, '', 'add clock-out', '', 'TimeTracker clock-out.');
+        } else {
+            add_to_log($unit->courseid, '', 
+                'error clocking-out', '', 'ERROR:  User clock-out failed.');
+            return false; 
+        }
+        return true;
+    } else { //spans multiple days
+
+        $origtimein = $unit->timein;
+        $checkout = $unit->timeout;
+        $endofday = (86400+(usergetmidnight($unit->timein)-1));
+
+        $usersdate = usergetdate($endofday);
+        if($usersdate['hours'] == 22){ 
+            $endofday += 60 * 60;
+        } else if ($usersdate['hours'] == 0){
+            $endofday -= 60 * 60;
+        }
+
+        while ($unit->timein < $checkout){
+        
+            //add to $DB
+            $unit->timeout = $endofday;
+            $worked = $DB->insert_record('block_timetracker_workunit', $unit);
+            if(!$worked){
+                add_to_log($unit->courseid, '', 'error adding work unit', 
+                    '', 'TimeTracker add work unit failed.');
+                return false; 
+            } else {
+                add_to_log($unit->courseid, '', 'add work unit', 
+                    '', 'TimeTracker work unit added.');
+            }
+        
+            $unit->timein = $endofday + 1;
+
+            //find next 23:59:59
+            $endofday = 86400 + (usergetmidnight($unit->timein)-1);
+        
+            //because I can't get dst_offset_on to work!
+            $usersdate = usergetdate($endofday);
+            if($usersdate['hours'] == 22){ 
+                $endofday += 60 * 60;
+            } else if ($usersdate['hours'] == 0){
+                $endofday -= 60 * 60;
+            }
+        
+            //if not a full day, don't go to 23:59:59 
+            //but rather checkout time
+            if($endofday > $checkout){
+                $endofday = $unit->timein + ($checkout - $unit->timein);
+            } 
+        }
+        return true;
+    }
+
+}
+
+/**
+* Given an object that holds all of the values necessary from block_timetracker_workunit,
+* add update it in the DB, splitting it across multiple days if necessary
+* @return the true if updated successfully, false if not
+*
+*/
+function update_unit($unit){
+    global $DB;
+    $result = add_unit($unit);
+    if($result){
+        $deleteresult = $DB->delete_record('block_timetracker_workunit', 'id', $unit->id);    
+        if(!$deleteresult){
+            //log error in deleting?
+            return false;
+        }
+    } else {
+        return false;    
+    }
+    return true;
+}
+
+/**
 * Attempts to see if this workunit overlaps with any other workunits already submitted
 * for user $userid in $COURSE
 * @return T if overlaps
@@ -46,10 +146,7 @@ function overlaps($timein, $timeout, $userid, $unitid=-1){
       $sql.=")";
     }
 
-    //error_log($sql);
-
     $numexistingunits = $DB->count_records_sql($sql);
-    //error_log("existingunits is $numexistingunits with curr id: $unitid");
 
     $sql = 'SELECT COUNT(*) FROM '.$CFG->prefix.'block_timetracker_pending WHERE '.
         "$userid = userid AND $COURSE->id = courseid AND ".
@@ -90,7 +187,6 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
                 $numalerts = '('.$n.')';
             }
         }
-
     }
     $tabs[] = new tabobject('alerts',
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams),
@@ -98,36 +194,6 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
 
     return $tabs;
 }
-
-/**
-* Zip all files in the basepath directory and ouptut to the OS temp directory
-*/
-/**
-function zip_files($files){
-    global $COURSE;
-
-    $tempfile = '/tmp/';
-
-    // Get the list of files in directory
-    $filestemp = get_directory_list($tempfile, '', false, true, true);
-    $files = array();
-    foreach ($filestemp as $file){ 
-        //Add zip paths and fs paths to all of them
-        $files[$file] = $tempfile . '/' . $file;
-    }
-
-    // Calculate the zip fullpath
-    $zipfile = $tempfile . '/timesheets_' .$COURSE->shortname .'.zip';
-
-    // Create zip packer
-    //$zipper = new zip_packer();
-    $zippacker = get_file_packer('application/zip');
-
-    // Zip files
-    $zippacker->archive_to_pathname($files, $zipfile);
-
-}
-*/
 
 function add_enrolled_users($context){
     global $COURSE,$DB;

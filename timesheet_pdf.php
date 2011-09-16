@@ -31,14 +31,6 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
 
     global $CFG,$DB;
 
-    /*
-    $month = required_param('month', PARAM_INTEGER);
-    $year = required_param('year', PARAM_INTEGER);
-    $userid = required_param('userid', PARAM_INTEGER);
-    $courseid = required_param('id', PARAM_INTEGER);
-    $method = optional_param('method','I',PARAM_ALPHA); //I for single file
-    */
-    
     $monthinfo = get_month_info($month, $year);
     
     
@@ -46,7 +38,6 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
         array('id'=>$userid,'courseid'=>$courseid));
     
     if(!$workerrecord){
-        //error_log('can find user with id: '.$userid.' and courseid: '.$courseid);
         print_error('usernotexist', 'block_timetracker',
             $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
     }
@@ -171,8 +162,10 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
             $mid = (86400 * ($date -1)) + $monthinfo['firstdaytimestamp'];
             $eod = (86400 * ($date -1)) + ($monthinfo['firstdaytimestamp'] + 86399);
     
-            foreach($units as $unit){
-                if($unit->timein < $eod && $unit->timein > $mid){
+            foreach($units as $unit) {
+                //print_object($unit);
+                //echo("$eod and $mid");
+                if($unit->timein < $eod && $unit->timein >= $mid){
                     $in = userdate($unit->timein,
                         get_string('timeformat','block_timetracker'));
                     $out = userdate($unit->timeout,
