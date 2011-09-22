@@ -174,7 +174,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             $DB->delete_records('block_timetracker_alert_com', array('alertid'=>$alertcomentry->alertid,
                 'mdluserid'=>$alertcomentry->mdluserid));
         }
-        $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertunit->id));
+        $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertid));
 
         $status = get_string('approvesuccess','block_timetracker');
         redirect($index,$status,1);

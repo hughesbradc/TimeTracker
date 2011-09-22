@@ -112,9 +112,11 @@ function add_unit($unit){
 */
 function update_unit($unit){
     global $DB;
+    $id = $unit->id;
     $result = add_unit($unit);
     if($result){
-        $deleteresult = $DB->delete_record('block_timetracker_workunit', 'id', $unit->id);    
+        $deleteresult = $DB->delete_records('block_timetracker_workunit', 
+            array('id'=>$id));
         if(!$deleteresult){
             //log error in deleting?
             return false;

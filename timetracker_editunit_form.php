@@ -154,6 +154,7 @@ class timetracker_editunit_form extends moodleform {
             }
     
             if(overlaps($data['timein'],$data['timeout'],$data['userid'],$data['unitid'])){
+
                 $errors['timein'] = 'Work unit overlaps with existing workunit';
             }
 
