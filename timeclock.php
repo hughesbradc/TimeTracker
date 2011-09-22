@@ -100,13 +100,14 @@ if($workerrecord->active == 0){
             $DB->delete_records('block_timetracker_pending', 
                 array('userid'=>$ttuserid,'courseid'=>$courseid));
         } else {
-            //ADD ERROR TO LOG TODO
             print_error(
                 'You tried to clock-out, but something went wrong.  We have logged the
                 error.  Please contact your supervisor.');
         }
-    } else { //ADD ERROR TO LOG TODO
+    } else { 
         $status = 'No matching clock-in. Work unit not recorded';
+        add_to_log($COURSE->id, '', 'error finding clock-in', ''.$COURSE->id, 
+            'ERROR:  No Matching clock-in.');
     }
 } 
 
