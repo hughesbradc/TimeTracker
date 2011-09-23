@@ -132,12 +132,13 @@ function update_unit($unit){
 * for user $userid in $COURSE
 * @return T if overlaps
 */
-function overlaps($timein, $timeout, $userid, $unitid=-1){
+function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
 
     global $CFG, $COURSE, $DB;
+    if($courseid == -1) $courseid = $COURSE->id;
     
     $sql = 'SELECT COUNT(*) FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        "$userid = userid AND $COURSE->id = courseid AND (".
+        "$userid = userid AND $courseid = courseid AND (".
         "($timein < timein AND $timeout > timeout) OR 
             (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR 
             ($timein > timein AND $timeout < timeout)";
@@ -151,7 +152,7 @@ function overlaps($timein, $timeout, $userid, $unitid=-1){
     $numexistingunits = $DB->count_records_sql($sql);
 
     $sql = 'SELECT COUNT(*) FROM '.$CFG->prefix.'block_timetracker_pending WHERE '.
-        "$userid = userid AND $COURSE->id = courseid AND ".
+        "$userid = userid AND $courseid = courseid AND ".
         "timein BETWEEN $timein AND $timeout";
 
     $numpending = $DB->count_records_sql($sql);

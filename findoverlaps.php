@@ -17,6 +17,7 @@ $courses = $DB->get_records_sql(
 foreach($courses as $course){
 
     $cid = $course->courseid;
+    if($cid == 73) continue; //skip demo course
 
     //get workers for this course
     $workers = $DB->get_records_sql(
@@ -31,11 +32,22 @@ foreach($courses as $course){
 
         $units  = $DB->get_records('block_timetracker_workunit',
             array('courseid'=>$cid,'userid'=>$wid));
+        //$count = 0;
         foreach($units as $unit){
-            if(overlaps($unit->timein, $unit->timeout, $worker->id, $unit->id)){
-                echo ("**ERROR**\nUnit id: $unit->id\n*********");
+            //echo ($unit->timein."\t".$unit->timeout."\n");
+            if(overlaps($unit->timein, $unit->timeout, $worker->id, $unit->id, $cid)){
+                echo ("\n**ERROR**\n");
+                echo ("cid: $cid\n");
+                echo("uid: $worker->id\n");
+                echo("wuid: $unit->id\n");
+                echo("<a href=\"http://moodle.mhc.edu/workstudy/blocks/timetracker/".
+                    "reports.php?id=$cid&userid=$worker->id\">View Reports Page</a>");
+                echo("*********\n");
             }
+
         }
+        //echo("Checked $count units\n");
+
     }
     //echo "Done checking courseid: $cid\n\n\n";
 }
