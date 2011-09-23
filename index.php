@@ -126,7 +126,8 @@ if ($canmanage) { //supervisor
                     get_string('datetimeformat','block_timetracker')).'</td>';
                 $currelapsed = $unit->timeout - $unit->timein;  
                 $row.='<td>'.
-                    format_elapsed_time($currelapsed).'</td>';
+                    //format_elapsed_time($currelapsed).'</td>';
+                    get_hours($currelapsed).' hour(s)</td>';
 
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
 
@@ -387,7 +388,8 @@ if ($canmanage) { //supervisor
             $table->add_data(array(
                 userdate($unit->timein, get_string('datetimeformat','block_timetracker')),
                 userdate($unit->timeout, get_string('datetimeformat','block_timetracker')),
-                format_elapsed_time($unit->timeout - $unit->timein),
+                //format_elapsed_time($unit->timeout - $unit->timein),
+                round_time($unit->timeout - $unit->timein).' hour(s)',
                 $alertaction));
         }
         unset($urlparams['unitid']);
