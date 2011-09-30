@@ -84,13 +84,16 @@
             $hasalerts = has_alerts($USER->id,$COURSE->id);
             if(has_capability('moodle/site:config',$this->context)){
                 $hasalerts = has_course_alerts($COURSE->id);
+                if($hasalerts > 0){
+                    $numalerts = '('.$hasalerts.')';
+                }
             }
 
             //check to see if the supervisor needs to manage
             if($hasalerts){
                 $this->content->text .= '<b><center><a style="color: red" href="'.
                     $CFG->wwwroot.'/blocks/timetracker/managealerts.php?id='.$COURSE->id.
-                    '">**Manage Alerts**</center></b></a>';
+                    '">**Manage Alerts '.$numalerts.'**</center></b></a>';
                 $this->content->text .= "<br /><br />";
             }
 
