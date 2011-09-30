@@ -280,7 +280,8 @@ class timetracker_reports_form  extends moodleform {
                 $total += round_time($currelapsed);
 
                 $row.='<td style="text-align: center">'.
-                    format_elapsed_time($currelapsed).'</td>';
+                    //format_elapsed_time($currelapsed).'</td>';
+                    get_hours($currelapsed).' hour(s)</td>';
 
                 if($canmanage){
 
@@ -331,7 +332,8 @@ class timetracker_reports_form  extends moodleform {
                     <td>&nbsp;</td>
                     <td style="text-align: center; border-top: 1px solid black"><b>Total: 
                     </b>'.
-                format_elapsed_time($total).'</td>
+                //format_elapsed_time($total).'</td>
+                get_hours($total).' hour(s)</td>
                     <td>&nbsp;</td></tr></table>';
             $mform->addElement('html',$finalrow);
 

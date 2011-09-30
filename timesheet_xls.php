@@ -50,6 +50,7 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
         $workbook = new MoodleExcelWorkbook($base.'/'.$fn);
     } else {
         $workbook = new MoodleExcelWorkbook('-');
+        $workbook->send($fn);
     }
 
     //$workbook->send('Timesheet_'.$year.'_'.$monthinfo['monthname'].'.xls');
@@ -225,8 +226,8 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
         //echo "inside for loop <br />";
         $dayofweek = $dayofweek % 7;
         do{
-            $worksheet[1]->write_string($currentrow, $dayofweek, $date, $format_calendar_dates);
-            
+            $worksheet[1]->write_string($currentrow, $dayofweek, 
+                $date, $format_calendar_dates);
             
             //begin of print work units
             
@@ -236,7 +237,7 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
             $eod = (86400 * ($date -1)) + ($monthinfo['firstdaytimestamp'] + 86399);
     
             foreach($units as $unit){
-                if($unit->timein < $eod && $unit->timein > $mid){
+                if($unit->timein < $eod && $unit->timein >= $mid){
                     $in = userdate($unit->timein,get_string('timeformat','block_timetracker'));
                     $out = userdate($unit->timeout,get_string('timeformat','block_timetracker'));
                     if(($unit->timeout - $unit->timein) >449){
@@ -258,7 +259,7 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
         
             // Calculate total hours
     
-            if($dayofweek == 6){
+            if($dayofweek == 6 || $date == $monthinfo['lastday']){
                 //Add week sum to monthly sum
                 //Print value in weekly totals column 
                 //clear weekly sum
@@ -290,9 +291,6 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
     $worksheet[1]->set_row(21,42);
     
     $workbook->close();
-    if($method != 'F'){
-        $workbook->send($fn);
-    }
     return $fn;
 }
 ?>

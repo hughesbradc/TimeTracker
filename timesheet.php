@@ -78,12 +78,20 @@ if($mform->is_cancelled()){
     $format = $formdata->fileformat;
     if(!is_array($formdata->workerid) || count($formdata->workerid)==1){ // a single id?
 
-	    $uid = $formdata->workerid[0];
+        if(is_array($formdata->workerid)){
+	        $uid = $formdata->workerid[0];
+        } else {
+	        $uid = $formdata->workerid;
+        }
+        //error_log($formdata->workerid);
+        //error_log('Worker id is: '.$uid);
         if($format == 'pdf'){
             generate_pdf($formdata->month, $formdata->year, $uid, $cid);
         } else {
-            redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
-                '&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
+            //redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
+                //'&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
+            generate_xls($formdata->month, $formdata->year, $uid, $cid);
+                
         }
     } else { //have multiple selected
         //create all the timesheets

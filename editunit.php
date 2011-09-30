@@ -24,6 +24,7 @@
  */
 
 require_once('../../config.php');
+require_once('lib.php');
 require('timetracker_editunit_form.php');
 
 global $CFG, $COURSE, $USER;
@@ -114,7 +115,8 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $formdata->lasteditedby = $formdata->editedby;
 
         //print_object($formdata);
-        $DB->update_record('block_timetracker_workunit', $formdata);
+        //$DB->update_record('block_timetracker_workunit', $formdata);
+        update_unit($formdata);
 
         $status = 'Workunit edited successfully.'; 
         redirect($index,$status,1);

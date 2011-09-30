@@ -31,14 +31,6 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
 
     global $CFG,$DB;
 
-    /*
-    $month = required_param('month', PARAM_INTEGER);
-    $year = required_param('year', PARAM_INTEGER);
-    $userid = required_param('userid', PARAM_INTEGER);
-    $courseid = required_param('id', PARAM_INTEGER);
-    $method = optional_param('method','I',PARAM_ALPHA); //I for single file
-    */
-    
     $monthinfo = get_month_info($month, $year);
     
     
@@ -170,15 +162,18 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
             $mid = (86400 * ($date -1)) + $monthinfo['firstdaytimestamp'];
             $eod = (86400 * ($date -1)) + ($monthinfo['firstdaytimestamp'] + 86399);
     
-            foreach($units as $unit){
-                if($unit->timein < $eod && $unit->timein > $mid){
+            foreach($units as $unit) {
+                //print_object($unit);
+                //echo("$eod and $mid");
+                if($unit->timein < $eod && $unit->timein >= $mid){
                     $in = userdate($unit->timein,
                         get_string('timeformat','block_timetracker'));
                     $out = userdate($unit->timeout,
                         get_string('timeformat','block_timetracker'));
-                    if(($unit->timeout - $unit->timein) >449){
+                    if(($unit->timeout - $unit->timein) > 449){
                         $wustr .= "In: $in<br />Out: $out<br />";
                         $weeksum += get_hours(($unit->timeout - $unit->timein));
+                        //error_log('current weeksum is: '.$weeksum);
                     }
                 } else {
                     break;
@@ -203,6 +198,21 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
                     '<td style="height: 75px" align="center"><font size="11"><b><br /><br />'.
                     $weeksum.'</b><br /></font></td>';
                 $weeksum = 0;
+            } else if ($date == $monthinfo['lastday']){
+                //what about when we reach the end of the month? Still need to put totals!!!
+                while($dayofweek != 6){ //pad to the rightmost column
+                    $days[] = '<td style="height: 10px">&nbsp;</td>';
+                    $vals[] = '<td style="height: 75px">&nbsp;</td>';
+                    $dayofweek++;
+                }
+                $monthsum = $monthsum + $weeksum;
+                //$worksheet[1]->write_string($currentrow +1, 7, $weeksum, $format_cal_total);
+                $days[] = '<td style="height: 10px">&nbsp;</td>';
+                $vals[] = 
+                    '<td style="height: 75px" align="center"><font size="11"><b><br /><br />'.
+                    $weeksum.'</b><br /></font></td>';
+                $weeksum = 0;
+
             }
             
             $dayofweek ++; $date++;

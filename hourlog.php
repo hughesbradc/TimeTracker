@@ -107,12 +107,16 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $formdata->payrate = $workerrecord->currpayrate;
         $formdata->lastedited = time();
         $formdata->lasteditedby = $formdata->editedby;
-        $addhourlog = $DB->insert_record('block_timetracker_workunit', $formdata);
-        if($addhourlog){
-            add_to_log($COURSE->id, '', 'TimeTracker work unit added.', '', 'TimeTracker work unit added.');
+
+        $worked = add_unit($formdata);
+
+        //$addhourlog = $DB->insert_record('block_timetracker_workunit', $formdata);
+
+        if($worked){
+            add_to_log($COURSE->id, '', 'add work unit', '', 'TimeTracker work unit added.');
             $status = 'Hourlog entry saved successfully.'; 
         } else {
-            add_to_log($COURSE->id, '', 'TimeTracker worker tried to add work unit, but was unsuccessful.', 
+            add_to_log($COURSE->id, '', 'error adding work unit', 
                 '', 'TimeTracker worker tried to add work unit, but was unsuccessful.');
             $status = 'There was an error.  Please see your supervisor.';
         }

@@ -49,7 +49,7 @@ class timetracker_timesheet_form  extends moodleform {
             $workerlist = array();
             $workers =
                 $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$COURSE->id),
-                'lastname DESC');
+                'lastname ASC');
             foreach($workers as $worker){
                 $workerlist[$worker->id] = $worker->firstname.' '.$worker->lastname;
             }
@@ -82,11 +82,13 @@ class timetracker_timesheet_form  extends moodleform {
             11=>'November',
             12=>'December');
 
-        $mform->addElement('select', 'month', get_string('month','block_timetracker'), $months);
+        $mform->addElement('select', 'month', 
+            get_string('month','block_timetracker'), $months);
         $mform->setDefault('month', date("m"));
         $mform->addHelpButton('month','month','block_timetracker');
 
-        $sql = 'SELECT timein FROM '.$CFG->prefix.'block_timetracker_workunit ORDER BY timein LIMIT 1';
+        $sql = 'SELECT timein FROM '.$CFG->prefix.
+            'block_timetracker_workunit ORDER BY timein LIMIT 1';
         $earliestyear = $DB->get_record_sql($sql);
 
         $earliestyear = date("Y", $earliestyear->timein);

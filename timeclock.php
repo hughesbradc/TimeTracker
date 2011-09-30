@@ -66,11 +66,13 @@ if($workerrecord->active == 0){
             $cin->courseid = $courseid;
             $cisuccess = $DB->insert_record('block_timetracker_pending', $cin);
             if($cisuccess){
-                add_to_log($COURSE->id, '', 'clock-in', "blocks/timetracker/index.php?id=$course->id&userid=$USER->id",'TimeTracker clock-in.');
+                add_to_log($COURSE->id, '', 'add clock-in', 
+                "blocks/timetracker/index.php?id=$course->id&userid=$USER->id",
+                'TimeTracker clock-in.');
             } else {
-                print_error('You tried to clock-in, but something went wrong.  We have logged the
-                    error.  Please contact your supervisor.');
-                add_to_log($COURSE->id, '', 'ERROR: clock-in', ''.$COURSE->id, 
+                print_error('You tried to clock-in, but something went wrong.  
+                    We have logged the error.  Please contact your supervisor.');
+                add_to_log($COURSE->id, '', 'error adding clock-in', ''.$COURSE->id, 
                     'ERROR:  TimeTracker clock-in failed.');
 
             }
@@ -81,57 +83,31 @@ if($workerrecord->active == 0){
 
     $cin = $DB->get_record('block_timetracker_pending', 
         array('userid'=>$ttuserid,'courseid'=>$courseid));
+
     if($cin){
         $nowtime = time();
 
-        $timein = usergetdate($cin->timein);
-        $timeout = usergetdate($nowtime);
-
         //timein && timeout are same day
         $cin->lastedited = $nowtime;
+        $cin->timeout = $nowtime;
         $cin->lasteditedby = $ttuserid;
         $cin->payrate = $workerrecord->currpayrate;
         unset($cin->id);
 
-        if($timein['year'] == $timeout['year'] && 
-            $timein['month'] == $timeout['month'] &&
-            $timein['mday'] == $timeout['mday']){
+        $worked = add_unit($cin);
 
-            $cin->timeout = $nowtime;
-
-            $worked = $DB->insert_record('block_timetracker_workunit',$cin);
-
-            if($worked){
-                $DB->delete_records('block_timetracker_pending', 
-                    array('userid'=>$ttuserid,'courseid'=>$courseid));
-                add_to_log($COURSE->id, '', 'clock-out.', '', 'TimeTracker clock-out.');
-            } else {
-                print_error('You tried to clock-out, but something went wrong.  We have logged the
-                    error.  Please contact your supervisor.');
-                add_to_log($COURSE->id, '', 'ERROR: clock-out.', '', 'ERROR:  User clock-out failed.');
-            }
-        } else { //spans multiple days
-            $tomidnight = 86400 + usergetmidnight($cin->timein) - 1 - ($cin->timein);
-            $currcheckin = $cin->timein;
-            while ($currcheckin < $nowtime){
-                $cin->timeout = $currcheckin + $tomidnight;
-                $worked = $DB->insert_record('block_timetracker_workunit', $cin);
-                if(!$worked){
-                    print_error('couldnotclockout', 'block_timetracker', 
-                        $CFG->wwwroot.'/blocks/timetracker/timeclock.php?id='.
-                            $courseid.'&userid='.$ttuserid);
-                    return;
-                }
-
-                $currcheckin += $tomidnight + 1;
-                $tomidnight = 86400 + (usergetmidnight($currcheckin)-1)- ($currcheckin);
-                if(($currcheckin+$tomidnight) > $nowtime){
-                    $tomidnight = $nowtime - $currcheckin;
-                } 
-            }
+        if($worked){
             $DB->delete_records('block_timetracker_pending', 
                 array('userid'=>$ttuserid,'courseid'=>$courseid));
+        } else {
+            print_error(
+                'You tried to clock-out, but something went wrong.  We have logged the
+                error.  Please contact your supervisor.');
         }
+    } else { 
+        $status = 'No matching clock-in. Work unit not recorded';
+        add_to_log($COURSE->id, '', 'error finding clock-in', ''.$COURSE->id, 
+            'ERROR:  No Matching clock-in.');
     }
 } 
 

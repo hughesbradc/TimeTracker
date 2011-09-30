@@ -67,7 +67,7 @@ class timetracker_manageworkers_form  extends moodleform {
 
 
         if(!$workers = $DB->get_records('block_timetracker_workerinfo',
-            array('courseid'=>$COURSE->id),'active DESC, lastname ASC')){
+            array('courseid'=>$COURSE->id),'lastname ASC, firstname ASC')){
 
             $mform->addElement('html',
                 '<tr><td colspan="4" style="text-align: center">No workers registered'.
@@ -84,10 +84,11 @@ class timetracker_manageworkers_form  extends moodleform {
                 if($worker->active){
                     if($canactivate){
                         $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', 
-                            null, array('checked="checked"','group'=>1));
+                            null, array('checked="checked"','group' => 1));
                     } else {
                         $mform->addElement('advcheckbox', 'activeid['.$worker->id.']','', 
-                            null, array('checked="checked"','disabled="disabled"'));
+                            null, array('checked="checked"','disabled="disabled"',
+                            'group' => 1));
                     }
                 } else {
                     if($canactivate){
@@ -95,7 +96,8 @@ class timetracker_manageworkers_form  extends moodleform {
                             null, array('group' => 1));
                     } else {
                         $mform->addElement('advcheckbox', 'activeid['.$worker->id.']', '', 
-                            null, array('disabled="disabled"'));
+                            null, array('disabled="disabled"', 
+                            'group' => 1));
                     }
                 }
 
@@ -146,7 +148,10 @@ class timetracker_manageworkers_form  extends moodleform {
     
                 $mform->addElement('hidden','workerid['.$worker->id.']', $worker->id);
             }
-            $this->add_checkbox_controller(1,null,null,1);
+
+            if($canactivate){
+                $this->add_checkbox_controller(1,null,null,1);
+            }
     
             $mform->addElement('html','</table>');
     

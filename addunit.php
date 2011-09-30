@@ -89,13 +89,19 @@ if ($mform->is_cancelled()){ //user clicked cancel
 	 redirect($manage);
 
 } else if ($formdata=$mform->get_data()){
-        $formdata->courseid = $formdata->id;
-        unset($formdata->id);
-        $formdata->payrate = $workerrecord->currpayrate;
-        $formdata->lastedited = time();
-        $formdata->lasteditedby = $formdata->editedby;
-        $DB->insert_record('block_timetracker_workunit', $formdata);
-    $status = 'Work unit added successfully.'; 
+    $formdata->courseid = $formdata->id;
+    unset($formdata->id);
+    $formdata->payrate = $workerrecord->currpayrate;
+    $formdata->lastedited = time();
+    $formdata->lasteditedby = $formdata->editedby;
+    $result = add_unit($formdata);
+    //$DB->insert_record('block_timetracker_workunit', $formdata);
+    if($result) {
+        $status = 'Work unit(s) added successfully.'; 
+    } else {
+        $status = 'Error adding work unit(s)';
+    }
+
     redirect($manage,$status,1);
 
 } else {
@@ -109,5 +115,3 @@ if ($mform->is_cancelled()){ //user clicked cancel
     $mform->display();
     echo $OUTPUT->footer();
 }
-
-

@@ -55,69 +55,62 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
-#$worker = $DB->get_record('block_timetracker_workerinfo',array('userid'=>$USER->id));
 echo $OUTPUT->header();
 
-//$conf = $DB->get_records('block_timetracker_config',array('courseid'=>2));
-//print_object($conf);
+$checkin = 1288084624 + (60 * 60 * 24 * 138)-(60*79);
+$checkout = $checkin + (60 * 60 * 24 * 8)-(60*60*17);
+//$checkout = time();
 
-
-$nowtime = time();
-$checkout = time();
-//echo $checkout;
-//$checkin = $checkout - 186400;
-$checkin = 1288084624;
-
-echo 'Check in:  '. userdate($checkin,get_string('datetimeformat','block_timetracker')).'<br />';
-echo 'Checkout: '. userdate($checkout,get_string('datetimeformat','block_timetracker')).'<br />';
+echo 'Check in:  '. userdate($checkin,
+    get_string('datetimeformat','block_timetracker')).'<br />';
+echo 'Checkout: '. userdate($checkout,
+    get_string('datetimeformat','block_timetracker')).'<br />';
 echo '<br />';
 
-//$totalsecs = $nowtime - $checkin;
-//date_default_timezone_set('America/New_York');
-
-//$tomidnight = (usergetmidnight($checkin)-1)  - ($checkin % 86400);
-$tomidnight = (86400+(usergetmidnight($checkin)-1)  - ($checkin));
+$endofday = (86400+(usergetmidnight($checkin)-1));
 $currcheckin = $checkin;
 
-while ($currcheckin < $checkout){
-    $output = userdate($currcheckin, get_string('datetimeformat','block_timetracker'));
-    $output .= ' to '.userdate($currcheckin+$tomidnight,get_string('datetimeformat','block_timetracker'));
-    $output .= '<br />';
+if(date("H",$endofday) == 22){
+    $endofday += 60 * 60;
+} else if (date("H",$endofday) == 0){
+    $endofday -= 60 * 60;
+}
 
+while ($currcheckin < $checkout){
+
+    //add to $DB
+    $output = userdate($currcheckin, get_string('datetimeformat','block_timetracker'));
+    $output .= ' to '.userdate($endofday,
+        get_string('datetimeformat','block_timetracker'));
+    $output .= ', for '.format_elapsed_time($endofday - $currcheckin);
+    $output .= '<br />';
     //don't echo $output, but add to DB
     echo $output;
 
-    //error_log(dst_offset_on($currcheckin).' dst on out: '.dst_offset_on($checkout));
-    $in_off = dst_offset_on($currcheckin);
-    $out_off = dst_offset_on($checkout);
-
-    if($in_off != $out_off){
-        //error_log("********* THEY ARE DIFFERENT: $in_off and $out_off");
-    }
-
-    $currcheckin += $tomidnight + 1;
-
+    //update checkin and checkout
     //update to midnight
-    $tomidnight = 86400 + (usergetmidnight($currcheckin)-1)- ($currcheckin);
-    //error_log('86399 + ' .usergetmidnight($currcheckin). ' - ' .$currcheckin .' = '.$tomidnight);
+    //$currcheckin += $tomidnight + 1;
+    $currcheckin = $endofday + 1;
 
-    if($tomidnight == -1){
-        //error_log($currcheckin. ' ' . $checkout . ' ' .$tomidnight);
-        //error_log(dst_offset_on($currcheckin).' dst on out: '.dst_offset_on($checkout));
-        //$tomidnight += 86399;
-        break;
+    //find next 23:59:59
+    $endofday = 86400 + (usergetmidnight($currcheckin)-1);
+
+    //because I can't get dst_offset_on to work!
+    $usersdate = usergetdate($endofday);
+    if($usersdate['hours'] == 22){ 
+        $endofday += 60 * 60;
+    } else if ($usersdate['hours'] == 0){
+        $endofday -= 60 * 60;
     }
 
-    if(($currcheckin+$tomidnight) > $checkout){
-        $tomidnight = $checkout - $currcheckin;
+    //if not a full day, don't go to 23:59:59 
+    //but rather checkout time
+    if($endofday > $checkout){
+        error_log("not a full day");
+        $endofday = $currcheckin + ($checkout - $currcheckin);
     } 
+    //break;
+
 }
 
-
-
-
-//$info = get_month_info(3,2011);
-//print_object($info);
-
-//print_object($CFG->config_block_timetracker_default_max_earnings);
 echo $OUTPUT->footer();
