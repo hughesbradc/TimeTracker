@@ -490,7 +490,7 @@ function get_month_info($month,$year){
     
     $timestamp = make_timestamp($year,$month); //timestamp of midnight, first day of $month
     $monthinfo['firstdaytimestamp'] = $timestamp;
-    $monthinfo['lastday'] = date('t',strtotime($timestamp));
+    $monthinfo['lastday'] = date('t',$timestamp);
 
     $thistime = usergetdate($timestamp);
     $monthinfo['dayofweek'] = $thistime['wday'];
@@ -796,3 +796,15 @@ function get_timetracker_config($courseid){
 
     return $config;
 }
+
+/**
+* for admin usage. Find all units that 
+*
+*/
+/*
+function find_units($startafter, $endbefore){
+
+}
+*/
+
+
