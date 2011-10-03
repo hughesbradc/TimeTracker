@@ -36,13 +36,13 @@ foreach($courses as $course){
         foreach($units as $unit){
             //echo ($unit->timein."\t".$unit->timeout."\n");
             if(overlaps($unit->timein, $unit->timeout, $worker->id, $unit->id, $cid)){
-                echo ("\n**ERROR**\n");
-                echo ("cid: $cid\n");
-                echo("uid: $worker->id\n");
-                echo("wuid: $unit->id\n");
+                echo ("<br />\n**ERROR**<br />\n");
+                echo ("cid: $cid<br />\n");
+                echo("uid: $worker->id<br />\n");
+                echo("wuid: $unit->id<br />\n");
                 echo("<a href=\"http://moodle.mhc.edu/workstudy/blocks/timetracker/".
-                    "reports.php?id=$cid&userid=$worker->id\">View Reports Page</a>");
-                echo("*********\n");
+                    "reports.php?id=$cid&userid=$worker->id\">View Reports Page</a><br />\n");
+                echo("*********<br />\n");
             }
 
         }

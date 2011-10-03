@@ -389,7 +389,7 @@ if ($canmanage) { //supervisor
                 userdate($unit->timein, get_string('datetimeformat','block_timetracker')),
                 userdate($unit->timeout, get_string('datetimeformat','block_timetracker')),
                 //format_elapsed_time($unit->timeout - $unit->timein),
-                round_time($unit->timeout - $unit->timein).' hour(s)',
+                get_hours($unit->timeout - $unit->timein).' hour(s)',
                 $alertaction));
         }
         unset($urlparams['unitid']);
