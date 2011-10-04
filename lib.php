@@ -141,6 +141,7 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
         "$userid = userid AND $courseid = courseid AND (".
         "($timein < timein AND $timeout > timeout) OR 
             (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR 
+            (($timeout > timein AND $timeout < timeout) AND $timein < timein) OR
             ($timein > timein AND $timeout < timeout)";
 
     if($unitid != -1){
