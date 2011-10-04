@@ -64,7 +64,7 @@ class timetracker_addunit_form  extends moodleform {
             $mform->addElement('hidden','userid', $this->userid);
             $mform->addElement('hidden','id', $this->courseid);
     
-            $mform->addElement('hidden','editedby', '0');
+            $mform->addElement('hidden','editedby', $USER->id);
     
             $workunit = $DB->get_record('block_timetracker_workunit', 
                 array('id'=>$this->userid,'courseid'=>$this->courseid));

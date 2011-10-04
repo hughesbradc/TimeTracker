@@ -143,9 +143,11 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         $messagehtml .= get_string('br2','block_timetracker'); 
         $messagehtml .= get_string('emessage2','block_timetracker');
         $messagehtml .= get_string('br1','block_timetracker'); 
-        $messagehtml .= get_string('emessage3','block_timetracker', userdate($alertunit->origtimein));
+        $messagehtml .= get_string('emessage3','block_timetracker', 
+            userdate($alertunit->origtimein));
         $messagehtml .= get_string('br1','block_timetracker'); 
-        $messagehtml .= get_string('emessage4','block_timetracker', userdate($alertunit->origtimeout));
+        $messagehtml .= get_string('emessage4','block_timetracker', 
+            userdate($alertunit->origtimeout));
         $messagehtml .= get_string('br1','block_timetracker'); 
         $messagehtml .= get_string('emessageduration','block_timetracker', 
             format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
@@ -156,7 +158,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         if($alertunit->todelete == 1){
             $messagehtml .= get_string('unitdeleted','block_timetracker');
         } else {
-            $messagehtml .= get_string('emessage4','block_timetracker', userdate($alertunit->timeout));
+            $messagehtml .= get_string('emessage4','block_timetracker', 
+                userdate($alertunit->timeout));
             $messagehtml .= get_string('br1','block_timetracker'); 
             $messagehtml .= get_string('emessageduration','block_timetracker', 
             format_elapsed_time($alertunit->timeout - $alertunit->timein));
@@ -171,7 +174,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 }
             } 
             // Remove record(s) from the 'alert_com' table
-            $DB->delete_records('block_timetracker_alert_com', array('alertid'=>$alertcomentry->alertid,
+            $DB->delete_records('block_timetracker_alert_com', 
+                array('alertid'=>$alertcomentry->alertid,
                 'mdluserid'=>$alertcomentry->mdluserid));
         }
         $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertid));
@@ -188,7 +192,9 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             unset($alertunit->id);
             $alertunit->timein = $alertunit->origtimein;
             $alertunit->timeout = $alertunit->origtimein;
+
             //$DB->insert_record('block_timetracker_workunit', $alertunit);
+
             add_unit($alertunit);
         } else {
             $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertunit->id));
@@ -292,6 +298,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertid));
             } else {
                 $formdata->lastedited = time();
+
                 $insertok = add_unit($formdata);
                 //$insertok = $DB->insert_record('block_timetracker_workunit', $formdata);
                 if(!$insertok) print_error('Error updating new work unit.');

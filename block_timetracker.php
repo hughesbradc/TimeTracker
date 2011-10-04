@@ -397,7 +397,7 @@
 
                             $cin->timeout = time();
                             $cin->lastedited = time();
-                            $cin->lasteditedby = $ttuserid;
+                            $cin->lasteditedby = $USER->id;
 
                             unset($cin->id);
 

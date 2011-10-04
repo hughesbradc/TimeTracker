@@ -89,7 +89,7 @@ class timetracker_editunit_form extends moodleform {
         $mform->addElement('hidden','id', $this->courseid);
         $mform->addElement('hidden','ispending', $this->ispending);
         //edited by supervisor
-        $mform->addElement('hidden','editedby', '0');
+        $mform->addElement('hidden','editedby', $USER->id);
         /** END HIDDEN FIELDS **/
         
 
