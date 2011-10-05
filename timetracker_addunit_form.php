@@ -48,7 +48,8 @@ class timetracker_addunit_form  extends moodleform {
         }
         
         if($canmanage){
-            $userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid));
+            $userinfo = $DB->get_record('block_timetracker_workerinfo',
+                array('id'=>$this->userid));
 
             if(!$userinfo){
                 print_error('Worker info does not exist for workerinfo id of '.$this->userid);
@@ -58,7 +59,8 @@ class timetracker_addunit_form  extends moodleform {
             $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
                 array('id'=>$this->courseid,'userid'=>$this->userid));
 
-            $mform->addElement('header', 'general', get_string('addunittitle','block_timetracker', 
+            $mform->addElement('header', 'general', 
+                get_string('addunittitle','block_timetracker', 
                 $userinfo->firstname.' '.$userinfo->lastname));
 
             $mform->addElement('hidden','userid', $this->userid);
