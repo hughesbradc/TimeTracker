@@ -139,16 +139,19 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
     
     $sql = 'SELECT COUNT(*) FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
         "$userid = userid AND $courseid = courseid AND (".
-        "($timein < timein AND $timeout > timeout) OR 
+        "($timein = timein AND $timeout = timeout) OR 
+        ($timein < timein AND $timeout > timeout) OR 
             (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR 
             (($timeout > timein AND $timeout < timeout) AND $timein < timein) OR
             ($timein > timein AND $timeout < timeout)";
 
     if($unitid != -1){
-      $sql.=" AND $unitid != id)"; 
+      $sql.=" AND id != $unitid )"; 
     } else {
       $sql.=")";
     }
+
+    error_log($sql);
 
     $numexistingunits = $DB->count_records_sql($sql);
 
