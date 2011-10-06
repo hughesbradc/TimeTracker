@@ -143,12 +143,10 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
         ($timein < timein AND $timeout > timeout) OR 
             (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR 
             (($timeout > timein AND $timeout < timeout) AND $timein < timein) OR
-            ($timein > timein AND $timeout < timeout)";
+            ($timein > timein AND $timeout < timeout))";
 
     if($unitid != -1){
-      $sql.=" AND id != $unitid )"; 
-    } else {
-      $sql.=")";
+      $sql.=" AND id != $unitid"; 
     }
 
     error_log($sql);
