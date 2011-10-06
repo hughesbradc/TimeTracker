@@ -48,7 +48,8 @@ class timetracker_addunit_form  extends moodleform {
         }
         
         if($canmanage){
-            $userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid));
+            $userinfo = $DB->get_record('block_timetracker_workerinfo',
+                array('id'=>$this->userid));
 
             if(!$userinfo){
                 print_error('Worker info does not exist for workerinfo id of '.$this->userid);
@@ -58,7 +59,8 @@ class timetracker_addunit_form  extends moodleform {
             $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
                 array('id'=>$this->courseid,'userid'=>$this->userid));
 
-            $mform->addElement('header', 'general', get_string('addunittitle','block_timetracker', 
+            $mform->addElement('header', 'general', 
+                get_string('addunittitle','block_timetracker', 
                 $userinfo->firstname.' '.$userinfo->lastname));
 
             $mform->addElement('hidden','userid', $this->userid);
@@ -69,10 +71,12 @@ class timetracker_addunit_form  extends moodleform {
             $workunit = $DB->get_record('block_timetracker_workunit', 
                 array('id'=>$this->userid,'courseid'=>$this->courseid));
     
-            $mform->addElement('date_time_selector','timein','Time In: ');
+            $mform->addElement('date_time_selector','timein','Time In: ',
+                array('optional'=>false,'step'=>1));
 		    $mform->addHelpButton('timein','timein','block_timetracker');
         
-            $mform->addElement('date_time_selector','timeout','Time Out: ');
+            $mform->addElement('date_time_selector','timeout','Time Out: ',
+                array('optional'=>false,'step'=>1));
 		    $mform->addHelpButton('timeout','timeout','block_timetracker');
 		    
             $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));

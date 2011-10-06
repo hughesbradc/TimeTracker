@@ -199,7 +199,7 @@ if ($canmanage) { //supervisor
                 */
             if($worker->maxtermearnings > 0 && ($worker->termearnings > $worker->maxtermearnings ||
                 ($worker->maxtermearnings - $worker->termearnings) <= 50 && $worker->termhours != 0)){
-                error_log("in the 'if'");
+                //error_log("in the 'if'");
                 $html .= '<td style="text-align:center"><span style="color: red">'.
                     $worker->termhours.' / $'.$worker->termearnings
                     .'</span></td>';
