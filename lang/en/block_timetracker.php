@@ -175,20 +175,19 @@ $string['timeouterror'] = 'Time Out:  ';
 $string['deleteunit'] = 'Delete this work unit'; 
 $string['messageforerror'] = 'Message:  '; 
 $string['selectallnone'] = 'Select all or none';
-$string['existingunit'] = '<b>Existing Work Unit Data:</b>';
-$string['existingtimein'] = '<b>Existing Time In:</b>  {$a}';
-$string['existingtimeout'] = '<b>Existing Time Out:</b>  {$a}';
+$string['existingunit'] = '<b>Original Work Unit Data:</b>';
+$string['existingtimein'] = '<b>Original Time In:</b>  {$a}';
+$string['existingtimeout'] = '<b>Original Time Out:</b>  {$a}';
 $string['existingduration'] = '<b>Duration:</b>  {$a}';
-$string['approvedsuccess'] = 'The error approval has been processed successfully!  Please wait to be
-    redirected.'; 
-
+$string['approvedsuccess'] = 'The error approval has been processed successfully!  
+Please wait to be redirected.'; 
 
 //Manage Unit Alerts
-$string['previous'] = 'Current Work Unit';
+$string['previous'] = 'Original Work Unit';
 $string['proposed'] = 'Proposed Work Unit';
 $string['message'] = 'Message';
 $string['noalerts'] = 'No Alerts at this Time';
-$string['managealerts'] = 'Manage Alert Work Units';
+$string['managealerts'] = 'Manage Alerts&nbsp; ';
 $string['managealerts_help'] = 'This page allows the supervisor or administrator to manage alerted work units
     Typically, this indicates that the worker has issued a dispute with the recorded time, and
     has notified his/her supervisor of the error. The three options afforded are:
@@ -202,7 +201,7 @@ $string['changeto'] = 'Change To:';
 
 // Error Alert Email
 $string['emessage1'] = 'Please review the following TimeTracker error alert data:';
-$string['emessage2'] = '<b>Existing Data:</b>';
+$string['emessage2'] = '<b>Original Data:</b>';
 $string['emessage3'] = 'Time In:  {$a}';
 $string['emessage4'] = 'Time Out:  {$a}';
 $string['emessageduration'] = 'Duration:  {$a}';
@@ -216,6 +215,7 @@ $string['emessageavailable'] = '<b>Available Actions:</b>';
 $string['emessagedisclaimer'] = '(Please note that you will be prompted to sign into Moodle in order to 
     complete the request).';
 $string['emessageapprove'] = 'Approve';
+$string['emessagedelete'] = 'Delete';
 $string['emessagechange'] = 'Change';
 $string['emessagedeny'] = 'Deny';
 
@@ -224,6 +224,16 @@ $string['amessage1'] = 'Sent on behalf of {$a}:';
 $string['amessage2'] = 'The following work unit has been approved:';
 $string['approveddata'] = '<b>Approved Data:</b>';
 $string['unitdeleted'] = 'This work unit has been deleted.';
+
+/**  ALERT DELETED MESSAGES **/
+$string['deletedsubject'] = 'Error Alert Deleted for {$a}';
+$string['deletemessage1'] = 'The following alert unit data was deleted:';
+$string['alertdeletesuccess'] = 'Error alert deleted for {$a}';
+$string['alertdeletefailure'] = 'Error removing the alert for {$a}';
+$string['deletemessage1'] = 'The following alert unit data was removed:';
+
+/** END ALERT DELETED MESSAGES **/
+
 
 $string['denysubject'] = 'Error Alert Denied for {$a}';
 $string['dmessage1'] = 'The following alert unit data was denied:';
