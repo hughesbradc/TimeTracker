@@ -47,8 +47,10 @@ $urlparams['alertid'] = $alertid;
 $courseid = $alertunit->courseid;
 
 $indexparams['id'] = $courseid; 
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $indexparams);
-$alertaction = new moodle_url($CFG->wwwroot.'/blocks/timetracker/alertaction.php', $urlparams);
+$index = new moodle_url($CFG->wwwroot.
+    '/blocks/timetracker/managealerts.php', $indexparams);
+$alertaction = new moodle_url($CFG->wwwroot.
+    '/blocks/timetracker/alertaction.php', $urlparams);
 
 $course = $DB->get_record('course', array('id' => $alertunit->courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
@@ -116,9 +118,11 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         $messagetext .= get_string('br2','block_timetracker'); 
         $messagetext .= get_string('emessage2','block_timetracker');
         $messagetext .= get_string('br1','block_timetracker'); 
-        $messagetext .= get_string('emessage3','block_timetracker', userdate($alertunit->origtimein));
+        $messagetext .= get_string('emessage3','block_timetracker', 
+            userdate($alertunit->origtimein));
         $messagetext .= get_string('br1','block_timetracker'); 
-        $messagetext .= get_string('emessage4','block_timetracker', userdate($alertunit->origtimeout));
+        $messagetext .= get_string('emessage4','block_timetracker', 
+            userdate($alertunit->origtimeout));
         $messagetext .= get_string('br1','block_timetracker'); 
         $messagetext .= get_string('emessageduration','block_timetracker', 
             format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
@@ -129,7 +133,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         if($alertunit->todelete == 1){
             $messagetext .= get_string('unitdeleted','block_timetracker');
         } else {
-            $messagetext .= get_string('emessage4','block_timetracker', userdate($alertunit->timeout));
+            $messagetext .= get_string('emessage4','block_timetracker', 
+                userdate($alertunit->timeout));
             $messagetext .= get_string('br1','block_timetracker'); 
             $messagetext .= get_string('emessageduration','block_timetracker', 
             format_elapsed_time($alertunit->timeout - $alertunit->timein));

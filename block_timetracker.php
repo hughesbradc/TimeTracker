@@ -280,7 +280,8 @@
                         'block_timetracker');
                     $clockinaction = $OUTPUT->action_icon($link, $clockinicon);
         
-                    $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
+                    $timeclockdataicon = new pix_icon('manage', 
+                        'Manage', 'block_timetracker');
                     $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
     
                     $editurl = new moodle_url($baseurl.'/updateworkerinfo.php',$indexparams);
@@ -355,7 +356,8 @@
 
 					if ($this->config->block_timetracker_show_month_earnings){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('totalmonth', 'block_timetracker');
+						$this->content->text .= 
+                            get_string('totalmonth', 'block_timetracker');
                         $this->content->text .= '$'.$stats['monthearnings'];
 					}
                     
@@ -364,7 +366,8 @@
                         if($closetomax){
                             $this->content->text .= '<span style="color: red">';
                         }
-						$this->content->text .= get_string('totalterm', 'block_timetracker');
+						$this->content->text .= 
+                            get_string('totalterm', 'block_timetracker');
                         $this->content->text .= '$'.$stats['termearnings'];
                         if($closetomax){
                             $this->content->text .= '</span>';
@@ -373,7 +376,8 @@
                     
 					if ($this->config->block_timetracker_show_ytd_earnings){
 						$this->content->text .= '<br />';
-						$this->content->text .= get_string('totalytd', 'block_timetracker');
+						$this->content->text .= 
+                            get_string('totalytd', 'block_timetracker');
                         $this->content->text .= '$'.$stats['yearearnings'];
 					}
                     

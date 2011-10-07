@@ -29,7 +29,8 @@ require_once ('lib.php');
 
 class timetracker_alert_form  extends moodleform {
 
-    function timetracker_alert_form($context, $userid, $courseid, $unitid, $ispending=false){
+    function timetracker_alert_form($context, $userid, $courseid, 
+        $unitid, $ispending=false){
         
         $this->context = $context;
         $this->userid = $userid;
@@ -64,7 +65,8 @@ class timetracker_alert_form  extends moodleform {
             return;
         }
         
-        $userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid));
+        $userinfo = $DB->get_record('block_timetracker_workerinfo',
+            array('id'=>$this->userid));
         
         if(!$userinfo){
             print_error('Worker info does not exist for workerinfo id of '.$this->userid);
@@ -96,7 +98,8 @@ class timetracker_alert_form  extends moodleform {
 
         $teachers = get_users_by_capability($this->context, 'block/timetracker:manageworkers');
         if(!$teachers){
-            print_error('No supervisor is enrolled in this course.  Please alert your Administrator.');
+            print_error('No supervisor is enrolled in this course.  
+            Please alert your Administrator.');
         }
         foreach ($teachers as $teacher) {
             if(is_enrolled($this->context, $teacher->id)){

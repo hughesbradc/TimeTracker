@@ -39,7 +39,8 @@ class timetracker_updateworkerinfo_form extends moodleform {
 
         $mform =& $this->_form;
 
-        $mform->addElement('header','general',get_string('updateformheadertitle','block_timetracker'));
+        $mform->addElement('header','general',
+            get_string('updateformheadertitle','block_timetracker'));
 
         //TODO defaults -- shouldn't need these, because config should always be set.
         $payrate = 7.50;
@@ -95,11 +96,13 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $opstring = '';
         }
 
-        $mform->addElement('text','firstname',get_string('firstname','block_timetracker'), $opstring);
+        $mform->addElement('text','firstname',
+            get_string('firstname','block_timetracker'), $opstring);
         $mform->setDefault('firstname',$worker->firstname);
 		$mform->addHelpButton('firstname','firstname','block_timetracker');
 
-        $mform->addElement('text','lastname',get_string('lastname','block_timetracker'), $opstring);
+        $mform->addElement('text','lastname',
+            get_string('lastname','block_timetracker'), $opstring);
         $mform->setDefault('lastname',$worker->lastname);
 		$mform->addHelpButton('lastname','lastname','block_timetracker');
         
@@ -123,22 +126,26 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $mform->setDefault('phonenumber', $worker->phonenumber);
    
         if ($canmanage){
-            $mform->addElement('text','maxtermearnings',get_string('maxtermearnings','block_timetracker'));
+            $mform->addElement('text','maxtermearnings',
+                get_string('maxtermearnings','block_timetracker'));
             $mform->setDefault('maxtermearnings',$maxearnings);
             $mform->addHelpButton('maxtermearnings','maxtermearnings','block_timetracker');
 
-            $mform->addElement('text','currpayrate',get_string('currpayrate','block_timetracker'));
+            $mform->addElement('text','currpayrate',
+                get_string('currpayrate','block_timetracker'));
             $mform->setDefault('currpayrate',$payrate);
 			$mform->addHelpButton('currpayrate','currpayrate','block_timetracker');
 
-            $mform->addElement('select','timetrackermethod',get_string('trackermethod','block_timetracker'),
+            $mform->addElement('select','timetrackermethod',
+                get_string('trackermethod','block_timetracker'),
                 array(0=>get_string('timeclocktitle','block_timetracker'),
                 1=>get_string('hourlogheader','block_timetracker')));
 
             $mform->setDefault('timetrackermethod',$trackermethod);
 			$mform->addHelpButton('timetrackermethod','trackermethod','block_timetracker');
 
-            $mform->addElement('text','institution',get_string('institution','block_timetracker'));
+            $mform->addElement('text','institution',
+                get_string('institution','block_timetracker'));
             $mform->setDefault('institution',$institution);
 			$mform->addHelpButton('institution','institution','block_timetracker');
             
@@ -154,11 +161,13 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $mform->setDefault('budget',$budget);
 			$mform->addHelpButton('budget','budget','block_timetracker');
             
-            $mform->addElement('text','supervisor',get_string('supervisor','block_timetracker'));
+            $mform->addElement('text','supervisor',
+                get_string('supervisor','block_timetracker'));
             $mform->setDefault('supervisor',$supname);
 			$mform->addHelpButton('supervisor','supname','block_timetracker');
         } else {
-            $mform->addElement('text','maxtermearnings',get_string('maxtermearnings','block_timetracker'),
+            $mform->addElement('text','maxtermearnings',
+                get_string('maxtermearnings','block_timetracker'),
                 'readonly="readonly"');
             $mform->setDefault('maxtermearnings',$maxearnings);
             $mform->addElement('text','currpayrate',

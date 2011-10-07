@@ -87,7 +87,6 @@ if ($canmanage) { //supervisor
     echo $OUTPUT->box_end();
 
     echo $OUTPUT->box_start('generalbox boxaligncenter');
-    //echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">';
     echo '<table align="center" cellspacing="10px" 
                 cellpadding="5px" width="95%" style="border: 1px solid #000;">';
     echo '<tr><th colspan=5">Last 10 Work Units</th></tr>'."\n";
@@ -112,7 +111,8 @@ if ($canmanage) { //supervisor
     $last10units = $DB->get_recordset_sql($last10unitssql);
 
     if(!$last10units){
-        echo '<tr><td colspan="5" style="text-align:center">No work units found</a></td></tr>';
+        echo 
+        '<tr><td colspan="5" style="text-align:center">No work units found</a></td></tr>';
     } else {
         foreach($last10units as $unit){
                 $row='<tr>';
@@ -190,16 +190,11 @@ if ($canmanage) { //supervisor
                 $worker->monthhours.' / $'.$worker->monthearnings
                 .'</td>';
 
-            //error_log($worker->maxtermearnings);
-            /*
-            if($worker->maxtermearnings > 0)
-                error_log("true");
-            else
-                error_log("false");
-                */
-            if($worker->maxtermearnings > 0 && ($worker->termearnings > $worker->maxtermearnings ||
-                ($worker->maxtermearnings - $worker->termearnings) <= 50 && $worker->termhours != 0)){
-                //error_log("in the 'if'");
+            if($worker->maxtermearnings > 0 && 
+                ($worker->termearnings > $worker->maxtermearnings ||
+                ($worker->maxtermearnings - $worker->termearnings) <= 50 && 
+                $worker->termhours != 0)){
+
                 $html .= '<td style="text-align:center"><span style="color: red">'.
                     $worker->termhours.' / $'.$worker->termearnings
                     .'</span></td>';

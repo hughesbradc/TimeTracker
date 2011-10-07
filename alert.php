@@ -50,7 +50,8 @@ $context = $PAGE->context;
 $PAGE->set_url($alerturl);
 $PAGE->set_pagelayout('base');
 
-$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
+$workerrecord = $DB->get_record('block_timetracker_workerinfo', 
+    array('id'=>$userid,'courseid'=>$courseid));
 
 if(!$workerrecord){
     echo "NO WORKER FOUND!";
@@ -63,7 +64,8 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 }
 
 
-$strtitle = get_string('errortitle','block_timetracker',$workerrecord->firstname.' '.$workerrecord->lastname); 
+$strtitle = get_string('errortitle','block_timetracker',
+    $workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
 
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);

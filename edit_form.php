@@ -41,11 +41,13 @@ class block_timetracker_edit_form extends block_edit_form {
         $mform->addElement('text','config_block_timetracker_curr_pay_rate',
             get_string('currpayrate','block_timetracker'));
         $mform->setDefault('config_block_timetracker_curr_pay_rate',0);
-        $mform->addHelpButton('config_block_timetracker_curr_pay_rate','currpayrate','block_timetracker');
+        $mform->addHelpButton('config_block_timetracker_curr_pay_rate',
+            'currpayrate','block_timetracker');
         
         $mform->addElement('select','config_block_timetracker_trackermethod',
             get_string('trackermethod','block_timetracker'),array('Timeclock','Hourlog'));
-        $mform->addHelpButton('config_block_timetracker_trackermethod','trackermethod','block_timetracker');
+        $mform->addHelpButton('config_block_timetracker_trackermethod',
+            'trackermethod','block_timetracker');
         
         $mform->addElement('header', 'displayheader', 
             get_string('workerdisplaysettings','block_timetracker'));
@@ -71,7 +73,8 @@ class block_timetracker_edit_form extends block_edit_form {
         $mform->addElement('selectyesno', 'config_block_timetracker_show_ytd_hours', 
             get_string('showytdhours', 'block_timetracker'));
         $mform->setDefault('config_block_timetracker_show_ytd_hours', 1);
-        $mform->addHelpButton('config_block_timetracker_show_ytd_hours','showytdhours','block_timetracker');
+        $mform->addHelpButton('config_block_timetracker_show_ytd_hours',
+            'showytdhours','block_timetracker');
 
         $mform->addElement('selectyesno', 'config_block_timetracker_show_month_earnings', 
             get_string('showmonthearnings', 'block_timetracker'));
@@ -99,28 +102,37 @@ class block_timetracker_edit_form extends block_edit_form {
 
         $mform->addElement('text','config_block_timetracker_department',
             get_string('department','block_timetracker'));
-        $mform->addRule('config_block_timetracker_department', null, 'required', null, 'client', 'false');
-        $mform->addHelpButton('config_block_timetracker_department','department','block_timetracker');
+        $mform->addRule('config_block_timetracker_department', 
+            null, 'required', null, 'client', 'false');
+        $mform->addHelpButton('config_block_timetracker_department',
+            'department','block_timetracker');
     
         $mform->addElement('text','config_block_timetracker_position',
             get_string('position','block_timetracker'));
-        $mform->addRule('config_block_timetracker_position', null, 'required', null, 'client', 'false');
-        $mform->addHelpButton('config_block_timetracker_position','position','block_timetracker');
+        $mform->addRule('config_block_timetracker_position', 
+            null, 'required', null, 'client', 'false');
+        $mform->addHelpButton('config_block_timetracker_position',
+            'position','block_timetracker');
     
         $mform->addElement('text','config_block_timetracker_budget',
             get_string('budget','block_timetracker'));
-        $mform->addRule('config_block_timetracker_budget', null, 'required', null, 'client', 'false');
+        $mform->addRule('config_block_timetracker_budget', 
+            null, 'required', null, 'client', 'false');
         $mform->addHelpButton('config_block_timetracker_budget','budget','block_timetracker');
 
         $mform->addElement('text','config_block_timetracker_institution',
             get_string('institution','block_timetracker'));
-        $mform->addRule('config_block_timetracker_institution', null, 'required', null, 'client', 'false');
-        $mform->addHelpButton('config_block_timetracker_institution','institution','block_timetracker');
+        $mform->addRule('config_block_timetracker_institution', 
+            null, 'required', null, 'client', 'false');
+        $mform->addHelpButton('config_block_timetracker_institution',
+            'institution','block_timetracker');
     
         $mform->addElement('text','config_block_timetracker_supname',
             get_string('supname','block_timetracker'));
-        $mform->addRule('config_block_timetracker_supname', null, 'required', null, 'client', 'false');
-        $mform->addHelpButton('config_block_timetracker_supname','supname','block_timetracker');
+        $mform->addRule('config_block_timetracker_supname', 
+            null, 'required', null, 'client', 'false');
+        $mform->addHelpButton('config_block_timetracker_supname',
+            'supname','block_timetracker');
     
     }
 

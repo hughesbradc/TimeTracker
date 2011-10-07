@@ -54,7 +54,8 @@ $context = $PAGE->context;
 $PAGE->set_url($hourlogurl);
 $PAGE->set_pagelayout('base');
 
-$workerrecord = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid,'courseid'=>$courseid));
+$workerrecord = $DB->get_record('block_timetracker_workerinfo', 
+    array('id'=>$userid,'courseid'=>$courseid));
 
 if(!$workerrecord){
     echo "NO WORKER FOUND!";
