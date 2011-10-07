@@ -58,8 +58,8 @@
                 $this->content->text='TimeTracker block must be configured before used.';
             } else {
                 $this->content->text=
-                    'TimeTracker is not yet configured. Contact your supervisor
-                    with this error';
+                    '<span style="color: red">TimeTracker is not yet configured. Contact your supervisor
+                    with this error</span>';
             }
             return $this->content;
 
@@ -87,26 +87,38 @@
                 $hasalerts = has_course_alerts($COURSE->id);
             }
 
+            $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
+            $indexparams['id'] = $courseid;
+            $this->content->text .= '<div style="text-align: left">';
+
             //check to see if the supervisor needs to manage
             if($hasalerts){
-                $this->content->text .= '<b><center><a style="color: red" href="'.
-                    $CFG->wwwroot.'/blocks/timetracker/managealerts.php?id='.$COURSE->id.
-                    '">**Manage Alerts**</center></b></a>';
-                $this->content->text .= "<br /><br />";
+                $alertsurl = new moodle_url($baseurl.'/managealerts.php', $indexparams);
+                $alerticon= new pix_icon('alert','Manage Alerts', 'block_timetracker');
+                $alertaction= $OUTPUT->action_icon($alertsurl, $alerticon);
+                $this->content->text .= $alertaction.' <span style="color:red">'.
+                    'Manage worker alerts</span><br /><br />';
             }
 
-            $indexparams['id'] = $courseid;
-            $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', 
-                $indexparams);
-            
-            $this->content->text .= '<div style="text-align: center">';
+            $index = new moodle_url($baseurl.'/index.php', $indexparams);
             $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
             $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
     
-            $this->content->text .= $timeclockdataaction.'</div><br />';
-            
-            $this->content->text .= '<div style="text-align: left">';
+            $this->content->text .= $timeclockdataaction.' Main<br />';
 
+            $reportsurl = new moodle_url($baseurl.'/reports.php', $indexparams);
+            $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('report', 
+                'Reports','block_timetracker'));
+
+            $this->content->text .= $reportsaction.' Reports<br />';
+
+            $timesheeturl = new moodle_url($baseurl.'/timesheet.php', $indexparams);
+            $timesheetaction=$OUTPUT->action_icon($reportsurl, 
+                new pix_icon('i/calendar', 'Timesheets')); 
+
+            $this->content->text .= $timesheetaction.' Timesheets<br />';
+
+            
             $numtimeclock = $DB->count_records('block_timetracker_workerinfo',
                 array('courseid'=>$courseid, 'timetrackermethod'=>0));
 
