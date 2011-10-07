@@ -109,10 +109,12 @@ if ($mform->is_cancelled()){
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage2','block_timetracker');
     $messagetext .= get_string('br1','block_timetracker');
-    $messagetext .= get_string('emessage3','block_timetracker', userdate($formdata->origtimein)); 
+    $messagetext .= get_string('emessage3','block_timetracker', 
+        userdate($formdata->origtimein)); 
     if(!$ispending){ 
         $messagetext .= get_string('br1','block_timetracker');
-        $messagetext .= get_string('emessage4','block_timetracker', userdate($formdata->origtimeout)); 
+        $messagetext .= get_string('emessage4','block_timetracker', 
+            userdate($formdata->origtimeout)); 
         $messagetext .= get_string('br1','block_timetracker');
         $messagetext .= get_string('emessageduration','block_timetracker', 
             format_elapsed_time($formdata->origtimeout - $formdata->origtimein));
