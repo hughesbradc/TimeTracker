@@ -51,7 +51,8 @@ class timetracker_managealerts_form  extends moodleform {
             $issiteadmin = true;
         }
 
-        $mform->addElement('header', 'general', get_string('managealerts','block_timetracker')); 
+        $mform->addElement('header', 'general', 
+            get_string('managealerts','block_timetracker')); 
 		$mform->addHelpButton('general','managealerts','block_timetracker');
 
 
@@ -61,7 +62,7 @@ class timetracker_managealerts_form  extends moodleform {
         $strmsg = get_string('message', 'block_timetracker');
 
         $mform->addElement('html', 
-            '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
+        '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
         
         $tblheaders=
             '<tr>
@@ -138,10 +139,11 @@ class timetracker_managealerts_form  extends moodleform {
 
                 $editurl = new moodle_url($alertlinks[$worker->id]['change']);
                 $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
-                    get_string('edit'),'block_timetracker'));
+                    'Edit proposed work unit','block_timetracker'));
     
                 $approveurl = new moodle_url($alertlinks[$worker->id]['approve']);
-                $checkicon = new pix_icon('approve','Approve','block_timetracker');
+                $checkicon = new pix_icon('approve',
+                    'Approve the proposed work unit','block_timetracker');
                 if($alert->todelete){
                     $approveaction=$OUTPUT->action_icon($approveurl, $checkicon,
                     new confirm_action('Are you sure you want to delete this work unit
@@ -149,20 +151,29 @@ class timetracker_managealerts_form  extends moodleform {
                 } else {
                     $approveaction=$OUTPUT->action_icon($approveurl, $checkicon);
                 }
-        
-                $deleteurl = new moodle_url($alertlinks[$worker->id]['deny']);
-                $deleteicon = new pix_icon('clock_delete',
-                    'Delete','block_timetracker');
 
+                $deleteurl = new moodle_url($alertlinks[$worker->id]['delete']);
+                $deleteicon = new pix_icon('delete',
+                    'Delete this alert', 'block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
                     $deleteurl, $deleteicon, 
                     new confirm_action(
-                    'Are you sure you want to delete this alert unit?<br />The work unit 
+                    'Are you sure you want to delete this alert?'));
+        
+                $denyurl = new moodle_url($alertlinks[$worker->id]['deny']);
+                $denyicon = new pix_icon('clock_delete',
+                    'Deny and restore original work unit','block_timetracker');
+
+                $denyaction = $OUTPUT->action_icon(
+                    $denyurl, $denyicon, 
+                    new confirm_action(
+                    'Are you sure you want to deny this alert unit?<br />The work unit 
                     will be re-inserted into the worker\'s record as it originally
                     appeared.'));
 
                 $row .= '<td style="text-align: center">'.
-                    $approveaction . ' ' . $deleteaction. ' '.$editaction.'</td>';
+                    $approveaction . ' ' . $deleteaction. ' '.
+                    $editaction. ' '.$denyaction.'</td>';
             }
     
             $row.='</tr>';
@@ -173,6 +184,19 @@ class timetracker_managealerts_form  extends moodleform {
         $mform->addElement('html','</table>');
     
         //$this->add_action_buttons(true, 'Save Changes');
+
+        $mform->addElement('header','general',
+            'Alert Action Legend');
+        $legend ='
+            <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/approve.png" />
+            Approve the proposed work unit <br />
+            <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/delete.png" />
+            Delete the alert and the original/proposed work units <br />
+            <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/clock_edit.png" />
+            Edit the proposed work unit before approval<br />
+            <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/clock_delete.png" />
+            Deny the proposed work unit and re-add the original work unit';
+        $mform->addElement('html',$legend);
     
         }
 

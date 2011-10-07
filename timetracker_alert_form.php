@@ -112,8 +112,8 @@ class timetracker_alert_form  extends moodleform {
         $mform->addElement('html', '<b>'); 
         $mform->addElement('html', get_string('subject','block_timetracker'));
         $mform->addElement('html', '</b>'); 
-        $mform->addElement('html', get_string('subjecttext','block_timetracker',$userinfo->firstname.' '.
-            $userinfo->lastname));
+        $mform->addElement('html', get_string('subjecttext','block_timetracker',
+            $userinfo->firstname.' '. $userinfo->lastname));
         $mform->addElement('html', '<br /><br />'); 
         $mform->addElement('html', get_string('existingunit','block_timetracker'));
         $mform->addElement('html', '<blockquote>'); 
@@ -150,12 +150,14 @@ class timetracker_alert_form  extends moodleform {
         }
        
         if(!$this->ispending){
-            $mform->addElement('checkbox', 'deleteunit', get_string('deleteunit','block_timetracker'));
+            $mform->addElement('checkbox', 'deleteunit', 
+                get_string('deleteunit','block_timetracker'));
             $mform->addHelpButton('deleteunit', 'deleteunit', 'block_timetracker');
         }
 
         $mform->addElement('textarea', 'message', 
-            get_string('messageforerror','block_timetracker'), 'wrap="virtual" rows="6" cols="75"');
+            get_string('messageforerror','block_timetracker'), 
+            'wrap="virtual" rows="6" cols="75"');
 		$mform->addHelpButton('message','messageforerror','block_timetracker');
         $mform->addRule('message', null, 'required', null, 'client', 'false');
         $mform->addElement('html', '</b>'); 
@@ -182,8 +184,9 @@ class timetracker_alert_form  extends moodleform {
         //if it gets here, we had no teachers selected. Use the first teacherid value to
         //place the error
         if(!$hasteach)
-            $errors['teacherid['.$firstteach.']'] = 'You didn\'t select any supervisors to alert. 
-            As default, all supervisors have been selected.';
+            $errors['teacherid['.$firstteach.']'] = 
+                'You didn\'t select any supervisors to alert. 
+                As default, all supervisors have been selected.';
 
         if($data['timeinerror'] > time()){
             $errors['timeinerror'] = 'Time cannot be set in the future.';
