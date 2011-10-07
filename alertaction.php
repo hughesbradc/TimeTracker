@@ -291,7 +291,6 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         redirect($index,$status,1);
     } else if ($action == 'delete'){ 
         //TODO Need to fix these blocks so we can reduce redundant code
-        
     
         // Email worker and any other supervisor(s) that the alert has been deleted
         $from = $USER; 
@@ -337,12 +336,11 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                     email_to_user($emailto, $from, $subject, $messagetext, $messagehtml);
                 }
             } 
+
             // Remove record(s) from the 'alert_com' table
             $DB->delete_records('block_timetracker_alert_com', 
                 array('alertid'=>$alertcomentry->alertid,
                 'mdluserid'=>$alertcomentry->mdluserid));
-
-
         }
         //remove the alertunits entry
         $result = $DB->delete_records('block_timetracker_alertunits',
