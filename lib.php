@@ -139,11 +139,17 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
     
     $sql = 'SELECT COUNT(*) FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
         "$userid = userid AND $courseid = courseid AND (".
+        "($timein >= timein AND $timein < timeout) OR ".
+        "($timeout > timein AND $timeout <= timeout) OR ".
+        "(timein >= $timein AND timein < $timeout))";
+        
+        /*
         "($timein = timein AND $timeout = timeout) OR 
         ($timein < timein AND $timeout > timeout) OR 
             (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR 
             (($timeout > timein AND $timeout < timeout) AND $timein < timein) OR
             ($timein > timein AND $timeout < timeout))";
+        */
 
     if($unitid != -1){
       $sql.=" AND id != $unitid"; 
@@ -413,6 +419,7 @@ function get_course_alert_links($courseid){
         $alertlinks[$alert->userid]['approve'] = $url.$params."&action=approve";
         $alertlinks[$alert->userid]['deny'] = $url.$params."&action=deny";
         $alertlinks[$alert->userid]['change'] = $url.$params."&action=change";
+        $alertlinks[$alert->userid]['delete'] = $url.$params."&action=delete";
 
     }
 
