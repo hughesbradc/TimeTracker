@@ -29,7 +29,8 @@ require_once ('lib.php');
 
 class timetracker_alert_form  extends moodleform {
 
-    function timetracker_alert_form($context, $userid, $courseid, $unitid, $ispending=false){
+    function timetracker_alert_form($context, $userid, $courseid, 
+        $unitid, $ispending=false){
         
         $this->context = $context;
         $this->userid = $userid;
@@ -64,7 +65,8 @@ class timetracker_alert_form  extends moodleform {
             return;
         }
         
-        $userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid));
+        $userinfo = $DB->get_record('block_timetracker_workerinfo',
+            array('id'=>$this->userid));
         
         if(!$userinfo){
             print_error('Worker info does not exist for workerinfo id of '.$this->userid);
@@ -96,7 +98,8 @@ class timetracker_alert_form  extends moodleform {
 
         $teachers = get_users_by_capability($this->context, 'block/timetracker:manageworkers');
         if(!$teachers){
-            print_error('No supervisor is enrolled in this course.  Please alert your Administrator.');
+            print_error('No supervisor is enrolled in this course.  
+            Please alert your Administrator.');
         }
         foreach ($teachers as $teacher) {
             if(is_enrolled($this->context, $teacher->id)){
@@ -112,8 +115,8 @@ class timetracker_alert_form  extends moodleform {
         $mform->addElement('html', '<b>'); 
         $mform->addElement('html', get_string('subject','block_timetracker'));
         $mform->addElement('html', '</b>'); 
-        $mform->addElement('html', get_string('subjecttext','block_timetracker',$userinfo->firstname.' '.
-            $userinfo->lastname));
+        $mform->addElement('html', get_string('subjecttext','block_timetracker',
+            $userinfo->firstname.' '. $userinfo->lastname));
         $mform->addElement('html', '<br /><br />'); 
         $mform->addElement('html', get_string('existingunit','block_timetracker'));
         $mform->addElement('html', '<blockquote>'); 
@@ -150,12 +153,14 @@ class timetracker_alert_form  extends moodleform {
         }
        
         if(!$this->ispending){
-            $mform->addElement('checkbox', 'deleteunit', get_string('deleteunit','block_timetracker'));
+            $mform->addElement('checkbox', 'deleteunit', 
+                get_string('deleteunit','block_timetracker'));
             $mform->addHelpButton('deleteunit', 'deleteunit', 'block_timetracker');
         }
 
         $mform->addElement('textarea', 'message', 
-            get_string('messageforerror','block_timetracker'), 'wrap="virtual" rows="6" cols="75"');
+            get_string('messageforerror','block_timetracker'), 
+            'wrap="virtual" rows="6" cols="75"');
 		$mform->addHelpButton('message','messageforerror','block_timetracker');
         $mform->addRule('message', null, 'required', null, 'client', 'false');
         $mform->addElement('html', '</b>'); 
@@ -182,8 +187,9 @@ class timetracker_alert_form  extends moodleform {
         //if it gets here, we had no teachers selected. Use the first teacherid value to
         //place the error
         if(!$hasteach)
-            $errors['teacherid['.$firstteach.']'] = 'You didn\'t select any supervisors to alert. 
-            As default, all supervisors have been selected.';
+            $errors['teacherid['.$firstteach.']'] = 
+                'You didn\'t select any supervisors to alert. 
+                As default, all supervisors have been selected.';
 
         if($data['timeinerror'] > time()){
             $errors['timeinerror'] = 'Time cannot be set in the future.';

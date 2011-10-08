@@ -45,7 +45,8 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
     
     //TODO -- change this to a filename, comment out 'send' function
     $fn = $year.'_'.($month<10?'0'.$month:$month).'Timesheet_'.
-        substr($workerrecord->firstname,0,1).$workerrecord->lastname. '_'.$workerrecord->mdluserid.'.xls';
+        substr($workerrecord->firstname,0,1).
+        $workerrecord->lastname. '_'.$workerrecord->mdluserid.'.xls';
     if($method == 'F'){
         $workbook = new MoodleExcelWorkbook($base.'/'.$fn);
     } else {
@@ -53,9 +54,6 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
         $workbook->send($fn);
     }
 
-    //$workbook->send('Timesheet_'.$year.'_'.$monthinfo['monthname'].'.xls');
-    
-    
     // Formatting
     $format_bold =& $workbook->add_format();
     $format_bold->set_bold();
@@ -152,7 +150,8 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
     $worksheet[1]->merge_cells(3,0,3,3);
     $worksheet[1]->write_string(4,0,"ADDRESS: $workerrecord->address", $format_bold);
     $worksheet[1]->merge_cells(4,0,4,3);
-    $worksheet[1]->write_string(5,0,'YTD Earnings: $'.number_format(get_earnings_this_year($userid,$courseid),2), $format_bold);
+    $worksheet[1]->write_string(5,0,'YTD Earnings: $'.
+        number_format(get_earnings_this_year($userid,$courseid),2), $format_bold);
     $worksheet[1]->merge_cells(5,0,5,3);
     $worksheet[1]->write_string(2,4,'SUPERVISOR: '.$conf['supname'], $format_bold);
     $worksheet[1]->merge_cells(2,4,2,7);
@@ -210,8 +209,10 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
     
     // Number the Days and add data
     
-    $sql = 'SELECT * from ' .$CFG->prefix.'block_timetracker_workunit '. 'WHERE userid='.$userid.
-        ' AND courseid='.$courseid.' AND timein BETWEEN '. $monthinfo['firstdaytimestamp'] .' AND '.
+    $sql = 'SELECT * from ' .$CFG->prefix.'block_timetracker_workunit '.
+        'WHERE userid='.$userid.
+        ' AND courseid='.$courseid.' AND timein BETWEEN '. 
+        $monthinfo['firstdaytimestamp'] .' AND '.
         $monthinfo['lastdaytimestamp']. ' ORDER BY timein';
     
     $units = $DB->get_recordset_sql($sql);
@@ -238,27 +239,25 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
     
             foreach($units as $unit){
                 if($unit->timein < $eod && $unit->timein >= $mid){
-                    $in = userdate($unit->timein,get_string('timeformat','block_timetracker'));
-                    $out = userdate($unit->timeout,get_string('timeformat','block_timetracker'));
+                    $in = userdate($unit->timein, 
+                        get_string('timeformat','block_timetracker'));
+                    $out = userdate($unit->timeout, 
+                        get_string('timeformat','block_timetracker'));
                     if(($unit->timeout - $unit->timein) >449){
                         $wustr .= "In: $in\nOut: $out\n";
-                        //unset($units[$key]);
                         $weeksum += get_hours(($unit->timeout - $unit->timein));
-                        //error_log($weeksum);
                     }
                 } else {
                     break;
                 }
             }
             
-            $worksheet[1]->write_string($currentrow +1, $dayofweek, $wustr, $format_cal_block);
+            $worksheet[1]->write_string($currentrow +1, $dayofweek, 
+                $wustr, $format_cal_block);
             
             //end of print work units
-            
             //if day of week = 7, copy value over and reset weekly sum to 0.        
-        
             // Calculate total hours
-    
             if($dayofweek == 6 || $date == $monthinfo['lastday']){
                 //Add week sum to monthly sum
                 //Print value in weekly totals column 
@@ -278,8 +277,9 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
     $worksheet[1]->write_string(20,0,"Pay Rate or Stipend Amount\n" .'$'.
         number_format($workerrecord->currpayrate,2),$format_footer);
     $worksheet[1]->merge_cells(20,0,20,3);
-    $worksheet[1]->write_string(20,4,'Total Hours/Earnings for '.$monthinfo['monthname'].', '
-        .$year.":\n".number_format($monthsum,2) .' / $' .
+    $worksheet[1]->write_string(20,4,'Total Hours/Earnings for '.
+        $monthinfo['monthname'].', '.
+        $year.":\n".number_format($monthsum,2) .' / $' .
         ($monthsum * $workerrecord->currpayrate),$format_footer);
     
     $worksheet[1]->merge_cells(20,4,20,7);

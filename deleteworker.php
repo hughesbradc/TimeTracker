@@ -45,7 +45,8 @@ if($courseid){
 }
 
 
-$manageworkerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
+$manageworkerurl = new moodle_url($CFG->wwwroot.
+    '/blocks/timetracker/manageworkers.php', $urlparams);
 
 $PAGE->set_url($manageworkerurl);
 $PAGE->set_pagelayout('base');

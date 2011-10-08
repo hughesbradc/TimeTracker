@@ -272,7 +272,8 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
     //change the $method from 'I' to $method -- allow more than just a single file
     //to be created
     $fn = $year.'_'.($month<10?'0'.$month:$month).'Timesheet_'.
-        substr($workerrecord->firstname,0,1).$workerrecord->lastname. '_'.$workerrecord->mdluserid.'.pdf';
+        substr($workerrecord->firstname,0,1).
+        $workerrecord->lastname. '_'.$workerrecord->mdluserid.'.pdf';
 
     //create the file
     $pdf->Output($base.'/'.$fn, $method);

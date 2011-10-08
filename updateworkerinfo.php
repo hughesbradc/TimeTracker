@@ -62,7 +62,8 @@ if($worker){
 }
 
 
-$PAGE->set_url(new moodle_url($CFG->wwwroot.'/blocks/timetracker/updateworkerinfo.php',$urlparams));
+$PAGE->set_url(new moodle_url($CFG->wwwroot.
+    '/blocks/timetracker/updateworkerinfo.php',$urlparams));
 $PAGE->set_pagelayout('base');
 
 $strtitle = get_string('updateformheadertitle','block_timetracker'); 

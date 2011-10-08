@@ -90,7 +90,7 @@ if($workerrecord->active == 0){
         //timein && timeout are same day
         $cin->lastedited = $nowtime;
         $cin->timeout = $nowtime;
-        $cin->lasteditedby = $ttuserid;
+        $cin->lasteditedby = $USER->id;
         $cin->payrate = $workerrecord->currpayrate;
         unset($cin->id);
 

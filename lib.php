@@ -139,15 +139,23 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
     
     $sql = 'SELECT COUNT(*) FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
         "$userid = userid AND $courseid = courseid AND (".
-        "($timein < timein AND $timeout > timeout) OR 
+        "($timein >= timein AND $timein < timeout) OR ".
+        "($timeout > timein AND $timeout <= timeout) OR ".
+        "(timein >= $timein AND timein < $timeout))";
+        
+        /*
+        "($timein = timein AND $timeout = timeout) OR 
+        ($timein < timein AND $timeout > timeout) OR 
             (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR 
-            ($timein > timein AND $timeout < timeout)";
+            (($timeout > timein AND $timeout < timeout) AND $timein < timein) OR
+            ($timein > timein AND $timeout < timeout))";
+        */
 
     if($unitid != -1){
-      $sql.=" AND $unitid != id)"; 
-    } else {
-      $sql.=")";
+      $sql.=" AND id != $unitid"; 
     }
+
+    error_log($sql);
 
     $numexistingunits = $DB->count_records_sql($sql);
 
@@ -411,6 +419,7 @@ function get_course_alert_links($courseid){
         $alertlinks[$alert->userid]['approve'] = $url.$params."&action=approve";
         $alertlinks[$alert->userid]['deny'] = $url.$params."&action=deny";
         $alertlinks[$alert->userid]['change'] = $url.$params."&action=change";
+        $alertlinks[$alert->userid]['delete'] = $url.$params."&action=delete";
 
     }
 
@@ -490,7 +499,7 @@ function get_month_info($month,$year){
     
     $timestamp = make_timestamp($year,$month); //timestamp of midnight, first day of $month
     $monthinfo['firstdaytimestamp'] = $timestamp;
-    $monthinfo['lastday'] = date('t',strtotime($timestamp));
+    $monthinfo['lastday'] = date('t',$timestamp);
 
     $thistime = usergetdate($timestamp);
     $monthinfo['dayofweek'] = $thistime['wday'];
@@ -796,3 +805,15 @@ function get_timetracker_config($courseid){
 
     return $config;
 }
+
+/**
+* for admin usage. Find all units that 
+*
+*/
+/*
+function find_units($startafter, $endbefore){
+
+}
+*/
+
+

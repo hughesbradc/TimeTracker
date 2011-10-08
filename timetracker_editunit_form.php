@@ -28,7 +28,9 @@ require_once ('lib.php');
 
 class timetracker_editunit_form extends moodleform {
 
-    function timetracker_editunit_form($context, $userid, $courseid, $unitid, $start=0, $end=0,$ispending=false){
+    function timetracker_editunit_form($context, $userid, $courseid, $unitid, 
+        $start=0, $end=0,$ispending=false){
+
         $this->context = $context;
         $this->userid = $userid;
         $this->unitid = $unitid;
@@ -53,7 +55,8 @@ class timetracker_editunit_form extends moodleform {
 
         $canmanage = true;
 
-        $userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$this->userid));
+        $userinfo = $DB->get_record('block_timetracker_workerinfo',
+            array('id'=>$this->userid));
 
         if(!$userinfo){
             print_error('Worker info does not exist for workerinfo id of '.$this->userid);
@@ -80,7 +83,8 @@ class timetracker_editunit_form extends moodleform {
             redirect($index,'No permission to add hours', 1);
         }
         
-        $mform->addElement('header', 'general', get_string('editunittitle','block_timetracker', 
+        $mform->addElement('header', 'general', 
+            get_string('editunittitle','block_timetracker', 
             $userinfo->firstname.' '.$userinfo->lastname));
 
         /** HIDDEN FIELDS **/
@@ -89,7 +93,7 @@ class timetracker_editunit_form extends moodleform {
         $mform->addElement('hidden','id', $this->courseid);
         $mform->addElement('hidden','ispending', $this->ispending);
         //edited by supervisor
-        $mform->addElement('hidden','editedby', '0');
+        $mform->addElement('hidden','editedby', $USER->id);
         /** END HIDDEN FIELDS **/
         
 

@@ -21,7 +21,8 @@ foreach($courses as $course){
 
     //get workers for this course
     $workers = $DB->get_records_sql(
-        'SELECT id FROM mdl_block_timetracker_workerinfo WHERE courseid='.$cid);
+        'SELECT * FROM mdl_block_timetracker_workerinfo WHERE courseid='.$cid.' ORDER BY
+        lastname,firstname');
 
     //each worker for this course
     //echo "Checking courseid: $cid\n";
@@ -36,13 +37,24 @@ foreach($courses as $course){
         foreach($units as $unit){
             //echo ($unit->timein."\t".$unit->timeout."\n");
             if(overlaps($unit->timein, $unit->timeout, $worker->id, $unit->id, $cid)){
-                echo ("\n**ERROR**\n");
-                echo ("cid: $cid\n");
-                echo("uid: $worker->id\n");
-                echo("wuid: $unit->id\n");
+                echo ("<br />\n**ERROR**<br />\n");
+
+                //echo ("cid: $cid<br />\n");
+                //echo("uid: $worker->id<br />\n");
+                echo("Worker ID: $unit->id<br />\n");
+                echo("Modified by ID <a href=\"".$CFG->wwwroot.
+                    "/user/profile.php?id=$unit->lasteditedby".
+                    "\">$unit->lasteditedby</a><br />\n");
+                echo("Modified: ". userdate($unit->lastedited,
+                    get_string('datetimeformat','block_timetracker'))."<br />\n");
+                echo("Worker: ".$worker->lastname.', '.$worker->firstname."<br />\n");
+                echo("timein: ".userdate($unit->timein,
+                    get_string('datetimeformat','block_timetracker'))."<br />\n");
+                echo("timeout: ".userdate($unit->timeout,
+                    get_string('datetimeformat','block_timetracker'))."<br />\n");
                 echo("<a href=\"http://moodle.mhc.edu/workstudy/blocks/timetracker/".
-                    "reports.php?id=$cid&userid=$worker->id\">View Reports Page</a>");
-                echo("*********\n");
+                    "reports.php?id=$cid&userid=$worker->id\">View Reports Page</a><br />\n");
+                echo("*********<br />\n");
             }
 
         }

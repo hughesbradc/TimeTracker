@@ -44,7 +44,8 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 }
 
 $worker =
-    $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id,'courseid'=>$courseid));
+    $DB->get_record('block_timetracker_workerinfo',
+    array('mdluserid'=>$USER->id,'courseid'=>$courseid));
 
 if($userid == -1 && $worker) $userid = $worker->id;
 else if ($userid == -1 && $canmanage) $userid = 0;
@@ -81,7 +82,8 @@ $PAGE->set_heading($strtitle);
 
 
 
-$mform = new timetracker_reports_form($PAGE->context,$userid,$courseid,$reportstart,$reportend);
+$mform = new timetracker_reports_form($PAGE->context,
+    $userid,$courseid,$reportstart,$reportend);
 
 if ($mform->is_cancelled()){ //user clicked 'cancel'
 

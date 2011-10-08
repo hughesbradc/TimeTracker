@@ -53,7 +53,7 @@ $alertsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php'
 $PAGE->set_url($alertsurl);
 $PAGE->set_pagelayout('base');
 
-$strtitle = get_string('manageworkertitle','block_timetracker');
+$strtitle = get_string('managealerts','block_timetracker');
 
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
