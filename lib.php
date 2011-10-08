@@ -201,7 +201,7 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
     }
     $tabs[] = new tabobject('alerts',
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams),
-        'Alerts'.$numalerts);
+        'Alerts '.$numalerts);
 
     return $tabs;
 }
