@@ -98,6 +98,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
+    $status = 'User cancelled form, redirecting.';
     redirect($index,$status,1);
 
 } else if ($formdata=$mform->get_data()){
