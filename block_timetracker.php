@@ -104,19 +104,22 @@
             $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
             $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
     
-            $this->content->text .= $timeclockdataaction.' Main<br />';
+            $this->content->text .= $timeclockdataaction.'<a href="'.$CFG->wwwroot.'/blocks/timetracker/index.php?id='
+                .$courseid.'"> Main<br />';
 
             $reportsurl = new moodle_url($baseurl.'/reports.php', $indexparams);
             $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('report', 
                 'Reports','block_timetracker'));
 
-            $this->content->text .= $reportsaction.' Reports<br />';
+            $this->content->text .= $reportsaction.'<a href="'.$CFG->wwwroot.'/blocks/timetracker/reports.php?id='
+                .$courseid.'"> Reports<br />';
 
             $timesheeturl = new moodle_url($baseurl.'/timesheet.php', $indexparams);
-            $timesheetaction=$OUTPUT->action_icon($reportsurl, 
+            $timesheetaction=$OUTPUT->action_icon($timesheeturl, 
                 new pix_icon('i/calendar', 'Timesheets')); 
 
-            $this->content->text .= $timesheetaction.' Timesheets<br />';
+            $this->content->text .= $timesheetaction.'<a href="'.$CFG->wwwroot.'/blocks/timetracker/timesheet.php?id='
+                .$courseid.'"> Timesheets</a><br />';
 
             
             $numtimeclock = $DB->count_records('block_timetracker_workerinfo',
