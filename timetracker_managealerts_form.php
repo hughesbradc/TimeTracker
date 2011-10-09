@@ -185,19 +185,21 @@ class timetracker_managealerts_form  extends moodleform {
     
         //$this->add_action_buttons(true, 'Save Changes');
 
-        $mform->addElement('header','general',
-            'Alert Action Legend');
-        $legend ='
-            <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/approve.png" />
-            Approve the proposed work unit <br />
-            <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/delete.png" />
-            Delete the alert and the original/proposed work units <br />
-            <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/clock_edit.png" />
-            Edit the proposed work unit before approval<br />
-            <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/clock_delete.png" />
-            Deny the proposed work unit and re-add the original work unit';
-        $mform->addElement('html',$legend);
-    
+        if($canmanage){
+            $mform->addElement('header','general',
+                'Alert Action Legend');
+            $legend ='
+                <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/approve.png" />
+                Approve the proposed work unit <br />
+                <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/delete.png" />
+                Delete the alert and the original/proposed work units <br />
+                <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/clock_edit.png" />
+                Edit the proposed work unit before approval<br />
+                <img src="'.$CFG->wwwroot.'/blocks/timetracker/pix/clock_delete.png" />
+                Deny the proposed work unit and re-add the original work unit';
+            $mform->addElement('html',$legend);
         }
+    
+    }
 
 }

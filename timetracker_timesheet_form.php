@@ -42,6 +42,8 @@ class timetracker_timesheet_form  extends moodleform {
             $canmanage = true;
         }
 
+        $mform->addElement('header','general','Generate Monthly Timesheet');
+
         // Collect all of the workers under the supervisor
 
         $mform->addElement('hidden','id',$COURSE->id);    

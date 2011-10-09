@@ -96,31 +96,28 @@
                 $alertsurl = new moodle_url($baseurl.'/managealerts.php', $indexparams);
                 $alerticon= new pix_icon('alert','Manage Alerts', 'block_timetracker');
                 $alertaction= $OUTPUT->action_icon($alertsurl, $alerticon);
-                $this->content->text .= $alertaction.' <span style="color:red">'.
-                    'Manage worker alerts</span><br /><br />';
+                $this->content->text .= $alertaction.' <a href="'.$alertsurl.
+                    '" style="color: red">Manage worker alerts</a><br /><br />';
             }
 
             $index = new moodle_url($baseurl.'/index.php', $indexparams);
             $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
             $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
     
-            $this->content->text .= $timeclockdataaction.'<a href="'.$CFG->wwwroot.'/blocks/timetracker/index.php?id='
-                .$courseid.'"> Main<br />';
+            $this->content->text .= $timeclockdataaction.' <a href="'.$index.
+                '">Main</a><br />';
 
             $reportsurl = new moodle_url($baseurl.'/reports.php', $indexparams);
             $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('report', 
                 'Reports','block_timetracker'));
 
-            $this->content->text .= $reportsaction.'<a href="'.$CFG->wwwroot.'/blocks/timetracker/reports.php?id='
-                .$courseid.'"> Reports<br />';
+            $this->content->text .= $reportsaction.'<a href="'.$reportsurl.'"> Reports<br />';
 
             $timesheeturl = new moodle_url($baseurl.'/timesheet.php', $indexparams);
             $timesheetaction=$OUTPUT->action_icon($timesheeturl, 
                 new pix_icon('i/calendar', 'Timesheets')); 
 
-            $this->content->text .= $timesheetaction.'<a href="'.$CFG->wwwroot.'/blocks/timetracker/timesheet.php?id='
-                .$courseid.'"> Timesheets</a><br />';
-
+            $this->content->text .= $timesheetaction.'<a href="'.$timesheeturl.'"> Timesheets</a><br />';
             
             $numtimeclock = $DB->count_records('block_timetracker_workerinfo',
                 array('courseid'=>$courseid, 'timetrackermethod'=>0));
@@ -190,7 +187,7 @@
     
                         $urlparams['clockin']=1;
     
-                        $link = new moodle_url($baseurl.'/timeclock.php', $urlparams);
+                        $timeclockurl = new moodle_url($baseurl.'/timeclock.php', $urlparams);
                         $timeclockicon = new pix_icon('clock_play','Clock in', 
                             'block_timetracker');
                         $timeclockdesc=' Clock-in';
@@ -201,7 +198,7 @@
                         $urlparams['ispending']=true;
                         $urlparams['unitid']=$pendingrecord->id;
 
-                        $link = new moodle_url($CFG->wwwroot.
+                        $timeclockurl = new moodle_url($CFG->wwwroot.
                             '/blocks/timetracker/timeclock.php', $urlparams);
                         $timeclockicon = new pix_icon('clock_stop','Clock in', 
                             'block_timetracker');
@@ -219,7 +216,7 @@
                     }
     
                     //Icons
-                    $timeclockaction = $OUTPUT->action_icon($link, $timeclockicon);
+                    $timeclockaction = $OUTPUT->action_icon($timeclockurl, $timeclockicon);
             
                     $timeclockdataicon = new pix_icon('manage', 'Manage', 
                         'block_timetracker');
@@ -244,11 +241,12 @@
                         new pix_icon('i/calendar', 'Timesheets')); 
             
                     $this->content->text .= '<div style="text-align: left">';
-                    $this->content->text .= $timeclockdataaction.' Main<br />'.
-                        $timeclockaction. $timeclockdesc.'<br />'.
-                        $reportsaction. ' Reports<br />'.
-                        $timesheetaction.' Timesheets<br />'.
-                        $editaction.' Edit worker<br /><br />';
+                    $this->content->text .= 
+                        $timeclockdataaction.' <a href="'.$index.'">Main</a><br />'.
+                        $timeclockaction.' <a href="'.$timeclockurl.'">'.$timeclockdesc.'</a><br />'.
+                        $reportsaction. ' <a href="'.$reportsurl.'">Reports</a><br />'.
+                        $timesheetaction.' <a href="'.$timesheeturl.'">Timesheets</a><br />'.
+                        $editaction.' <a href="'.$editurl.'"> Edit worker</a><br /><br />';
     
                     $this->content->text .= '</div>';
 
@@ -256,12 +254,11 @@
                              
                         $pendingtimestamp= $DB->get_record('block_timetracker_pending', 
                             array('userid'=>$ttuserid,'courseid'=>$courseid));
-                        $this->content->text .= $alertaction.' Clock-in:<ul><li>'.
+                        $this->content->text .= 'Clock-in:<br />'.$alertaction.' '.
                             userdate($pendingtimestamp->timein,
-                            get_string('datetimeformat','block_timetracker')).
-                            '</li></ul>';
+                            get_string('datetimeformat','block_timetracker')).'<br />';
                     }
-                    //$this->content->text .= '</div>';
+
                     $this->content->text .= '<hr>';
 
                 } else if($worker->timetrackermethod == 1){ //Hourlog Method
@@ -272,28 +269,45 @@
                     $indexparams['userid'] = $ttuserid;
                     $indexparams['id'] = $courseid;
                     
-                    $link = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php', 
+                    $hourlogurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php', 
                         $urlparams);
                     $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', 
                         $indexparams);
     
                     // Clock In Icon
-                    $this->content->text .= '<div style="text-align: center">';
+                    $this->content->text .= '<div style="text-align: left">';
                     $clockinicon = new pix_icon('clock_add','Add work unit', 
                         'block_timetracker');
-                    $clockinaction = $OUTPUT->action_icon($link, $clockinicon);
+                    $clockinaction = $OUTPUT->action_icon($hourlogurl, $clockinicon);
         
                     $timeclockdataicon = new pix_icon('manage', 
                         'Manage', 'block_timetracker');
                     $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
+
+                    $reportsurl = new moodle_url($baseurl.'/reports.php', $indexparams);
+                    $reportsurl->params(array('userid'=>$worker->id));
+                    $reportsaction=$OUTPUT->action_icon($reportsurl, 
+                        new pix_icon('report', 'Reports','block_timetracker'));
     
                     $editurl = new moodle_url($baseurl.'/updateworkerinfo.php',$indexparams);
                     $editurl->params(array('mdluserid'=>$USER->id));
                     $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
                         get_string('edit'),'block_timetracker'));
     
-                    $this->content->text .= $clockinaction. ' '.$timeclockdataaction.' '.
-                        $editaction.'<br />';
+                    $timesheeturl = new moodle_url($baseurl.'/timesheet.php', 
+                        $indexparams);
+                    $timesheeturl->params(array('userid'=>$worker->id));
+                    $timesheetaction=$OUTPUT->action_icon($reportsurl, 
+                        new pix_icon('i/calendar', 'Timesheets')); 
+
+                    $this->content->text .= '<div style="text-align: left">';
+                    $this->content->text .= 
+                        $timeclockdataaction.' <a href="'.$index.'">Main</a><br />'.
+                        $clockinaction.' <a href="'.$hourlogurl.'">Add work unit</a><br />'.
+                        $reportsaction. ' <a href="'.$reportsurl.'">Reports</a><br />'.
+                        $timesheetaction.' <a href="'.$timesheeturl.'">Timesheets</a><br />'.
+                        $editaction.' <a href="'.$editurl.'"> Edit worker</a><br /><br />';
+    
                     $this->content->text .= '</div>';
                     $this->content->text .= '<hr>';
                 }
