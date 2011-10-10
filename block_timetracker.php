@@ -246,7 +246,7 @@
                         $timeclockaction.' <a href="'.$timeclockurl.'">'.$timeclockdesc.'</a><br />'.
                         $reportsaction. ' <a href="'.$reportsurl.'">Reports</a><br />'.
                         $timesheetaction.' <a href="'.$timesheeturl.'">Timesheets</a><br />'.
-                        $editaction.' <a href="'.$editurl.'"> Edit worker</a><br /><br />';
+                        $editaction.' <a href="'.$editurl.'"> Edit my info</a><br /><br />';
     
                     $this->content->text .= '</div>';
 
@@ -306,7 +306,7 @@
                         $clockinaction.' <a href="'.$hourlogurl.'">Add work unit</a><br />'.
                         $reportsaction. ' <a href="'.$reportsurl.'">Reports</a><br />'.
                         $timesheetaction.' <a href="'.$timesheeturl.'">Timesheets</a><br />'.
-                        $editaction.' <a href="'.$editurl.'"> Edit worker</a><br /><br />';
+                        $editaction.' <a href="'.$editurl.'"> Edit my info</a><br /><br />';
     
                     $this->content->text .= '</div>';
                     $this->content->text .= '<hr>';
