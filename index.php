@@ -187,7 +187,8 @@ if ($canmanage) { //supervisor
             $html .= '<td style="text-align: center">$'.
                 number_format($worker->currpayrate, 2).'</td>';
             $html .= '<td style="text-align: center">'.
-                $worker->monthhours.' / $'.$worker->monthearnings
+                $worker->monthhours.' / $'.
+                number_format($worker->monthearnings, 2)
                 .'</td>';
 
             if($worker->maxtermearnings > 0 && 
@@ -196,19 +197,23 @@ if ($canmanage) { //supervisor
                 $worker->termhours != 0)){
 
                 $html .= '<td style="text-align:center"><span style="color: red">'.
-                    $worker->termhours.' / $'.$worker->termearnings
+                    $worker->termhours.' / $'.
+                    number_format($worker->termearnings, 2)
                     .'</span></td>';
             } else {
                 $html .= '<td style="text-align: center">'.
-                    $worker->termhours.' / $'.$worker->termearnings
+                    $worker->termhours.' / $'.
+                    number_format($worker->termearnings, 2)
                     .'</td>';
             }
 
             $html .= '<td style="text-align: center">'.
-                $worker->yearhours.' / $'.$worker->yearearnings
+                $worker->yearhours.' / $'.
+                number_format($worker->yearearnings, 2)
                 .'</td>';
             $html .= '<td style="text-align: center">'.
-                $worker->totalhours.' / $'.$worker->totalearnings
+                $worker->totalhours.' / $'.
+                number_format($worker->totalearnings, 2)
                 .'</td>';
 
             $html .= '</tr>';
@@ -275,21 +280,29 @@ if ($canmanage) { //supervisor
     //$statstable->set_attribute('width', '95%');
     $statstable->setup();
 
+    $closetomax = false;
+    if($worker->maxtermearnings > 0 && 
+        ($worker->termearnings > $worker->maxtermearnings ||
+        ($worker->maxtermearnings - $worker->termearnings) <= 50 && 
+        $worker->termhours != 0)){
+        $closetomax = true;
+    }
+
     $statstable->add_data(array(
         'This month',$stats['monthhours'],
-        '$'.$stats['monthearnings']
+        '$'.number_format($stats['monthearnings'], 2)
         ));
     $statstable->add_data(array(
         'This term',$stats['termhours'],
-        '$'.$stats['termearnings']
+        '$'.number_format($stats['termearnings'], 2)
         ));
     $statstable->add_data(array(
         'This year',$stats['yearhours'],
-        '$'.$stats['yearearnings']
+        '$'.number_format($stats['yearearnings'], 2)
         ));
     $statstable->add_data(array(
         'Total hours',$stats['totalhours'],
-        '$'.$stats['totalearnings']
+        '$'.number_format($stats['totalearnings'], 2)
         ));
 
     $statstable->print_html();

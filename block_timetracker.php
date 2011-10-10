@@ -42,8 +42,6 @@
         $clockin = optional_param('clockin', 0,PARAM_INTEGER);
         $clockout = optional_param('clockout',0, PARAM_INTEGER);
         $courseid = $COURSE->id;
-        //error_log("in block_tt and $COURSE->id");
-        //error_log("in block_tt and cid is $courseid");
         $worker = $DB->get_record('block_timetracker_workerinfo', 
             array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
         
@@ -243,7 +241,8 @@
                     $this->content->text .= '<div style="text-align: left">';
                     $this->content->text .= 
                         $timeclockdataaction.' <a href="'.$index.'">Main</a><br />'.
-                        $timeclockaction.' <a href="'.$timeclockurl.'">'.$timeclockdesc.'</a><br />'.
+                        $timeclockaction.' <a href="'.$timeclockurl.
+                        '">'.$timeclockdesc.'</a><br />'.
                         $reportsaction. ' <a href="'.$reportsurl.'">Reports</a><br />'.
                         $timesheetaction.' <a href="'.$timesheeturl.'">Timesheets</a><br />'.
                         $editaction.' <a href="'.$editurl.'"> Edit my info</a><br /><br />';
@@ -269,8 +268,8 @@
                     $indexparams['userid'] = $ttuserid;
                     $indexparams['id'] = $courseid;
                     
-                    $hourlogurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php', 
-                        $urlparams);
+                    $hourlogurl = new moodle_url($CFG->wwwroot.
+                        '/blocks/timetracker/hourlog.php', $urlparams);
                     $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', 
                         $indexparams);
     
@@ -316,9 +315,9 @@
 
                 //calculate if this user is within $50 of reaching maxtermearnings
                 $closetomax = false;
-                if($worker->maxtermearnings == 0 ||
-                    $stats['termearnings'] > $worker->maxtermearnings || 
-                    ($worker->maxtermearnings - $stats['termearnings']) <= 50){
+                if($worker->maxtermearnings > 0 &&  
+                    ($stats['termearnings'] > $worker->maxtermearnings || 
+                    ($worker->maxtermearnings - $stats['termearnings']) <= 50)){
                     $closetomax = true; 
                 }
 
@@ -375,7 +374,8 @@
 						$this->content->text .= '<br />';
 						$this->content->text .= 
                             get_string('totalmonth', 'block_timetracker');
-                        $this->content->text .= '$'.$stats['monthearnings'];
+                        $this->content->text .= '$'.
+                            number_format($stats['monthearnings'],2);
 					}
                     
 					if ($this->config->block_timetracker_show_term_earnings){
@@ -385,7 +385,8 @@
                         }
 						$this->content->text .= 
                             get_string('totalterm', 'block_timetracker');
-                        $this->content->text .= '$'.$stats['termearnings'];
+                        $this->content->text .= '$'.
+                            number_format($stats['termearnings'], 2);
                         if($closetomax){
                             $this->content->text .= '</span>';
                         }
@@ -395,13 +396,15 @@
 						$this->content->text .= '<br />';
 						$this->content->text .= 
                             get_string('totalytd', 'block_timetracker');
-                        $this->content->text .= '$'.$stats['yearearnings'];
+                        $this->content->text .= '$'.
+                            number_format($stats['yearearnings'], 2);
 					}
                     
 					if ($this->config->block_timetracker_show_total_earnings){
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('total', 'block_timetracker');
-                        $this->content->text .= '$'.$stats['totalearnings'];
+                        $this->content->text .= '$'.
+                            number_format($stats['totalearnings'],2);
 					}
 				}
 
@@ -523,7 +526,6 @@
     function instance_delete() {
         //remove the necessary data
         global $DB, $COURSE;
-        //error_log('in before_delete()');
         $DB->delete_records('block_timetracker_workerinfo',
             array('courseid'=>$COURSE->id));
 

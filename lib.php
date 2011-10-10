@@ -722,10 +722,11 @@ function get_worker_stats($userid,$courseid){
     $stats['yearhours'] = get_hours_this_year($userid, $courseid);
     $stats['termhours'] = get_hours_this_term($userid, $courseid);
 
-    $stats['totalearnings'] = number_format(get_total_earnings($userid,$courseid),2);
-    $stats['monthearnings'] = number_format(get_earnings_this_month($userid,$courseid),2);
-    $stats['yearearnings'] = number_format(get_earnings_this_year($userid,$courseid),2);
-    $stats['termearnings'] = number_format(get_earnings_this_term($userid,$courseid),2);
+    //$stats['totalearnings'] = number_format(get_total_earnings($userid,$courseid),2);
+    $stats['totalearnings'] = get_total_earnings($userid,$courseid);
+    $stats['monthearnings'] =get_earnings_this_month($userid,$courseid);
+    $stats['yearearnings'] = get_earnings_this_year($userid,$courseid);
+    $stats['termearnings'] = get_earnings_this_term($userid,$courseid);
 
 
     return $stats; 
