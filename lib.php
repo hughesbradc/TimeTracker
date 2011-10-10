@@ -155,7 +155,7 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
       $sql.=" AND id != $unitid"; 
     }
 
-    error_log($sql);
+    //error_log($sql);
 
     $numexistingunits = $DB->count_records_sql($sql);
 
