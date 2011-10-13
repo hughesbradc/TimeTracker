@@ -334,19 +334,26 @@
 						$this->content->text .= '<br />';
 						$this->content->text .= get_string('totalmonth', 'block_timetracker');
                         $this->content->text .= $stats['monthhours'];
-					}
+                    }
 					
                     if ($this->config->block_timetracker_show_term_hours){
 						$this->content->text .= '<br />';
                         if($closetomax){
-                            $this->content->text .= '<span style="color: red">';
+                            $this->content->text .= '<span style="color: red; font-weight:bold">';
                         }
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
-                        $this->content->text .= $stats['termhours'];
+                        $this->content->text .= $stats['termhours']; 
+                        
+					    $remearnings = $worker->maxtermearnings - $stats['termearnings'];
+                        $remhours = $remearnings/$worker->currpayrate;
+                        $this->content->text .= '<br />';
+                        $this->content->text .= get_string('remaining', 'block_timetracker');
+                        $this->content->text .= $remhours;
+                        
                         if($closetomax){
                             $this->content->text .= '</span>';
                         }
-					
+				    }	
             
 					if ($this->config->block_timetracker_show_ytd_hours){
 						$this->content->text .= '<br />';
@@ -359,7 +366,7 @@
 						$this->content->text .= get_string('total', 'block_timetracker');
                         $this->content->text .= $stats['totalhours'];
 					}
-                }
+                
       
 				if ($this->config->block_timetracker_show_month_earnings ||
 				    $this->config->block_timetracker_show_term_earnings ||
@@ -381,12 +388,18 @@
 					if ($this->config->block_timetracker_show_term_earnings){
 						$this->content->text .= '<br />';
                         if($closetomax){
-                            $this->content->text .= '<span style="color: red">';
+                            $this->content->text .= '<span style="color: red; font-weight:bold">';
                         }
 						$this->content->text .= 
                             get_string('totalterm', 'block_timetracker');
                         $this->content->text .= '$'.
                             number_format($stats['termearnings'], 2);
+					    
+                        $remearnings = $worker->maxtermearnings - $stats['termearnings'];
+                        $this->content->text .= '<br />';
+                        $this->content->text .= get_string('remaining', 'block_timetracker');
+                        $this->content->text .= '$' .number_format($remearnings, 2);
+                        
                         if($closetomax){
                             $this->content->text .= '</span>';
                         }

@@ -69,6 +69,7 @@ $string['hourstitle'] = 'Hours';
 $string['earningstitle'] = 'Earnings';
 $string['totalmonth'] = 'This month: ';
 $string['totalterm'] = 'This term: ';
+$string['remaining'] = 'Remaining: ';
 $string['totalytd'] = 'Year to date: ';
 $string['total'] = 'Total: ';
 $string['manage'] = 'Manage';

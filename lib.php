@@ -705,7 +705,7 @@ function get_earnings_this_term($userid,$courseid){
 /**
 * Gives an array with worker stats:
 * $stats['totalhours']
-* $stats['monthhours']
+* $stats['monthhours'
 * $stats['yearhours']
 * $stats['termhours']
 * $stats['totalearnings'] 
