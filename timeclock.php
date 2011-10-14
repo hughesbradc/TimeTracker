@@ -44,6 +44,12 @@ $context = $PAGE->context;
 $timeclockurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',$urlparams);
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $index;
+}
+
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
     array('id'=>$ttuserid,'courseid'=>$courseid));
 
@@ -111,5 +117,5 @@ if($workerrecord->active == 0){
     }
 } 
 
-redirect($index,$status,1);
+redirect($nextpage, $status,1);
 

@@ -63,6 +63,12 @@ $maintabs = get_tabs($urlparams, $canmanage, $courseid);
 $manageworkerurl = new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/manageworkers.php', $urlparams);
 
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $manageworkerurl;
+}
+
 $PAGE->set_url($manageworkerurl);
 $PAGE->set_pagelayout('base');
 
@@ -85,7 +91,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 
     // this seems to send a courseID of 0 to index.php, when, as best I can tell
     // $urlparams has the correct id. TODO
-    redirect($timetrackerurl); 
+    redirect($nextpage); 
 } else if($formdata = $mform->get_data()){
     //print_object($formdata);
 
@@ -115,7 +121,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 
     //echo $OUTPUT->heading($strtitle, 2);
     //content goes here
-    redirect($manageworkerurl,'Changes saved successfully',1);
+    redirect($nextpage, 'Changes saved successfully',1);
 
 } else {
 

@@ -43,13 +43,20 @@ class timetracker_changealert_form extends moodleform {
             $canmanage = true;
         }
     
-        $alertunit = $DB->get_record('block_timetracker_alertunits', array('id'=>$this->alertid));
-        $userinfo = $DB->get_record('block_timetracker_workerinfo', array('id'=>$alertunit->userid));
+        $alertunit = $DB->get_record('block_timetracker_alertunits', 
+            array('id'=>$this->alertid));
+        $userinfo = $DB->get_record('block_timetracker_workerinfo', 
+            array('id'=>$alertunit->userid));
             
         $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
             array('id'=>$alertunit->courseid,'userid'=>$alertunit->userid));
+        if(isset($_SERVER['HTTP_REFERER'])){
+            $nextpage = $_SERVER['HTTP_REFERER'];
+        } else {
+            $nextpage = $index;
+        }
         if(!$canmanage && $USER->id != $userinfo->mdluserid){
-            redirect($index,'You do not have permission to change this alert.', 1);
+            redirect($nextpage, 'You do not have permission to change this alert.', 1);
         } else {
         
             $mform->addElement('hidden', 'userid', $alertunit->userid);
@@ -102,20 +109,45 @@ class timetracker_changealert_form extends moodleform {
     }
 
     function validation ($data){
+        global $OUTPUT;
         $errors = array();
 
         if($data['timeout'] > time()){ 
             $errors['timeout'] = 'Time cannot be set in the future.';
-        }
-        
-        if($data['timein'] > $data['timeout']){
+        } else if($data['timein'] > $data['timeout']){
             $errors['timein'] = 'Time out cannot be set before time in.';
-        }
+        } else if(!has_capability('block/timetracker:manageoldunits', $this->context) && 
+            expired($data['timein'])){
+            $errors['timein'] = 'You are not authorized to add work units this far in the
+            past. See an administrator for assistance';
+        } else {
 
-        if(overlaps($data['timein'],$data['timeout'],$data['userid'])){
-            $errors['timein'] = 'Work unit overlaps with existing workunit';
+            $conflicts = find_conflicts($data['timein'],$data['timeout'],$data['userid']);
+            if(sizeof($conflicts) > 0){
+                $errormsg = 'Work unit conflicts with existing unit(s):<br />';
+                $errormsg .= '<table>';
+                foreach($conflicts as $conflict){
+                    $errormsg .= '<tr>';
+                    $editaction = $OUTPUT->action_icon($conflict->editlink, new
+                        pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
+    
+                    $deleteaction = $OUTPUT->action_icon(
+                        $conflict->deletelink, new pix_icon('clock_delete',
+                        get_string('delete'), 'block_timetracker'),
+                        new confirm_action('Are you sure you want to delete this '.
+                        ' conflicting work unit?'));
+    
+    
+                    $errormsg .= '<td>'.$conflict->display.'</td><td>';
+                    if($conflict->editlink != '#') //not a pending clock-in
+                        $errormsg .= ' '.$editaction;
+    
+                    $errormsg .= ' '.$deleteaction.'</td></tr>';
+                }
+                $errormsg .= '</table>';
+                $errors['timein'] = $errormsg;
+            }
         }
-
         return $errors;
     }
 }

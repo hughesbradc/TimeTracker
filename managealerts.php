@@ -45,8 +45,11 @@ $urlparams['id'] = $courseid;
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
-
-
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $index;
+}
 
 $alertsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams);
 
@@ -58,11 +61,9 @@ $strtitle = get_string('managealerts','block_timetracker');
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
-#print_object($urlparams);
-$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 //$PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
+$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_managealerts_form($PAGE->context);
@@ -71,7 +72,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 
     // this seems to send a courseID of 0 to index.php, when, as best I can tell
     // $urlparams has the correct id. TODO
-    redirect($timetrackerurl); 
+    redirect($nextpage); 
 } else if($formdata = $mform->get_data()){
 
 } else {

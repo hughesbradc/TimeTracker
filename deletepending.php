@@ -30,7 +30,6 @@ require_login();
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
 $pendingid = required_param('unitid', PARAM_INTEGER);
-$nextpage = optional_param('next',0,PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
@@ -39,10 +38,11 @@ $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
 
-//assume we're coming from reports
-$nexturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
-if($nextpage!=0){
-    $nexturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    //assume we're coming from reports
+    $nextpage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
 }
 
 $canmanage = false;
@@ -64,4 +64,4 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
     }
 }
 
-redirect($nexturl,'Pending work unit has been deleted', 1);
+redirect($nextpage,'Pending work unit has been deleted', 1);

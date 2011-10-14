@@ -79,8 +79,13 @@ class timetracker_editunit_form extends moodleform {
 
         $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
             array('id'=>$this->courseid,'userid'=>$this->userid));
+        if(isset($_SERVER['HTTP_REFERER'])){
+            $nextpage = $_SERVER['HTTP_REFERER'];
+        } else {
+            $nextpage = $index;
+        }
         if(!$canmanage && $USER->id != $userinfo->mdluserid){
-            redirect($index,'No permission to add hours', 1);
+            redirect($nextpage, 'No permission to add hours', 1);
         }
         
         $mform->addElement('header', 'general', 
@@ -143,7 +148,7 @@ class timetracker_editunit_form extends moodleform {
     }
 
     function validation ($data){
-        global $COURSE;
+        global $COURSE, $OUTPUT, $SESSION;
 
         $errors = array();
         
@@ -156,14 +161,54 @@ class timetracker_editunit_form extends moodleform {
             if($data['timein'] > time() || $data['timeout'] > time()){
                 $errors['timein'] = 'Time cannot be set in the future';    
             }
-    
-            if(overlaps($data['timein'],$data['timeout'],$data['userid'],$data['unitid'])){
 
-                $errors['timein'] = 'Work unit overlaps with existing workunit';
+            if(expired($data['timein'])){
+                $errors['timein'] = 'You are not authorized to add work units this far in the
+                past. See an administrator for assistance';
             }
 
             if(!isset($data['payrate']) || $data['payrate'] == ''){
                 $errors['payrate'] = 'Payrate cannot be empty';
+            }
+
+            $conflicts = find_conflicts($data['timein'], $data['timeout'],
+                $data['userid'], $data['unitid']);
+            if(sizeof($conflicts) > 0){
+                $errormsg = 'Work unit conflicts with existing unit(s):<br />';
+                $errormsg .= '<table>';
+                foreach($conflicts as $conflict){
+                    $errormsg .= '<tr>';
+                    $conflict->editlink = $conflict->editlink.
+                        '&eid='.$data['id'].
+                        '&eunitid='.$data['unitid'].
+                        '&estart='.$data['timein'].
+                        '&eend='.$data['timeout'].
+                        '&eispending='.$data['ispending'];
+
+                    $editaction = $OUTPUT->action_icon($conflict->editlink, new
+                        pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
+    
+                    $conflict->deletelink = $conflict->deletelink.
+                        '&eunitid='.$data['unitid'].
+                        '&estart='.$data['timein'].
+                        '&eend='.$data['timeout'].
+                        '&eispending='.$data['ispending'];
+                    $deleteaction = $OUTPUT->action_icon(
+                        $conflict->deletelink, new pix_icon('clock_delete',
+                        get_string('delete'), 'block_timetracker'),
+                        new confirm_action('Are you sure you want to delete this '.
+                        ' conflicting work unit?'));
+    
+    
+                    $errormsg .= '<td>'.$conflict->display.'</td><td>';
+                    if($conflict->editlink != '#') //not a pending clock-in
+                        $errormsg .= ' '.$editaction;
+    
+                    $errormsg .= ' '.$deleteaction.'</td></tr>';
+                }
+                $errormsg .= '</table>';
+                $errors['timein'] = $errormsg;
+
             }
         }
 
