@@ -56,8 +56,13 @@ class timetracker_hourlog_form  extends moodleform {
 
         $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
             array('id'=>$this->courseid,'userid'=>$this->userid));
+        if(isset($_SERVER['HTTP_REFERER'])){
+            $nextpage = $_SERVER['HTTP_REFERER'];
+        } else {
+            $nextpage = $index;
+        }
         if(!$canmanage && $USER->id != $userinfo->mdluserid){
-            redirect($index,'No permission to add hours', 1);
+            redirect($nextpage, 'No permission to add hours', 1);
         }
         
 
@@ -82,17 +87,35 @@ class timetracker_hourlog_form  extends moodleform {
     }
 
     function validation ($data){
+        global $OUTPUT, $CFG;
         $errors = array();
         if($data['timein'] > $data['timeout']){
             $errors['timein'] = 'Time in cannot be before time out';    
-        }
-
-        if($data['timein'] > time() || $data['timeout'] > time()){
+        } else if($data['timein'] > time() || $data['timeout'] > time()){
             $errors['timein'] = 'Time cannot be set in the future';    
-        }
+        } else if(!has_capability('block/timetracker:manageoldunits', $this->context) && 
+            expired($data['timein'])){
+            $errors['timein'] = 'You are not authorized to add work units this far in the
+            past. See an administrator for assistance';
+        } else {
 
-        if(overlaps($data['timein'],$data['timeout'],$data['userid'])){
-            $errors['timein'] = 'Work unit overlaps with existing workunit';
+            $conflicts = find_conflicts($data['timein'],$data['timeout'],$data['userid']);
+            if(sizeof($conflicts) > 0){
+                $errormsg = 'Work unit conflicts with existing unit(s):<br />';
+                $errormsg .= '<table>';
+                foreach($conflicts as $conflict){
+                    $errormsg .= '<tr>';
+                    $alerticon= new pix_icon('alert',
+                        'Alert Supervisor of Error','block_timetracker');
+
+                    $alertaction= $OUTPUT->action_icon($conflict->alertlink, $alerticon);
+    
+                    $errormsg .= '<td>'.$conflict->display.'</td><td>';
+                    $errormsg .= ' '.$alertaction.'</td></tr>';
+                }
+                $errormsg .= '</table>';
+                $errors['timein'] = $errormsg;
+            }
         }
 
         return $errors;

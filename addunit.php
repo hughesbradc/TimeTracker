@@ -70,6 +70,13 @@ $urlparams['userid'] = $userid;
 $urlparams['id'] = $courseid;
 $manage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $manage;
+}
+
+
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $manage);
 $PAGE->navbar->add($strtitle);
@@ -86,7 +93,7 @@ if($workerrecord->active == 0){
 
 if ($mform->is_cancelled()){ //user clicked cancel
     //TODO Redirect user to the home page
-	 redirect($manage);
+	 redirect($nextpage);
 
 } else if ($formdata=$mform->get_data()){
     $formdata->courseid = $formdata->id;
@@ -102,7 +109,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $status = 'Error adding work unit(s)';
     }
 
-    redirect($manage,$status,1);
+    redirect($nextpage,$status,1);
 
 } else {
     //form is shown for the first time

@@ -66,12 +66,14 @@ class timetracker_managealerts_form  extends moodleform {
         
         $tblheaders=
             '<tr>
-                <th>'.$strname.'</th>
-                <th>'.$strprev.'</th>
-                <th>'.$strproposed.'</th>
-                <th>'.$strmsg.'</th>';
+                <td><span style="font-weight: bold">'.$strname.'</span></td>
+                <td><span style="font-weight: bold">'.$strprev.'</span></td>
+                <td><span style="font-weight: bold">'.$strproposed.'</span></td>
+                <td><span style="font-weight: bold">'.$strmsg.'</span></td>';
         if($canmanage)
-                $tblheaders .= '<th>'.get_string('action').'</th>';
+                $tblheaders .= '<td style="text-align: center">'.
+                    '<span style="font-weight: bold">'.
+                    get_string('action').'</span></td>';
         $tblheaders .= '</tr>';
 
         $mform->addElement('html',$tblheaders);

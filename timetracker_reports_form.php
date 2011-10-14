@@ -50,6 +50,11 @@ class timetracker_reports_form  extends moodleform {
             $canmanage = true;
         }
 
+        $canmanageold = false;
+        if (has_capability('block/timetracker:manageoldunits', $this->context)){
+            $canmanageold = true;
+        }
+
         $issiteadmin = false;
         if(has_capability('moodle/site:config',$this->context)){
             $issiteadmin = true;
@@ -59,6 +64,8 @@ class timetracker_reports_form  extends moodleform {
             print_error('notpermissible','block_timetracker',
                 $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
         }
+
+        $now = time();
 
         if($this->userid == 0 && $canmanage){
             //supervisor -- show all!
@@ -92,11 +99,11 @@ class timetracker_reports_form  extends moodleform {
         $mform->addElement('hidden','sesskey', sesskey());
 
         if($this->reportstart == 0){
-            $this->reportstart = time()-(60*60*24*31);
+            $this->reportstart = $now-(60*60*24*31);
         }
 
         if($this->reportend == 0){
-            $this->reportend = time();
+            $this->reportend = $now;
         } 
 
         $mform->addElement('date_selector', 'reportstart',
@@ -290,33 +297,67 @@ class timetracker_reports_form  extends moodleform {
                     $urlparams['sesskey'] = sesskey();
                     $urlparams['unitid'] = $unit->id;
 
+                    $unitdateinfo = usergetdate($unit->timein);
+                    //error_log (($now - $unit->timein)-(86400*35));
+                    //error_log("now: $now");
+                    //error_log("timein: $unit->timein");
+
+                    if(!$canmanageold && expired($unit->timein, $now)){
+                        
+                        //show greyed out icons and no URL
+                        $row .= '<td style="text-align: center">'.
+                            html_writer::empty_tag('img', 
+                                array('src' => 
+                                $CFG->wwwroot.'/blocks/timetracker/pix/clock_edit_bw.png', 
+                                'class' => 'icon')).' '.
+                            html_writer::empty_tag('img', 
+                                array('src' => 
+                                $CFG->wwwroot.'/blocks/timetracker/pix/clock_delete_bw.png', 
+                                'class' => 'icon')).
+                            '</td>';
+                    }else {
                  
-                    $editurl = new
-                        moodle_url($baseurl.'/editunit.php', $urlparams);
-                    $editaction = $OUTPUT->action_icon($editurl, 
-                        new pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
+                        //error_log (($now - $unit->timein)-(86400*35));
+                        $editurl = new
+                            moodle_url($baseurl.'/editunit.php', $urlparams);
+                        $editaction = $OUTPUT->action_icon($editurl, 
+                            new pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
+            
+                        $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php', $urlparams);
+                        $deleteicon = new pix_icon('clock_delete',
+                            get_string('delete'),'block_timetracker');
+                        $deleteaction = $OUTPUT->action_icon(
+                            $deleteurl, $deleteicon, 
+                            new confirm_action(
+                            'Are you sure you want to delete this work unit?'));
         
-                    $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php', $urlparams);
-                    $deleteicon = new pix_icon('clock_delete',
-                        get_string('delete'),'block_timetracker');
-                    $deleteaction = $OUTPUT->action_icon(
-                        $deleteurl, $deleteicon, 
-                        new confirm_action('Are you sure you want to delete this work unit?'));
-    
-                    $row .= '<td style="text-align: center">'.$editaction . ' '.
-                        $deleteaction.'</td>';
+                        $row .= '<td style="text-align: center">'.$editaction . ' '.
+                            $deleteaction.'</td>';
+                    }
     
                 } else {
                     $urlparams['id'] = $this->courseid;
                     $urlparams['userid'] = $unit->userid;
                     $urlparams['sesskey'] = sesskey();
                     $urlparams['unitid'] = $unit->id;
-                    
-                    $alerturl = new moodle_url($baseurl.'/alert.php', $urlparams);
-                    $alerticon = new pix_icon('alert', 'Alert Supervisor of Error',
-                        'block_timetracker');
-                    $alertaction = $OUTPUT->action_icon($alerturl, $alerticon);
 
+                    $unitdateinfo = usergetdate($unit->timein);
+                    if(!$canmanageold && expired($unit->timein, $now)){
+                        
+                        //show greyed out icons and no URL
+                        $alertaction = 
+                            html_writer::empty_tag('img', 
+                            array('src' => 
+                            $CFG->wwwroot.'/blocks/timetracker/pix/alert_bw.gif', 
+                            'class' => 'icon'));
+                    }else {
+                    
+                        $alerturl = new moodle_url($baseurl.'/alert.php', $urlparams);
+                        $alerticon = new pix_icon('alert', 'Alert Supervisor of Error',
+                            'block_timetracker');
+                        $alertaction = $OUTPUT->action_icon($alerturl, $alerticon);
+
+                    }
                     $row .='<td style="text-align:center">'.$alertaction.'</td>';
 
                 }

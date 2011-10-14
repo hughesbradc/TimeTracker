@@ -54,6 +54,7 @@ if(!$workerrecord){
     die;
 }
 
+
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
@@ -61,14 +62,18 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $index;
+}
+
 if($USER->id != $workerrecord->mdluserid && !$canmanage){
     print_error('You do not have permissions to add hours for this user');
 } else if(!$canmanage && $workerrecord->timetrackermethod==0){
     $status = 'You are not authorized to use the hourlog interface.';
-    redirect($index,$status,1);
+    redirect($nextpage, $status,1);
 }
-
-
 
 
 
@@ -98,7 +103,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    redirect($index,$status,1);
+    redirect($nextpage, $status,1);
 
 } else if ($formdata=$mform->get_data()){
         $formdata->courseid = $formdata->id;
@@ -107,7 +112,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $formdata->lastedited = time();
         $formdata->lasteditedby = $formdata->editedby;
 
-        $worked = add_unit($formdata);
+        $worked = add_unit($formdata, true);
 
         //$addhourlog = $DB->insert_record('block_timetracker_workunit', $formdata);
 
@@ -120,7 +125,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
             $status = 'There was an error.  Please see your supervisor.';
         }
 
-    redirect($index,$status,1);
+    redirect($nextpage, $status,1);
 
 } else {
     //form is shown for the first time
