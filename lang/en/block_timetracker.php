@@ -20,13 +20,14 @@
  */
 
 $string['datetimeformat']='%m/%d/%y, %I:%M %p';
-$string['timeformat']='%I:%M%p';
+$string['timeformat']='%I:%M %p';
 
 $string['couldnotclockout'] = 'Error adding clock out'; 
 $string['trackermethod'] = 'Which timetracking method would you like to use?';
 $string['pluginname'] = 'TimeTracker';
-$string['timetracker:manageworkers'] = 'Manage Workers';
-$string['timetracker:activateworkers'] = 'Activate Workers';
+$string['timetracker:manageworkers'] = 'Manage workers';
+$string['timetracker:activateworkers'] = 'Activate workers';
+$string['timetracker:manageoldunits'] = 'Manage units from a previous month';
 $string['notactiveerror'] = 'This worker is not authorized to work.';
 $string['defaultworkerconfig'] = 'Default Worker Configuration';
 $string['workername'] = 'Worker Name';
@@ -172,7 +173,7 @@ $string['data'] = 'Change Work Unit Data to:  ';
 $string['date'] = 'Date:  '; 
 $string['timeinerror'] = 'Time In:  '; 
 $string['timeouterror'] = 'Time Out:  '; 
-$string['deleteunit'] = 'Delete this work unit'; 
+$string['deleteunit'] = 'Delete this work unit?'; 
 $string['messageforerror'] = 'Message:  '; 
 $string['selectallnone'] = 'Select all or none';
 $string['existingunit'] = '<b>Original Work Unit Data:</b>';
