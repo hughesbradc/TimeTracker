@@ -34,7 +34,26 @@ echo '<table cellspacing="10" cellpadding="5" width="85%">';
     
         $remaining = $worker->maxtermearnings - $earnings;
 
-        echo '<tr><td>'.$course->shortname.'</td><td>'.$worker->lastname.', '
+        $course = $DB->get_record('course',array('id'=>$worker->courseid));
+        $PAGE->set_course($course);
+        $context = $PAGE->context;
+           
+        $teachers = get_users_by_capability($context, 'block/timetracker:manageworkers');
+        if(!$teachers){
+            echo ('No supervisor is enrolled in the course.');
+        }
+            
+        $supervisor = '';
+            
+        foreach ($teachers as $teacher) {
+            if(is_enrolled($context, $teacher->id)){
+                $supervisor .= $teacher->firstname.' '.$teacher->lastname .' ' .$teacher->email
+                .',';
+            }
+        }
+        $supervisor = substr($supervisor,0,-1);
+        
+        echo '<tr><td>'.$course->shortname.'</td><td>'.$supervisor .'</td><td>'.$worker->lastname.', '
             .$worker->firstname.'</td><td>'.$earnings.'</td><td>'.$worker->maxtermearnings
             .'</td><td>'.$remaining.'</td></tr>';
     }
