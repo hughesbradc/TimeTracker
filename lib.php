@@ -241,9 +241,9 @@ function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
     foreach ($conflictingunits as $unit){
         $entry = new stdClass();
         $disp = 'From: '.userdate($unit->timein,
-            get_string('datetimeformat', 'block_timetracker')).
+            get_string('datetimeformat', 'block_timetracker'),99,false).
             ' to '.userdate($unit->timeout,
-            get_string('timeformat', 'block_timetracker'));
+            get_string('timeformat', 'block_timetracker'),99,false);
         $entry->display = $disp;
         $entry->deletelink = $baseurl.'/deleteworkunit.php?id='.$unit->courseid.
             '&userid='.$unit->userid.'&unitid='.$unit->id.
