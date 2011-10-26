@@ -1,0 +1,7 @@
+#show workunits over 10 hours in length and store to csv
+select lastname, firstname, timein, timeout, shortname into outfile '/tmp/overtime.csv'
+fields terminated by ',' optionally enclosed by '"' escaped by '\\' lines terminated by
+'\n' from mdl_block_timetracker_workunit, mdl_block_timetracker_workerinfo, mdl_course
+where (timeout-timein) > 36000 AND mdl_course.id=mdl_block_timetracker_workunit.courseid
+AND mdl_block_timetracker_workerinfo.id=mdl_block_timetracker_workunit.userid AND
+mdl_block_timetracker_workunit.courseid <> 73 order by shortname;
