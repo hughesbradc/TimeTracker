@@ -75,8 +75,13 @@ class timetracker_alert_form  extends moodleform {
 
         $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
             array('id'=>$this->courseid,'userid'=>$this->userid));
+        if(isset($_SERVER['HTTP_REFERER'])){
+            $nextpage = $_SERVER['HTTP_REFERER'];
+        } else {
+            $nextpage = $index;
+        }
         if(!$canmanage && $USER->id != $userinfo->mdluserid){
-            redirect($index,'No permission to add hours',1);
+            redirect($nextpage,'No permission to add hours',1);
         }
 
         $mform->addElement('header', 'general', get_string('errortitle','block_timetracker', 
@@ -137,10 +142,13 @@ class timetracker_alert_form  extends moodleform {
 
         $mform->addElement('html', '</blockquote><b>'); 
         $mform->addElement('html', get_string('data','block_timetracker'));
-        $mform->addElement('date_time_selector','timeinerror','Time In: ');
+        $mform->addElement('date_time_selector','timeinerror','Time In: ',
+            array('optional'=>false, 'step'=>1));
+
         $mform->setDefault('timeinerror',$unit->timein);
 		$mform->addHelpButton('timeinerror','timein','block_timetracker');
-        $mform->addElement('date_time_selector','timeouterror','Time Out: ');
+        $mform->addElement('date_time_selector','timeouterror','Time Out: ',
+            array('optional'=>false, 'step'=>1));
 		$mform->addHelpButton('timeouterror','timeout','block_timetracker');
 
         $mform->addElement('hidden','origtimein', $unit->timein); 

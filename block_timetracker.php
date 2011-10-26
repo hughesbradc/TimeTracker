@@ -115,7 +115,8 @@
             $timesheetaction=$OUTPUT->action_icon($timesheeturl, 
                 new pix_icon('i/calendar', 'Timesheets')); 
 
-            $this->content->text .= $timesheetaction.'<a href="'.$timesheeturl.'"> Timesheets</a><br />';
+            $this->content->text .= $timesheetaction.'<a href="'.
+                $timesheeturl.'"> Timesheets</a><br />';
             
             $numtimeclock = $DB->count_records('block_timetracker_workerinfo',
                 array('courseid'=>$courseid, 'timetrackermethod'=>0));
@@ -336,7 +337,9 @@
                         $this->content->text .= $stats['monthhours'];
                     }
 					
-                    if ($this->config->block_timetracker_show_term_hours){
+                    if ($this->config->block_timetracker_show_term_hours &&
+                            $worker->maxtermearnings > 0){
+
 						$this->content->text .= '<br />';
                         if($closetomax){
                             $this->content->text .= '<span style="color: red; font-weight:bold">';
@@ -346,9 +349,10 @@
                         
 					    $remearnings = $worker->maxtermearnings - $stats['termearnings'];
                         $remhours = $remearnings/$worker->currpayrate;
+                        if($remhours < 0) $remhours = 0;
                         $this->content->text .= '<br />';
                         $this->content->text .= get_string('remaining', 'block_timetracker');
-                        $this->content->text .= $remhours;
+                        $this->content->text .= number_format($remhours,2);
                         
                         if($closetomax){
                             $this->content->text .= '</span>';
@@ -385,7 +389,8 @@
                             number_format($stats['monthearnings'],2);
 					}
                     
-					if ($this->config->block_timetracker_show_term_earnings){
+					if ($this->config->block_timetracker_show_term_earnings &&
+                            $worker->maxtermearnings > 0){
 						$this->content->text .= '<br />';
                         if($closetomax){
                             $this->content->text .= '<span style="color: red; font-weight:bold">';
@@ -396,6 +401,7 @@
                             number_format($stats['termearnings'], 2);
 					    
                         $remearnings = $worker->maxtermearnings - $stats['termearnings'];
+                        if($remearnings < 0) $remearnings = 0;
                         $this->content->text .= '<br />';
                         $this->content->text .= get_string('remaining', 'block_timetracker');
                         $this->content->text .= '$' .number_format($remearnings, 2);

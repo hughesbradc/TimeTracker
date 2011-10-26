@@ -54,24 +54,20 @@ if (!has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 }
 $canmanage = true;
 
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
-
 $strtitle = get_string('terms_title','block_timetracker');
 
-$PAGE->set_title($strtitle);
-
-$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
+$PAGE->set_title($strtitle);
 $PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
+$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_editterms_form($context);
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    redirect($index,'');
+    redirect($index);
 } else if ($formdata=$mform->get_data()){
         print_object($formdata);
         //add/update items to the DB
@@ -101,7 +97,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
             }
         }
 
-        redirect($index,'');
+        redirect($index);
 } else {
     //form is shown for the first time
     echo $OUTPUT->header();

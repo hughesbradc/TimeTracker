@@ -52,6 +52,12 @@ $index = new moodle_url($CFG->wwwroot.
 $alertaction = new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/alertaction.php', $urlparams);
 
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $index;
+}
+
 $course = $DB->get_record('course', array('id' => $alertunit->courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $PAGE->set_url($alertaction);
@@ -186,8 +192,9 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertid));
 
         $status = get_string('approvesuccess','block_timetracker');
-        redirect($index,$status,1);
+        redirect($nextpage, $status, 2);
     } else if ($action == 'deny'){
+        $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertunit->id));
         if($alertunit->origtimeout == 0){
             /* 
              * Set the timein and timeout as the same value so that this will ensure the unit
@@ -202,7 +209,6 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
 
             add_unit($alertunit);
         } else {
-            $DB->delete_records('block_timetracker_alertunits', array('id'=>$alertunit->id));
 
             // Add work unit back to 'workunit' table
             unset($alertunit->id);
@@ -293,7 +299,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 'mdluserid'=>$alertcomentry->mdluserid));
         }
         $status = get_string('denysuccess','block_timetracker');
-        redirect($index,$status,1);
+        redirect($nextpage, $status, 2);
     } else if ($action == 'delete'){ 
         //TODO Need to fix these blocks so we can reduce redundant code
     
@@ -359,7 +365,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 $worker->firstname.' '.$worker->lastname.' in '.$course->shortname);
         }
 
-        redirect($index,$status,1);
+        redirect($nextpage, $status, 2);
     
     } else {
         // Supervisor wishes to change data in the error alert
@@ -367,7 +373,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
 
         if ($mform->is_cancelled()){ 
             //user clicked cancel
-            redirect($index);
+            redirect($nextpage);
 
         } else if ($formdata=$mform->get_data()){
             //Form is submitted, add the unit to the 'workunit' database; 
@@ -471,7 +477,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 $DB->delete_records('block_timetracker_alertunits', 
                     array('id'=>$alertunit->id));
             }
-            redirect($index);
+            redirect($nextpage);
         } else {
             //form is shown for the first time
             echo $OUTPUT->header();

@@ -56,7 +56,6 @@ $PAGE->set_pagelayout('base');
 
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
     array('id'=>$userid,'courseid'=>$courseid));
-
 if(!$workerrecord){
     echo "NO WORKER FOUND!";
     die;
@@ -68,11 +67,22 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 }
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $index;
+}
+//if we posted to ourself from ourself
+if(strpos($nextpage, curr_url()) !== false){
+    $nextpage = $SESSION->lastpage;
+} else {
+    $SESSION->lastpage = $nextpage;
+}
 
 if($USER->id != $workerrecord->mdluserid && !$canmanage){
     print_error('You do not have permissions to add hours for this user');
 } else if(!$canmanage && $workerrecord->timetrackermethod==0){
-    redirect($index,$status,1);
+    redirect($nextpage, $status,1);
 }
 
 $strtitle = get_string('editunittitle','block_timetracker',
@@ -106,7 +116,7 @@ if($workerrecord->active == 0){
 if ($mform->is_cancelled()){ //user clicked cancel
     $urlparams = array();
     $urlparams['id'] = $courseid;
-    redirect($index,'');
+    redirect($nextpage);
 } else if ($formdata=$mform->get_data()){
 
         $formdata->courseid = $formdata->id;
@@ -120,7 +130,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
         update_unit($formdata);
 
         $status = 'Workunit edited successfully.'; 
-        redirect($index,$status,1);
+        redirect($nextpage,$status,1);
 
 } else {
     //form is shown for the first time

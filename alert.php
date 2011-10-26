@@ -74,6 +74,23 @@ $indexparams['userid'] = $userid;
 $indexparams['id'] = $courseid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $index;
+}
+if(strpos($nextpage, curr_url()) !== false){
+    $nextpage = $SESSION->lastpage;
+} else {
+    $SESSION->lastpage = $nextpage;
+}
+
+if($nextpage == $CFG->wwwroot.'/blocks/timetracker/hourlog.php'){
+    $nextpage .=
+        '?id='.$courseid.
+        '&userid='.$userid;
+}
+
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
@@ -92,7 +109,7 @@ if($workerrecord->active == 0){
 
 if ($mform->is_cancelled()){ 
     //user clicked cancel
-    redirect($index);
+    redirect($nextpage);
 
 } else if ($formdata=$mform->get_data()){
     // Data collection to send email to supervisor(s)
@@ -309,7 +326,7 @@ if ($mform->is_cancelled()){
     }
 
         $status = get_string('emessagesent','block_timetracker');
-        redirect($index,$status,1);
+        redirect($nextpage, $status,1);
 
     
     } else {

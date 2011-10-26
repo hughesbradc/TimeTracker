@@ -24,17 +24,56 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
+require_once('lib.php');
 
 
 require_login();
 
+global $SESSION;
+
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
 $unitid = required_param('unitid', PARAM_INTEGER);
-$nextpage = optional_param('next',0,PARAM_INTEGER);
+
+$eunitid = optional_param('eunitid', 0, PARAM_INTEGER);
+$estart = optional_param('estart', 0, PARAM_INTEGER);
+$eend = optional_param('eend', 0, PARAM_INTEGER);
+$eispending = optional_param('eispending', false, PARAM_BOOL);
+
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
+
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $index;
+}
+//if we posted to ourself from ourself
+if(strpos($nextpage, curr_url()) !== false){
+    $nextpage = $SESSION->lastpage;
+} else {
+    $SESSION->lastpage = $nextpage;
+}
+
+error_log($nextpage);
+
+//check to see if from editunit
+if($nextpage == $CFG->wwwroot.'/blocks/timetracker/editunit.php'){
+    $nextpage = $nextpage.
+        '?id='.$courseid.
+        '&userid='.$userid.
+        '&unitid='.$eunitid.
+        '&start='.$estart.
+        '&end='.$eend.
+        '&ispending='.$eispending;
+//} else if($nextpage == $CFG->wwwroot.'/blocks/timetracker/reports.php'){
+          
+
+}
+error_log($nextpage);
+
 
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -43,12 +82,6 @@ if($courseid){
 } else {
     $context = get_context_instance(CONTEXT_SYSTEM);
     $PAGE->set_context($context);
-}
-
-//assume we're coming from reports
-$nexturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
-if($nextpage!=0){
-    $nexturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 }
 
 if (!has_capability('block/timetracker:manageworkers', $context)) {
@@ -61,6 +94,7 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
         print_error('errordeleting','block_timetracker', 
             $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
     }
+    unset($SESSION->afterdelete);
 }
 
-redirect($nexturl, 'Unit deleted', 1);
+redirect($nextpage, 'Unit deleted', 1);

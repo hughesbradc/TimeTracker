@@ -24,13 +24,50 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+* Tell whether a unit can be editable, based on the following:
+* A unit may be edited until the 5th day of the next month
+*/
+function expired($timein, $now=-1){
+    if($now == -1) $now = time();
+
+    $currdateinfo = usergetdate($now);
+
+    $unitdateinfo = usergetdate($timein);
+    if($now - $timein > (86400 * 35) || 
+        (($currdateinfo['month'] != $unitdateinfo['month'] || 
+        $currdateinfo['year'] != $unitdateinfo['year']) &&
+        $currdateinfo['mday'] > 5)){
+        return true;
+    }
+    return false;
+
+}
+
+function curr_url(){
+    $pageURL = 'http';
+    if (isset($_SERVER['HTTPS']) && 
+        $_SERVER['HTTPS'] == "on") 
+        $pageURL .= "s";
+
+    $pageURL .= "://";
+    if ($_SERVER["SERVER_PORT"] != "80") {
+        $pageURL .=
+        $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+    } else {
+        $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+    }
+    return $pageURL;
+
+}
+
 
 /**
 * Given an object that holds all of the values necessary from block_timetracker_workunit,
 * Add it to the workunit table, splitting across multiple days if necessary
 * @return true if worked, false if failed
 */
-function add_unit($unit){
+function add_unit($unit,$hourlog=false){
     global $DB;
 
     if(!is_object($unit)) return 0;    
@@ -46,10 +83,18 @@ function add_unit($unit){
 
         $unitid = $DB->insert_record('block_timetracker_workunit', $unit);
         if($unitid){
-            add_to_log($unit->courseid, '', 'add clock-out', '', 'TimeTracker clock-out.');
+            if($hourlog)
+                add_to_log($unit->courseid, '', 'add work unit', '', 'TimeTracker hourlog');
+            else
+                add_to_log($unit->courseid, '', 'add clock-out', '', 'TimeTracker clock-out');
         } else {
-            add_to_log($unit->courseid, '', 
-                'error clocking-out', '', 'ERROR:  User clock-out failed.');
+            if($hourlog){
+                add_to_log($unit->courseid, '', 
+                    'error adding work unit', '', 'ERROR:  User hourlog failed.');
+            } else {
+                add_to_log($unit->courseid, '', 
+                    'error clocking-out', '', 'ERROR:  User clock-out failed.');
+            }
             return false; 
         }
         return true;
@@ -143,19 +188,9 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
         "($timeout > timein AND $timeout <= timeout) OR ".
         "(timein >= $timein AND timein < $timeout))";
         
-        /*
-        "($timein = timein AND $timeout = timeout) OR 
-        ($timein < timein AND $timeout > timeout) OR 
-            (($timein > timein AND $timein < timeout) AND $timeout > timeout) OR 
-            (($timeout > timein AND $timeout < timeout) AND $timein < timein) OR
-            ($timein > timein AND $timeout < timeout))";
-        */
-
     if($unitid != -1){
       $sql.=" AND id != $unitid"; 
     }
-
-    //error_log($sql);
 
     $numexistingunits = $DB->count_records_sql($sql);
 
@@ -169,6 +204,85 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
 
     if($numexistingunits == 0 && $numpending == 0) return false;
     return true;
+}
+
+/**
+* Returns an array of stdobjects that have the following:
+* obj->display (how to display the work unit)
+* obj->editlink (a url to edit the work unit)
+* obj->deletelink (a url to delete the unit)
+* obj->alertlink (a url to create an alert)
+* obj->timein (a timestamp for this clock-in)
+* obj->timeout (a timestamp for this clock-out, if applicable. if
+* obj->id (the id of the offending unit)
+* it is a pending clock-in, this value will be the same as the clock-in value)
+* If the array is empty, there are no overlapping units
+*/
+function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
+
+    global $CFG, $COURSE, $DB;
+    if($courseid == -1) $courseid = $COURSE->id;
+    
+    //check workunit table first
+    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        "$userid = userid AND $courseid = courseid AND (".
+        "($timein >= timein AND $timein < timeout) OR ".
+        "($timeout > timein AND $timeout <= timeout) OR ".
+        "(timein >= $timein AND timein < $timeout))";
+        
+    if($unitid != -1){
+      $sql.=" AND id != $unitid"; 
+    }
+
+    $conflictingunits = $DB->get_records_sql($sql);
+
+    $conflicts  = array();
+    $baseurl = $CFG->wwwroot.'/blocks/timetracker';
+    foreach ($conflictingunits as $unit){
+        $entry = new stdClass();
+        $disp = 'From: '.userdate($unit->timein,
+            get_string('datetimeformat', 'block_timetracker'),99,false).
+            ' to '.userdate($unit->timeout,
+            get_string('timeformat', 'block_timetracker'),99,false);
+        $entry->display = $disp;
+        $entry->deletelink = $baseurl.'/deleteworkunit.php?id='.$unit->courseid.
+            '&userid='.$unit->userid.'&unitid='.$unit->id.
+            '&sesskey='.sesskey();
+        $entry->editlink = $baseurl.'/editunit.php?id='.$unit->courseid.
+            '&userid='.$unit->userid.'&unitid='.$unit->id;
+        $entry->alertlink = $baseurl.'/alert.php?id='.$unit->courseid.
+            '&userid='.$unit->userid.'&unitid='.$unit->id;
+        $entry->timein = $unit->timein;
+        $entry->timeout = $unit->timeout;
+        $entry->id = $unit->id;
+
+        $conflicts[] = $entry;
+    }
+
+    //pending units
+    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_pending WHERE '.
+        "$userid = userid AND $courseid = courseid AND ".
+        "timein BETWEEN $timein AND $timeout";
+
+    $pendingconflicts = $DB->get_records_sql($sql);
+    foreach ($pendingconflicts as $pending){
+        $entry = new stdClass();
+        $disp = 'Pending clock-in time: '.userdate($pending->timein,
+            get_string('datetimeformat', 'block_timetracker'));
+        $entry->display = $disp;
+        $entry->deletelink = $baseurl.'/deleteworkunit.php?id='.$pending->courseid.
+            '&userid='.$pending->userid.'&unitid='.$pending->id;
+        $entry->editlink =  '#';
+        $entry->timein = $entry->timeout = $pending->timein;
+        $entry->alertlink = $baseurl.'/alert.php?id='.$pending->courseid.
+            '&userid='.$pending->userid.'&unitid='.$pending->id.'&ispending=true';
+        $entry->id = $pending->id;
+
+        $conflicts[] = $entry;
+
+    }
+   
+    return $conflicts;
 }
 
 /**
@@ -722,7 +836,6 @@ function get_worker_stats($userid,$courseid){
     $stats['yearhours'] = get_hours_this_year($userid, $courseid);
     $stats['termhours'] = get_hours_this_term($userid, $courseid);
 
-    //$stats['totalearnings'] = number_format(get_total_earnings($userid,$courseid),2);
     $stats['totalearnings'] = get_total_earnings($userid,$courseid);
     $stats['monthearnings'] =get_earnings_this_month($userid,$courseid);
     $stats['yearearnings'] = get_earnings_this_year($userid,$courseid);

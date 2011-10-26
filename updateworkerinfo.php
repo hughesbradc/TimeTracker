@@ -30,9 +30,7 @@ require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 $mdluserid = required_param('mdluserid', PARAM_INTEGER);
-
 $userid = optional_param('userid', -1, PARAM_INTEGER);
-
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
@@ -46,21 +44,33 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 $urlparams['id'] = $courseid;
 $urlparams['mdluserid'] = $mdluserid;
 $urlparams['userid'] = $userid;
-$indexurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+
+if(isset($_SERVER['HTTP_REFERER'])){
+    $nextpage = $_SERVER['HTTP_REFERER'];
+} else {
+    $nextpage = $index;
+}
+
+//if we posted to ourself from ourself
+if(strpos($nextpage, curr_url()) !== false){
+    $nextpage = $SESSION->lastpage;
+} else {
+    $SESSION->lastpage = $nextpage;
+}
 
 
 $worker = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid));
 
 if($worker){
     $userid=$worker->id;
-    $indexurl->params(array('userid'=>$userid));
+    $index->params(array('userid'=>$userid));
 
     $ttuserid = $worker->id;
     if($USER->id != $worker->mdluserid && !$canmanage){
-        print_error('notpermissible', 'block_timetracker',$indexurl);
+        print_error('notpermissible', 'block_timetracker',$index);
     }
 }
-
 
 $PAGE->set_url(new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/updateworkerinfo.php',$urlparams));
@@ -71,18 +81,13 @@ $PAGE->set_title($strtitle);
 $PAGE->set_pagelayout('base');
 
 $PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $indexurl);
+$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_updateworkerinfo_form($context, $courseid, $mdluserid);
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    if($canmanage){
-        redirect($CFG->wwwroot. '/blocks/timetracker/manageworkers.php?id=' .$COURSE->id
-            .'&userid='.$USER->id);
-    } else {
-        redirect($CFG->wwwroot. '/course/view.php?id='.$COURSE->id);
-    }
+    redirect($nextpage);
 
 } else if ($formdata=$mform->get_data()){
 
@@ -100,7 +105,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
     $indexparams['id'] = $courseid;
     $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
-    redirect($index);
+    redirect($nextpage);
     
 } else {
     //form is shown for the first time

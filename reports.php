@@ -56,7 +56,6 @@ $urlparams['userid'] = $userid;
 if($reportstart) $urlparams['repstart'] = $reportstart;
 if($reportend) $urlparams['repend'] = $reportend;
 
-
 $reportsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $urlparams);
 
 $PAGE->set_url($reportsurl);
@@ -80,14 +79,12 @@ $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
 
-
-
 $mform = new timetracker_reports_form($PAGE->context,
     $userid,$courseid,$reportstart,$reportend);
 
 if ($mform->is_cancelled()){ //user clicked 'cancel'
 
-    redirect($index); 
+    redirect($reportsurl); 
 
 } else if($formdata = $mform->get_data()){
 
