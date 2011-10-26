@@ -21,7 +21,7 @@ global $CFG, $DB, $USER;
 //start/stop time for search
 $from=1314849600;
 $to=time();
-$datetimeformat='%m/%d/%y, %I:%M %p';
+$datetimeformat='%m/%d/%y %I:%M %p';
 
 
 $day_names = array();
@@ -30,8 +30,9 @@ $day_names['t'] = 'Tuesday';
 $day_names['w'] = 'Wednesday';
 $day_names['r'] = 'Thursday';
 $day_names['f'] = 'Friday';
+$day_names['s'] = 'Saturday';
 
-if(($handle = fopen("/tmp/student_schedules.csv", "r")) !== FALSE){
+if(($handle = fopen("2011Fall_student_schedules.csv", "r")) !== FALSE){
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
         $email = $data[0].'@mhc.edu';
@@ -39,6 +40,9 @@ if(($handle = fopen("/tmp/student_schedules.csv", "r")) !== FALSE){
         $days_string = $data[2];
         $starttime = $data[3];
         $endtime = $data[4];
+
+        if(strtolower($days_string) == 'tba') continue;
+        if(strtolower($days_string) == 'mtof') $days_string='mtwrf';
 
         $workers = $DB->get_records('block_timetracker_workerinfo',
             array('email'=>$email)); 
@@ -54,7 +58,8 @@ if(($handle = fopen("/tmp/student_schedules.csv", "r")) !== FALSE){
            
             $teachers = get_users_by_capability($context, 'block/timetracker:manageworkers');
             if(!$teachers){
-                echo ('No supervisor is enrolled in the course.');
+                error_log("no teachers for $course->shortname");
+                continue;
             }
             
             $supervisor = '';
