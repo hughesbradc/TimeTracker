@@ -139,10 +139,12 @@ class timetracker_changealert_form extends moodleform {
     
     
                     $errormsg .= '<td>'.$conflict->display.'</td><td>';
+                    /*
                     if($conflict->editlink != '#') //not a pending clock-in
                         $errormsg .= ' '.$editaction;
     
                     $errormsg .= ' '.$deleteaction.'</td></tr>';
+                    */
                 }
                 $errormsg .= '</table>';
                 $errors['timein'] = $errormsg;

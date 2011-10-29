@@ -70,7 +70,7 @@ if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $manageworkerurl;
 }
 */
-$next = $manageworkerurl;
+$nextpage = $manageworkerurl;
 
 $PAGE->set_url($manageworkerurl);
 $PAGE->set_pagelayout('base');

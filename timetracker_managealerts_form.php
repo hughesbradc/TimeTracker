@@ -139,11 +139,11 @@ class timetracker_managealerts_form  extends moodleform {
     
             if($canmanage){
 
-                $editurl = new moodle_url($alertlinks[$worker->id]['change']);
+                $editurl = new moodle_url($alertlinks[$worker->id][$alert->id]['change']);
                 $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
                     'Edit proposed work unit','block_timetracker'));
     
-                $approveurl = new moodle_url($alertlinks[$worker->id]['approve']);
+                $approveurl = new moodle_url($alertlinks[$worker->id][$alert->id]['approve']);
                 $checkicon = new pix_icon('approve',
                     'Approve the proposed work unit','block_timetracker');
                 if($alert->todelete){
@@ -154,7 +154,7 @@ class timetracker_managealerts_form  extends moodleform {
                     $approveaction=$OUTPUT->action_icon($approveurl, $checkicon);
                 }
 
-                $deleteurl = new moodle_url($alertlinks[$worker->id]['delete']);
+                $deleteurl = new moodle_url($alertlinks[$worker->id][$alert->id]['delete']);
                 $deleteicon = new pix_icon('delete',
                     'Delete this alert', 'block_timetracker');
                 $deleteaction = $OUTPUT->action_icon(
@@ -162,7 +162,7 @@ class timetracker_managealerts_form  extends moodleform {
                     new confirm_action(
                     'Are you sure you want to delete this alert?'));
         
-                $denyurl = new moodle_url($alertlinks[$worker->id]['deny']);
+                $denyurl = new moodle_url($alertlinks[$worker->id][$alert->id]['deny']);
                 $denyicon = new pix_icon('clock_delete',
                     'Deny and restore original work unit','block_timetracker');
 

@@ -193,6 +193,7 @@ class timetracker_alert_form  extends moodleform {
                 break;
             }
         }
+        $expired = false;
         if(!has_capability('block/timetracker:manageoldunits', $this->context) && 
             expired($data['timeinerror'])){
             $expired = true;            
@@ -221,8 +222,9 @@ class timetracker_alert_form  extends moodleform {
         } else if($data['timeouterror'] > time()){
             $errors['timeouterror'] = 'Time cannot be set in the future.';
         } else {
+
             $conflicts = find_conflicts($data['timeinerror'], $data['timeouterror'],
-                $data['userid']);
+                $data['userid'], $data['unitid'], -1, $data['ispending']);
             
             if(sizeof($conflicts) > 0){
                 $errormsg = 'Work unit conflicts with existing unit(s):<br />';

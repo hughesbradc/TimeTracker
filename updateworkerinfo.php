@@ -44,7 +44,6 @@ $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
-/*
 if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $_SERVER['HTTP_REFERER'];
 } else {
@@ -57,8 +56,7 @@ if(strpos($nextpage, qualified_me()) !== false){
 } else {
     $SESSION->lastpage = $nextpage;
 }
-*/
-$nextpage = $index;
+//$nextpage = $index;
 
 $worker = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid));
 

@@ -159,7 +159,8 @@ if ($mform->is_cancelled()){
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage6','block_timetracker', $formdata->message);
     $messagetext .= get_string('br2','block_timetracker');
-    $messagetext .= get_string('hr','block_timetracker');
+    //$messagetext .= get_string('hr','block_timetracker');
+    $messagetext .= get_string('br1','block_timetracker');
     $messagetext .= get_string('emessageavailable','block_timetracker');
     $messagetext .= get_string('br1','block_timetracker');
     $messagetext .= get_string('emessagedisclaimer','block_timetracker');
@@ -199,7 +200,8 @@ if ($mform->is_cancelled()){
     $messagehtml .= get_string('br2','block_timetracker');
     $messagehtml .= get_string('emessage6','block_timetracker', $formdata->message);
     $messagehtml .= get_string('br2','block_timetracker');
-    $messagehtml .= get_string('hr','block_timetracker');
+    //$messagehtml .= get_string('hr','block_timetracker');
+    $messagehtml .= get_string('br1','block_timetracker');
     $messagehtml .= get_string('emessageavailable','block_timetracker');
     $messagehtml .= get_string('br1','block_timetracker');
     $messagehtml .= get_string('emessagedisclaimer','block_timetracker');

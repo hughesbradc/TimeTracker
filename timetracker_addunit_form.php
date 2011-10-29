@@ -28,10 +28,12 @@ require_once ('lib.php');
 
 class timetracker_addunit_form  extends moodleform {
 
-    function timetracker_addunit_form($context, $userid, $courseid){
+    function timetracker_addunit_form($context, $userid, $courseid, $timein=0, $timeout=0){
         $this->context = $context;
         $this->userid = $userid;
         $this->courseid = $courseid;
+        $this->timein = $timein;
+        $this->timeout = $timeout;
         parent::__construct();
     }
 
@@ -74,10 +76,16 @@ class timetracker_addunit_form  extends moodleform {
             $mform->addElement('date_time_selector','timein','Time In: ',
                 array('optional'=>false,'step'=>1));
 		    $mform->addHelpButton('timein','timein','block_timetracker');
+            if($this->timein != 0){
+                $mform->setDefault('timein',$this->timein);
+            }
         
             $mform->addElement('date_time_selector','timeout','Time Out: ',
                 array('optional'=>false,'step'=>1));
 		    $mform->addHelpButton('timeout','timeout','block_timetracker');
+            if($this->timeout != 0){
+                $mform->setDefault('timeout',$this->timeout);
+            }
 		    
             $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
         } else {
@@ -101,46 +109,39 @@ class timetracker_addunit_form  extends moodleform {
             $conflicts = find_conflicts($data['timein'],$data['timeout'],$data['userid']);
             if(sizeof($conflicts) > 0){
 
-                if($data['inpopup'] == true){
-                    $errormsg = 'Work unit conflicts with existing unit(s).<br />'.
-                        'Change your times and click \'Save\' to re-check against '.
-                        'existing units';
-                } else {
-                    $params['userid'] = $data['userid'];
-                    $params['id'] = $data['id'];
-                    $params['timein'] = $data['timein'];
-                    $params['timeout'] = $data['timeout'];
+                $params['userid'] = $data['userid'];
+                $params['id'] = $data['id'];
+                $params['timein'] = $data['timein'];
+                $params['timeout'] = $data['timeout'];
 
-                    $next = new moodle_url(qualified_me(), $params);
-                    $SESSION->fromurl = $next;
+                $next = new moodle_url(qualified_me(), $params);
+                $SESSION->fromurl = $next;
 
-                    $errormsg = 'Work unit conflicts with existing unit(s):<br />';
-                    $errormsg .= '<table>';
-                    foreach($conflicts as $conflict){
-                        $errormsg .= '<tr>';
-                        $conflict->editlink .= '&inpopup=true';
-                        $editaction = $OUTPUT->action_icon($conflict->editlink, new
-                            pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
+                $errormsg = 'Work unit conflicts with existing unit(s):<br />';
+                $errormsg .= '<table>';
+                foreach($conflicts as $conflict){
+                    $errormsg .= '<tr>';
+                    $conflict->editlink .= '&inpopup=true';
+
+                    $editaction = $OUTPUT->action_icon(
+                        $conflict->editlink, 
+                        new pix_icon('clock_edit', 'Edit unit', 'block_timetracker'),
+                        new popup_action('click', $conflict->editlink, 'editunit'));
         
-                        /*
-                        $conflict->deletelink .=
-                            '&next=addunit';
-                        */
-                        $deleteaction = $OUTPUT->action_icon(
-                            $conflict->deletelink, new pix_icon('clock_delete',
-                            get_string('delete'), 'block_timetracker'),
-                            new confirm_action('Are you sure you want to delete this '.
-                            ' conflicting work unit?'));
+                    $deleteaction = $OUTPUT->action_icon(
+                        $conflict->deletelink, new pix_icon('clock_delete',
+                        get_string('delete'), 'block_timetracker'),
+                        new confirm_action('Are you sure you want to delete this '.
+                        ' conflicting work unit?'));
         
-                        $errormsg .= '<td>'.$conflict->display.'</td><td>';
-                        if($conflict->editlink != '#') //not a pending clock-in
-                            $errormsg .= ' '.$editaction;
+                    $errormsg .= '<td>'.$conflict->display.'</td><td>';
+                    if($conflict->editlink != '#') //not a pending clock-in
+                        $errormsg .= ' '.$editaction;
         
-                        $errormsg .= ' '.$deleteaction.'</td></tr>';
-                    }
-                    $errormsg .= '</table>';
-                    $errors['timein'] = $errormsg;
+                    $errormsg .= ' '.$deleteaction.'</td></tr>';
                 }
+                $errormsg .= '</table>';
+                $errors['timein'] = $errormsg;
             }
         }
     

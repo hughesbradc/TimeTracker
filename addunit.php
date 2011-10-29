@@ -33,12 +33,16 @@ require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
+$timein = optional_param('timein', 0, PARAM_INTEGER);
+$timeout = optional_param('timeout', 0, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 
 //set up page URLs
 $url = new moodle_url($CFG->wwwroot.'/blocks/timetracker/addunit.php', $urlparams);
+$url->params(array('timein'=>"$timein"));
+$url->params(array('timeout'=>"$timeout"));
 $manage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -88,11 +92,13 @@ if (isset($SESSION->fromurl) &&
 }
 
 $PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $manage);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_addunit_form($context, $userid, $courseid);
+$mform = new timetracker_addunit_form($context, $userid, $courseid,
+    $timein, $timeout);
 
 if($workerrecord->active == 0){
     echo $OUTPUT->header();
@@ -103,8 +109,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    //TODO Redirect user to the home page
-	 redirect($nextpage);
+	 redirect($manage);
 
 } else if ($formdata=$mform->get_data()){
     $formdata->courseid = $formdata->id;

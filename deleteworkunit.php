@@ -61,6 +61,7 @@ if(strpos($nextpage, me()) !== false){
 //error_log('in delete: '.$SESSION->fromurl);
 if (isset($SESSION->fromurl) &&
     !empty($SESSION->fromurl)){
+    error_log($SESSION->fromurl);
     $nextpage = new moodle_url($SESSION->fromurl);
     unset($SESSION->fromurl);
 }
