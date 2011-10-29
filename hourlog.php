@@ -77,6 +77,7 @@ if($USER->id != $workerrecord->mdluserid && !$canmanage){
 $strtitle = get_string('hourlogtitle','block_timetracker',
     $workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
 
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
