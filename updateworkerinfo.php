@@ -44,8 +44,8 @@ $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
-if(isset($_SERVER['HTTP_REFERER'])){
-    $nextpage = $_SERVER['HTTP_REFERER'];
+if(get_referer(false)){
+    $nextpage = get_referer(false);
 } else {
     $nextpage = $index;
 }
