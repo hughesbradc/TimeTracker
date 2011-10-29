@@ -76,14 +76,12 @@ if(get_referer(false)){
     $nextpage = $manage;
 }
 
-/*
 //if we posted to ourself from ourself
 if(strpos($nextpage, qualified_me()) !== false){
     $nextpage = new moodle_url($SESSION->lastpage);
 } else {
     $SESSION->lastpage = $nextpage;
 }
-*/
 
 if (isset($SESSION->fromurl) &&
     !empty($SESSION->fromurl)){

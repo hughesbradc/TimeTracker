@@ -182,13 +182,13 @@ class timetracker_editunit_form extends moodleform {
                 $params['unitid'] = $data['unitid'];
 
                 $next = new moodle_url(qualified_me(),$params);
-                $SESSION->fromurl = $next;
                 //error_log('form: '.$next);
                 if($data['inpopup'] == true){
                     $errormsg = 'Work unit conflicts with existing unit(s).<br />'.
                         'Change your times and click \'Save\' to re-check against '.
                         'existing units';
                 } else {
+                    $SESSION->fromurl = $next;
 
                     $errormsg = 'Work unit conflicts with existing unit(s).<br />';
 
