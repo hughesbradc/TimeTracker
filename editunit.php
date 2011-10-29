@@ -94,6 +94,12 @@ if(!$inpopup){ //don't modify SESSION->lastpage from popup
     }
 }
 
+if (isset($SESSION->fromurl) &&
+    !empty($SESSION->fromurl)){
+    $nextpage = new moodle_url($SESSION->fromurl);
+    unset($SESSION->fromurl);
+}
+
 if($USER->id != $workerrecord->mdluserid && !$canmanage){
     print_error('You do not have permissions to add hours for this user');
 } else if(!$canmanage && $workerrecord->timetrackermethod==0){

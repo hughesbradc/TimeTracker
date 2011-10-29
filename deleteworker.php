@@ -48,23 +48,23 @@ if($courseid){
 $manageworkerurl = new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/manageworkers.php', $urlparams);
 
-$PAGE->set_url($manageworkerurl);
-$PAGE->set_pagelayout('base');
+//$PAGE->set_url($manageworkerurl);
+//$PAGE->set_pagelayout('base');
 
-$strtitle = get_string('manageworkertitle','block_timetracker');
+//$strtitle = get_string('manageworkertitle','block_timetracker');
 
-$PAGE->set_title($strtitle);
-$PAGE->set_heading($strtitle);
+//$PAGE->set_title($strtitle);
+//$PAGE->set_heading($strtitle);
 
 #print_object($urlparams);
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 //$PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
-$PAGE->navbar->add($strtitle);
+//$PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $timetrackerurl);
+//$PAGE->navbar->add($strtitle);
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading($strtitle, 2);
+//echo $OUTPUT->header();
+//echo $OUTPUT->heading($strtitle, 2);
 
 
 //$PAGE->print_header('Delete TimeTracker Worker', 'Delete Worker');
@@ -79,11 +79,12 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
         $DB->delete_records('block_timetracker_workerinfo',array('id'=>$userid));    
         $DB->delete_records('block_timetracker_workunit',array('userid'=>$userid));    
         $DB->delete_records('block_timetracker_pending',array('userid'=>$userid));    
-        echo 'Worker and all data have been deleted';
+        redirect($manageworkerurl, 'All worker data has been deleted. Un-enroll the
+            worker from the course to completely remove them.', 3);
     } else {
         print_error('errordeleting','block_timetracker', 
             $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
     }
 }
 
-echo $OUTPUT->footer();
+//echo $OUTPUT->footer();

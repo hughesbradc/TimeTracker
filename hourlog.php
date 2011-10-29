@@ -74,8 +74,6 @@ if($USER->id != $workerrecord->mdluserid && !$canmanage){
     redirect($nextpage, $status,1);
 }
 
-
-
 $strtitle = get_string('hourlogtitle','block_timetracker',
     $workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
@@ -102,7 +100,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    redirect($nextpage);
+    redirect($index);
 
 } else if ($formdata=$mform->get_data()){
         $formdata->courseid = $formdata->id;
