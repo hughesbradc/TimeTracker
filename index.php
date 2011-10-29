@@ -282,7 +282,7 @@ if ($canmanage) { //supervisor
             echo $OUTPUT->box_start('generalbox boxaligncenter');
             echo '<h2>';
             echo $clockinaction;
-            echo 'Add Hours?</h2>';
+            echo ' Add Hours?</h2>';
             echo 'Would you like to add some hours now? Click the icon to '.
                 'add work units.<br />';
             echo $OUTPUT->box_end();

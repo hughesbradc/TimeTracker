@@ -120,7 +120,6 @@ class timetracker_editunit_form extends moodleform {
         $mform->addElement('html','</blockquote>');
         /** END EXISTING DATA **/
 
-
         $mform->addElement('date_time_selector','timein','Time In: ',
             array('optional'=>false,'step'=>1));
 		$mform->addHelpButton('timein','timein','block_timetracker');
@@ -129,7 +128,7 @@ class timetracker_editunit_form extends moodleform {
         } else {
             $mform->setDefault('timein',$unit->timein);
         }
-        
+       
         if(!$this->ispending){
             $mform->addElement('date_time_selector','timeout','Time Out: ',
                 array('optional'=>false,'step'=>1));

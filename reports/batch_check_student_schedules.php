@@ -2,8 +2,8 @@
 <?php
 
 define('CLI_SCRIPT', true);
-require_once('../../config.php');
-require_once('lib.php');
+require_once('../../../config.php');
+require_once('../lib.php');
 //require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
 global $CFG, $DB, $USER;
