@@ -101,7 +101,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    redirect($nextpage);
+    redirect($index);
 
 } else if ($formdata=$mform->get_data()){
         $formdata->courseid = $formdata->id;
