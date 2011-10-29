@@ -202,7 +202,7 @@ class timetracker_editunit_form extends moodleform {
                             $conflict->editlink, 
                             new pix_icon('clock_edit', 'Edit unit', 'block_timetracker'),
                             new popup_action('click', $conflict->editlink, 'editunit',
-                                array('height'=>400, 'width'=>745)));
+                                array('height'=>520, 'width'=>745)));
     
     
                         $conflict->deletelink .=
