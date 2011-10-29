@@ -4,4 +4,6 @@ fields terminated by ',' optionally enclosed by '"' escaped by '\\' lines termin
 '\n' from mdl_block_timetracker_workunit, mdl_block_timetracker_workerinfo, mdl_course
 where (timeout-timein) > 36000 AND mdl_course.id=mdl_block_timetracker_workunit.courseid
 AND mdl_block_timetracker_workerinfo.id=mdl_block_timetracker_workunit.userid AND
-mdl_block_timetracker_workunit.courseid <> 73 order by shortname;
+(mdl_block_timetracker_workunit.courseid < 73 OR
+mdl_block_timetracker_workunit.courseid > 76) order by shortname;
+

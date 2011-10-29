@@ -49,6 +49,24 @@ if(($handle = fopen("/tmp/student_schedules.csv", "r")) !== FALSE){
             if($worker->courseid <= 76 && $worker->courseid >=73) 
                 continue; //courses that don't count
 
+            $course = $DB->get_record('course',array('id'=>$worker->courseid));
+            $context = get_context_instance(CONTEXT_COURSE, $worker->courseid);
+           
+            $teachers = get_users_by_capability($context, 'block/timetracker:manageworkers');
+            if(!$teachers){
+                echo ('No supervisor is enrolled in the course.');
+            }
+            
+            $supervisor = '';
+            
+            foreach ($teachers as $teacher) {
+                if(is_enrolled($context, $teacher->id)){
+                    $supervisor .= $teacher->firstname.' '.$teacher->lastname .' ' .$teacher->email
+                    .',';
+                }
+            }
+            $supervisor = substr($supervisor,0,-1);
+
             $days_array = preg_split('//', $days_string, -1, PREG_SPLIT_NO_EMPTY); 
             foreach($days_array as $day){
                 $day = strtolower($day);
@@ -91,14 +109,10 @@ if(($handle = fopen("/tmp/student_schedules.csv", "r")) !== FALSE){
                         $worker->courseid);
                     if(sizeof($conflicts) > 0){
                         foreach($conflicts as $conflict){
-                            echo "\n";
-                            echo "******************************************************\n";
-                            echo "$worker->lastname, $worker->firstname\n";
-                            echo "Conflict on ".userdate($iterator, '%A %m/%d/%y')."\n";
-                            echo "Class: $coursename, meets $days_string from $starttime to $endtime\n";
-                            echo "Work unit: ".$conflict->display."\n";
-                            echo "******************************************************\n\n";
-
+                            echo "$worker->lastname,$worker->firstname,".
+                                "$coursename $days_string $starttime to $endtime,".
+                                userdate($iterator,'%A %m/%d/%y',99,false).",".
+                                $conflict->display.','.$course->shortname.','.$supervisor."\n";
                         }
                     }
                     $iterator = $iterator + (7 * 86400);
