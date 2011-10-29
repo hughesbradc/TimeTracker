@@ -61,126 +61,126 @@ class timetracker_managealerts_form  extends moodleform {
         $strproposed = get_string('proposed', 'block_timetracker');
         $strmsg = get_string('message', 'block_timetracker');
 
-        if(!has_course_alerts($COURSE->id)){
-            $mform->addElement('html','<div style="text-align:center">');
-            $mform->addElement('html',get_string('noalerts','block_timetracker'));
-            $mform->addElement('html','</div>'); 
-            return;
-        } else {
-            $mform->addElement('html', 
-            '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
+        $mform->addElement('html', 
+        '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
         
-            $tblheaders=
+        $tblheaders=
             '<tr>
                 <td><span style="font-weight: bold">'.$strname.'</span></td>
                 <td><span style="font-weight: bold">'.$strprev.'</span></td>
                 <td><span style="font-weight: bold">'.$strproposed.'</span></td>
                 <td><span style="font-weight: bold">'.$strmsg.'</span></td>';
-            if($canmanage)
-                    $tblheaders .= '<td style="text-align: center">'.
-                        '<span style="font-weight: bold">'.
-                        get_string('action').'</span></td>';
-            $tblheaders .= '</tr>';
+        if($canmanage)
+                $tblheaders .= '<td style="text-align: center">'.
+                    '<span style="font-weight: bold">'.
+                    get_string('action').'</span></td>';
+        $tblheaders .= '</tr>';
 
-            $mform->addElement('html',$tblheaders);
-        
-            $alertlinks=get_course_alert_links($COURSE->id);
-            //print_object($alertlinks);
+        $mform->addElement('html',$tblheaders);
 
-            if($canmanage){
-                $alerts = $DB->get_records('block_timetracker_alertunits', 
-                    array('courseid'=>$COURSE->id), 'alerttime');
-            } else {
-                $ttuserid = $DB->get_field('block_timetracker_workerinfo',
-                    'id', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
-                if(!$ttuserid) print_error('Error obtaining mdluserid from workerinfo for '.
+        if($issiteadmin && !has_course_alerts($COURSE->id)){
+            $mform->addElement('html',
+                '<tr><td colspan="5" style="text-align: center">'.
+                get_string('noalerts','block_timetracker').'</td></tr></table>');
+            return;
+        }
+
+        $alertlinks=get_course_alert_links($COURSE->id);
+        //print_object($alertlinks);
+
+        if($canmanage){
+            $alerts = $DB->get_records('block_timetracker_alertunits', 
+                array('courseid'=>$COURSE->id), 'alerttime');
+        } else {
+            $ttuserid = $DB->get_field('block_timetracker_workerinfo',
+                'id', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
+            if(!$ttuserid) print_error('Error obtaining mdluserid from workerinfo for '.
                 $USER->id);
-                $alerts = $DB->get_records('block_timetracker_alertunits',
-                    array('courseid'=>$COURSE->id,'userid'=>$ttuserid));
+            $alerts = $DB->get_records('block_timetracker_alertunits',
+                array('courseid'=>$COURSE->id,'userid'=>$ttuserid));
+        }
+
+
+        foreach ($alerts as $alert){ 
+            $worker = $DB->get_record('block_timetracker_workerinfo',
+                array('id'=>$alert->userid));
+
+            $mform->addElement('html','<tr>'); 
+            $row ='<td>'.$worker->lastname.', '.$worker->firstname .'</td>';
+            $row.='<td>In: '.userdate($alert->origtimein, 
+                get_string('datetimeformat','block_timetracker'));
+
+            if($alert->origtimeout > 0){
+                $row.='<br />Out: '.userdate($alert->origtimeout, 
+                    get_string('datetimeformat','block_timetracker'));
+                $row.='<br />Elapsed: '.format_elapsed_time($alert->origtimeout -
+                    $alert->origtimein);
+            } else {
+                $row.= '';
             }
+            $row .='</td>';
 
-
-            foreach ($alerts as $alert){ 
-                $worker = $DB->get_record('block_timetracker_workerinfo',
-                    array('id'=>$alert->userid));
-
-                $mform->addElement('html','<tr>'); 
-                $row ='<td>'.$worker->lastname.', '.$worker->firstname .'</td>';
-                $row.='<td>In: '.userdate($alert->origtimein, 
+            if($alert->todelete == 0){
+                $row.='<td>In: '.userdate($alert->timein, 
                     get_string('datetimeformat','block_timetracker'));
 
-                if($alert->origtimeout > 0){
-                    $row.='<br />Out: '.userdate($alert->origtimeout, 
-                        get_string('datetimeformat','block_timetracker'));
-                    $row.='<br />Elapsed: '.format_elapsed_time($alert->origtimeout -
-                        $alert->origtimein);
-                } else {
-                    $row.= '';
-                }
-                $row .='</td>';
+                $row.='<br />Out: '.userdate($alert->timeout, 
+                    get_string('datetimeformat','block_timetracker'));
 
-                if($alert->todelete == 0){
-                    $row.='<td>In: '.userdate($alert->timein, 
-                        get_string('datetimeformat','block_timetracker'));
+                $row.='<br />Elapsed: '.format_elapsed_time($alert->timeout -
+                    $alert->timein);
 
-                    $row.='<br />Out: '.userdate($alert->timeout, 
-                        get_string('datetimeformat','block_timetracker'));
-
-                    $row.='<br />Elapsed: '.format_elapsed_time($alert->timeout -
-                        $alert->timein);
-
-                    $row.='</td>';
-                } else {
-                    $row.='<td><span style="color: red">User requests removal</span></td>';
-                }
-
-                $row.='<td>'.nl2br($alert->message).'</td>';
-        
-                if($canmanage){
-
-                    $editurl = new moodle_url($alertlinks[$worker->id]['change']);
-                    $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
-                        'Edit proposed work unit','block_timetracker'));
-    
-                    $approveurl = new moodle_url($alertlinks[$worker->id]['approve']);
-                    $checkicon = new pix_icon('approve',
-                        'Approve the proposed work unit','block_timetracker');
-                    if($alert->todelete){
-                        $approveaction=$OUTPUT->action_icon($approveurl, $checkicon,
-                        new confirm_action('Are you sure you want to delete this work unit
-                        as requested by the worker?'));
-                    } else {
-                        $approveaction=$OUTPUT->action_icon($approveurl, $checkicon);
-                    }
-
-                    $deleteurl = new moodle_url($alertlinks[$worker->id]['delete']);
-                    $deleteicon = new pix_icon('delete',
-                        'Delete this alert', 'block_timetracker');
-                    $deleteaction = $OUTPUT->action_icon(
-                        $deleteurl, $deleteicon, 
-                        new confirm_action(
-                        'Are you sure you want to delete this alert?'));
-            
-                    $denyurl = new moodle_url($alertlinks[$worker->id]['deny']);
-                    $denyicon = new pix_icon('clock_delete',
-                        'Deny and restore original work unit','block_timetracker');
-    
-                    $denyaction = $OUTPUT->action_icon(
-                        $denyurl, $denyicon, 
-                        new confirm_action(
-                        'Are you sure you want to deny this alert unit?<br />The work unit 
-                        will be re-inserted into the worker\'s record as it originally
-                        appeared.'));
-    
-                    $row .= '<td style="text-align: center">'.
-                        $approveaction . ' ' . $deleteaction. ' '.
-                        $editaction. ' '.$denyaction.'</td>';
-                }
-        
-                $row.='</tr>';
-                $mform->addElement('html',$row);
-        
+                $row.='</td>';
+            } else {
+                $row.='<td><span style="color: red">User requests removal</span></td>';
             }
+
+            $row.='<td>'.nl2br($alert->message).'</td>';
+    
+            if($canmanage){
+
+                $editurl = new moodle_url($alertlinks[$worker->id][$alert->id]['change']);
+                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('clock_edit', 
+                    'Edit proposed work unit','block_timetracker'));
+    
+                $approveurl = new moodle_url($alertlinks[$worker->id][$alert->id]['approve']);
+                $checkicon = new pix_icon('approve',
+                    'Approve the proposed work unit','block_timetracker');
+                if($alert->todelete){
+                    $approveaction=$OUTPUT->action_icon($approveurl, $checkicon,
+                    new confirm_action('Are you sure you want to delete this work unit
+                    as requested by the worker?'));
+                } else {
+                    $approveaction=$OUTPUT->action_icon($approveurl, $checkicon);
+                }
+
+                $deleteurl = new moodle_url($alertlinks[$worker->id][$alert->id]['delete']);
+                $deleteicon = new pix_icon('delete',
+                    'Delete this alert', 'block_timetracker');
+                $deleteaction = $OUTPUT->action_icon(
+                    $deleteurl, $deleteicon, 
+                    new confirm_action(
+                    'Are you sure you want to delete this alert?'));
+        
+                $denyurl = new moodle_url($alertlinks[$worker->id][$alert->id]['deny']);
+                $denyicon = new pix_icon('clock_delete',
+                    'Deny and restore original work unit','block_timetracker');
+
+                $denyaction = $OUTPUT->action_icon(
+                    $denyurl, $denyicon, 
+                    new confirm_action(
+                    'Are you sure you want to deny this alert unit?<br />The work unit 
+                    will be re-inserted into the worker\'s record as it originally
+                    appeared.'));
+
+                $row .= '<td style="text-align: center">'.
+                    $approveaction . ' ' . $deleteaction. ' '.
+                    $editaction. ' '.$denyaction.'</td>';
+            }
+    
+            $row.='</tr>';
+            $mform->addElement('html',$row);
+    
         }
     
         $mform->addElement('html','</table>');

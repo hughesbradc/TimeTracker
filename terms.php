@@ -57,6 +57,8 @@ $canmanage = true;
 $strtitle = get_string('terms_title','block_timetracker');
 
 
+
+
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
 $PAGE->set_title($strtitle);

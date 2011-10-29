@@ -33,11 +33,17 @@ require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
+$timein = optional_param('timein', 0, PARAM_INTEGER);
+$timeout = optional_param('timeout', 0, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 
-$url = new moodle_url($CFG->wwwroot.'/blocks/timetracker/addunit.php',$urlparams);
+//set up page URLs
+$url = new moodle_url($CFG->wwwroot.'/blocks/timetracker/addunit.php', $urlparams);
+$url->params(array('timein'=>"$timein"));
+$url->params(array('timeout'=>"$timeout"));
+$manage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
@@ -50,38 +56,49 @@ $workerrecord = $DB->get_record('block_timetracker_workerinfo',
     array('id'=>$userid,'courseid'=>$courseid));
 
 if(!$workerrecord){
-    echo "NO WORKER FOUND!";
+    print_error("No worker found.");
     die;
 }
 
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
-    //print_error('nopermissionserror', 'block_timetracker');
-   
 }
 
 $strtitle = get_string('addunittitle','block_timetracker',
     $workerrecord->firstname.' '.$workerrecord->lastname); 
 
-$PAGE->set_title($strtitle);
+$nextpage = $manage;
 
-$urlparams['userid'] = $userid;
-$urlparams['id'] = $courseid;
-$manage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
-
-if(isset($_SERVER['HTTP_REFERER'])){
-    $nextpage = $_SERVER['HTTP_REFERER'];
+if(get_referer(false)){
+    $nextpage = new moodle_url(get_referer(false));
 } else {
     $nextpage = $manage;
 }
 
+/*
+//if we posted to ourself from ourself
+if(strpos($nextpage, qualified_me()) !== false){
+    $nextpage = new moodle_url($SESSION->lastpage);
+} else {
+    $SESSION->lastpage = $nextpage;
+}
+*/
 
+if (isset($SESSION->fromurl) &&
+    !empty($SESSION->fromurl)){
+    $nextpage = new moodle_url($SESSION->fromurl);
+    unset($SESSION->fromurl);
+}
+
+$PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $manage);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_addunit_form($context, $userid, $courseid);
+$mform = new timetracker_addunit_form($context, $userid, $courseid,
+    $timein, $timeout);
 
 if($workerrecord->active == 0){
     echo $OUTPUT->header();
@@ -92,8 +109,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    //TODO Redirect user to the home page
-	 redirect($nextpage);
+	 redirect($manage);
 
 } else if ($formdata=$mform->get_data()){
     $formdata->courseid = $formdata->id;
@@ -109,15 +125,18 @@ if ($mform->is_cancelled()){ //user clicked cancel
         $status = 'Error adding work unit(s)';
     }
 
-    redirect($nextpage,$status,1);
+    redirect($nextpage, $status, 1);
 
 } else {
     //form is shown for the first time
     echo $OUTPUT->header();
     $tabs = get_tabs($urlparams, $canmanage, $courseid);
+    $tabs[] = new tabobject('addunit',
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php#', $urlparams),
+        'Add Work Unit');
     
     $tabs = array($tabs);
-    print_tabs($tabs, 'manage');
+    print_tabs($tabs, 'addunit');
 
     $mform->display();
     echo $OUTPUT->footer();

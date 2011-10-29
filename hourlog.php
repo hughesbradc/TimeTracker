@@ -54,7 +54,6 @@ if(!$workerrecord){
     die;
 }
 
-
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
@@ -74,8 +73,6 @@ if($USER->id != $workerrecord->mdluserid && !$canmanage){
     $status = 'You are not authorized to use the hourlog interface.';
     redirect($nextpage, $status,1);
 }
-
-
 
 $strtitle = get_string('hourlogtitle','block_timetracker',
     $workerrecord->firstname.' '.$workerrecord->lastname); 
@@ -103,7 +100,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    redirect($nextpage, $status,1);
+    redirect($index);
 
 } else if ($formdata=$mform->get_data()){
         $formdata->courseid = $formdata->id;

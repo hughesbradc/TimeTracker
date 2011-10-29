@@ -34,46 +34,37 @@ global $SESSION;
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
 $unitid = required_param('unitid', PARAM_INTEGER);
-
-$eunitid = optional_param('eunitid', 0, PARAM_INTEGER);
-$estart = optional_param('estart', 0, PARAM_INTEGER);
-$eend = optional_param('eend', 0, PARAM_INTEGER);
-$eispending = optional_param('eispending', false, PARAM_BOOL);
-
+//$inpopup = optional_param('inpopup', 0, PARAM_BOOL);
+$next = optional_param('next', '', PARAM_ALPHA);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
-if(isset($_SERVER['HTTP_REFERER'])){
-    $nextpage = $_SERVER['HTTP_REFERER'];
+
+$nextpage = $index;
+if(get_referer(false)){
+    $nextpage = new moodle_url(get_referer(false));
 } else {
     $nextpage = $index;
 }
+
+/*
 //if we posted to ourself from ourself
-if(strpos($nextpage, curr_url()) !== false){
-    $nextpage = $SESSION->lastpage;
+if(strpos($nextpage, me()) !== false){
+    $nextpage = new moodle_url($SESSION->lastpage);
 } else {
     $SESSION->lastpage = $nextpage;
 }
+*/
 
-error_log($nextpage);
-
-//check to see if from editunit
-if($nextpage == $CFG->wwwroot.'/blocks/timetracker/editunit.php'){
-    $nextpage = $nextpage.
-        '?id='.$courseid.
-        '&userid='.$userid.
-        '&unitid='.$eunitid.
-        '&start='.$estart.
-        '&end='.$eend.
-        '&ispending='.$eispending;
-//} else if($nextpage == $CFG->wwwroot.'/blocks/timetracker/reports.php'){
-          
-
+//error_log('in delete: '.$SESSION->fromurl);
+if (isset($SESSION->fromurl) &&
+    !empty($SESSION->fromurl)){
+    error_log($SESSION->fromurl);
+    $nextpage = new moodle_url($SESSION->fromurl);
+    unset($SESSION->fromurl);
 }
-error_log($nextpage);
-
 
 if($courseid){
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -90,6 +81,7 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
 } else {
     if($unitid && confirm_sesskey()){
         $DB->delete_records('block_timetracker_workunit',array('id'=>$unitid));
+        //error_log("Deleted unit id: $unitid");
     } else {
         print_error('errordeleting','block_timetracker', 
             $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);

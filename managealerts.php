@@ -45,13 +45,16 @@ $urlparams['id'] = $courseid;
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
+/*
 if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $_SERVER['HTTP_REFERER'];
 } else {
     $nextpage = $index;
 }
+*/
 
 $alertsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams);
+$nextpage = $alertsurl;
 
 $PAGE->set_url($alertsurl);
 $PAGE->set_pagelayout('base');

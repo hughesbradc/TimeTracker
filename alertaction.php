@@ -47,16 +47,19 @@ $urlparams['alertid'] = $alertid;
 $courseid = $alertunit->courseid;
 
 $indexparams['id'] = $courseid; 
-$index = new moodle_url($CFG->wwwroot.
+$managealerts = new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/managealerts.php', $indexparams);
 $alertaction = new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/alertaction.php', $urlparams);
 
+/*
 if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $_SERVER['HTTP_REFERER'];
 } else {
-    $nextpage = $index;
+    $nextpage = $managealerts;
 }
+*/
+$nextpage = $managealerts;
 
 $course = $DB->get_record('course', array('id' => $alertunit->courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
@@ -64,13 +67,10 @@ $PAGE->set_url($alertaction);
 $PAGE->set_pagelayout('base');
 $context = $PAGE->context;
 
-
-
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
-
 
 if(!$canmanage){
     print_error('notpermissible','block_timetracker');
@@ -102,10 +102,19 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             $alertunit->lastedited = time();
             $alertunit->lasteditedby = $USER->id;
             //$result = $DB->insert_record('block_timetracker_workunit', $alertunit);
-            $result = add_unit($alertunit);
+
+            $conflicts = find_conflicts($alertunit->timein, $alertunit->timeout,
+                $alertunit->userid);  
+            if(sizeof($conflicts) == 0){
+
+                $result = add_unit($alertunit);
         
-            if(!$result){
-                print_error('Something happened');       
+                if(!$result){
+                    print_error('Something bad happened :(');       
+                }
+            } else {
+                redirect($managealerts, 'Cannot approve this unit; it conflicts with
+                    an existing work unit!', 3);
             }
         }
         
@@ -221,7 +230,18 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             $alertunit->timein = $alertunit->origtimein;
             $alertunit->timeout = $alertunit->origtimeout;
             //$DB->insert_record('block_timetracker_workunit', $alertunit);
-            add_unit($alertunit);
+
+            $conflicts = find_conflicts($alertunit->timein, $alertunit->timeout,
+                $alertunit->userid);  
+            if(sizeof($conflicts) == 0){
+                $result = add_unit($alertunit);
+                if(!$result){
+                    print_error('Something bad happened :(');       
+                }
+            } else {
+                redirect($managealerts, 'Cannot approve this unit; it conflicts with
+                    an existing work unit!', 3);
+            }
         }
 
         // Email worker and any other supervisor(s) that the work unit has been denied

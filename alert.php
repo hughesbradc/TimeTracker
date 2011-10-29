@@ -68,18 +68,19 @@ $strtitle = get_string('errortitle','block_timetracker',
     $workerrecord->firstname.' '.$workerrecord->lastname); 
 $PAGE->set_title($strtitle);
 
-$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+unset($urlparams['ispending']);
+unset($urlparams['unitid']);
 
-$indexparams['userid'] = $userid;
-$indexparams['id'] = $courseid;
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
+$nextpage = $index;
+/*
 if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $_SERVER['HTTP_REFERER'];
 } else {
     $nextpage = $index;
 }
-if(strpos($nextpage, curr_url()) !== false){
+if(strpos($nextpage, qualified_me()) !== false){
     $nextpage = $SESSION->lastpage;
 } else {
     $SESSION->lastpage = $nextpage;
@@ -90,14 +91,14 @@ if($nextpage == $CFG->wwwroot.'/blocks/timetracker/hourlog.php'){
         '?id='.$courseid.
         '&userid='.$userid;
 }
+*/
 
 $PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
+$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_alert_form($context, $userid, $courseid,
     $unitid, $ispending);
-
 
 if($workerrecord->active == 0){
     echo $OUTPUT->header();
@@ -158,7 +159,8 @@ if ($mform->is_cancelled()){
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage6','block_timetracker', $formdata->message);
     $messagetext .= get_string('br2','block_timetracker');
-    $messagetext .= get_string('hr','block_timetracker');
+    //$messagetext .= get_string('hr','block_timetracker');
+    $messagetext .= get_string('br1','block_timetracker');
     $messagetext .= get_string('emessageavailable','block_timetracker');
     $messagetext .= get_string('br1','block_timetracker');
     $messagetext .= get_string('emessagedisclaimer','block_timetracker');
@@ -198,7 +200,8 @@ if ($mform->is_cancelled()){
     $messagehtml .= get_string('br2','block_timetracker');
     $messagehtml .= get_string('emessage6','block_timetracker', $formdata->message);
     $messagehtml .= get_string('br2','block_timetracker');
-    $messagehtml .= get_string('hr','block_timetracker');
+    //$messagehtml .= get_string('hr','block_timetracker');
+    $messagehtml .= get_string('br1','block_timetracker');
     $messagehtml .= get_string('emessageavailable','block_timetracker');
     $messagehtml .= get_string('br1','block_timetracker');
     $messagehtml .= get_string('emessagedisclaimer','block_timetracker');

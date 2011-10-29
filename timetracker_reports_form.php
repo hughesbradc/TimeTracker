@@ -43,7 +43,7 @@ class timetracker_reports_form  extends moodleform {
         global $CFG, $USER, $DB, $OUTPUT;
         $mform =& $this->_form; // Don't forget the underscore! 
 
-        //userid of 0 means we want to see every worker.
+        //userid of 0 means we want to see every worker. -- this needs fixing. XXX
 
         $canmanage = false;
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
@@ -222,7 +222,10 @@ class timetracker_reports_form  extends moodleform {
 
         //************** WORK UNITS SECTION ****************//
 
+        //TODO - courseid is never really 0, unless we're viewing from main page.
         //which workers to see?
+
+        $workerdesc = 'Completed work units';
         $endtime = $this->reportend + ((60*60*23)+60*59); //23:59
         $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE timeout '.
             'BETWEEN '.$this->reportstart.' AND '.$endtime.' ';
@@ -230,14 +233,24 @@ class timetracker_reports_form  extends moodleform {
             $units = $DB->get_records_sql($sql);
         } else if ($this->userid==0 && $this->courseid!=0){ //see all workers, this course
             $sql .= 'AND courseid='.$this->courseid;
+            $workerdesc .= ' for all workers';
         } else { //specific user, this course
+            if($canmanage){
+                $allurl = new moodle_url($baseurl.'/reports.php',
+                    array('id'=>$this->courseid,
+                    'userid'=>0,
+                    'repstart'=>$this->reportstart,
+                    'repend'=>$this->reportend));
+                $workerdesc .= ' for '.$user->firstname.' '.
+                    $user->lastname.' [ '.$OUTPUT->action_link($allurl, 'see all').' ]';
+            }
             $sql .= ' AND courseid='.$this->courseid.' AND userid='.$this->userid;
         }
 
         $sql .= ' ORDER BY timein DESC';
         $units = $DB->get_records_sql($sql);
 
-        $mform->addElement('header', 'general', 'Completed work units');
+        $mform->addElement('header', 'general', $workerdesc); 
         if(!$units){ //if they don't have them.
             $mform->addElement('html','No completed work units<br />');
         } else { //if they do have some
@@ -266,10 +279,16 @@ class timetracker_reports_form  extends moodleform {
             foreach($units as $unit){
                 $row='<tr>';
                 if($this->userid == 0){
-                    $row .='<td><a href="'.$baseurl.
-                        '/reports.php?id='.$this->courseid.'&userid='.$unit->userid.'">'.
+                    $userurl = new moodle_url($baseurl.'/reports.php');
+                    $userurl->params(array(
+                        'id'=>$this->courseid,
+                        'userid'=>$unit->userid,
+                        'repstart'=>$this->reportstart,
+                        'repend'=>$this->reportend));
+                    $row .='<td>'.$OUTPUT->action_link($userurl,
                         $workers[$unit->userid]->lastname.', '.
-                        $workers[$unit->userid]->firstname.'</a></td>';
+                        $workers[$unit->userid]->firstname).
+                        '</td>';
                 } else if($canmanage){
                     $row .='<td>'.
                         $user->lastname.', '.

@@ -27,16 +27,27 @@ require_once('../../config.php');
 require_once('lib.php');
 require('timetracker_editunit_form.php');
 
-global $CFG, $COURSE, $USER;
+global $CFG, $COURSE, $USER, $SESSION;
 
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
-$unitid = required_param('unitid', PARAM_INTEGER);
 $start = optional_param('start', 0, PARAM_INTEGER);
 $end = optional_param('end', 0, PARAM_INTEGER);
-$ispending = optional_param('ispending',false,PARAM_BOOL);
+$ispending = optional_param('ispending', 0,PARAM_BOOL);
+$inpopup = optional_param('inpopup', 0, PARAM_BOOL);
+
+//make it optional, storing it in SESSION for better redirects. Hack?
+$unitid = optional_param('unitid', -1, PARAM_INTEGER);
+
+if (isset($SESSION->timetracker_lasteditunit) &&  
+    !empty($SESSION->timetracker_lasteditunit) &&
+    $unitid == -1){
+    $unitid = $SESSION->timetracker_lasteditunit;
+} else {
+    $SESSION->timetracker_lasteditunit = $unitid; 
+}
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
@@ -44,15 +55,17 @@ $urlparams['unitid'] = $unitid;
 $urlparams['start'] = $start;
 $urlparams['end'] = $end;
 $urlparams['ispending'] = $ispending;
+$urlparams['inpopup'] = $inpopup;
 
-$hourlogurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',$urlparams);
+
+//Define URLs for use in this page
+$edituniturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/editunit.php',$urlparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
-
-$PAGE->set_url($hourlogurl);
-$PAGE->set_pagelayout('base');
+$PAGE->set_url($edituniturl);
 
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
     array('id'=>$userid,'courseid'=>$courseid));
@@ -66,17 +79,25 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
-if(isset($_SERVER['HTTP_REFERER'])){
-    $nextpage = $_SERVER['HTTP_REFERER'];
+if(get_referer(false)){
+    $nextpage = new moodle_url(get_referer(false));
 } else {
     $nextpage = $index;
 }
-//if we posted to ourself from ourself
-if(strpos($nextpage, curr_url()) !== false){
-    $nextpage = $SESSION->lastpage;
-} else {
-    $SESSION->lastpage = $nextpage;
+    
+if(!$inpopup){ //don't modify SESSION->lastpage from popup
+    //if we posted to ourself from ourself
+    if(strpos($nextpage, qualified_me()) !== false){
+        $nextpage = new moodle_url($SESSION->lastpage);
+    } else {
+        $SESSION->lastpage = $nextpage;
+    }
+}
+
+if (isset($SESSION->fromurl) &&
+    !empty($SESSION->fromurl)){
+    $nextpage = new moodle_url($SESSION->fromurl);
+    unset($SESSION->fromurl);
 }
 
 if($USER->id != $workerrecord->mdluserid && !$canmanage){
@@ -88,20 +109,18 @@ if($USER->id != $workerrecord->mdluserid && !$canmanage){
 $strtitle = get_string('editunittitle','block_timetracker',
     $workerrecord->firstname.' '.$workerrecord->lastname); 
 
-$PAGE->set_title($strtitle);
-$PAGE->set_heading($strtitle);
+if($inpopup){
+    $PAGE->set_pagelayout('popup');
+} else {
+    $PAGE->set_pagelayout('base');
+    $PAGE->set_title($strtitle);
+    $PAGE->set_heading($strtitle);
 
-$timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+    $PAGE->navbar->add(get_string('blocks'));
+    $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
+    $PAGE->navbar->add($strtitle);
+}
 
-$indexparams['userid'] = $userid;
-$indexparams['id'] = $courseid;
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
-
-$PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
-$PAGE->navbar->add($strtitle);
-
-//error_log('before creating form');
 $mform = new timetracker_editunit_form($context, $userid,
     $courseid, $unitid, $start, $end, $ispending);
 
@@ -114,9 +133,11 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    $urlparams = array();
-    $urlparams['id'] = $courseid;
-    redirect($nextpage);
+    if(!$inpopup){
+        redirect($nextpage);
+    } else {
+        close_window(0);
+    }
 } else if ($formdata=$mform->get_data()){
 
         $formdata->courseid = $formdata->id;
@@ -129,18 +150,29 @@ if ($mform->is_cancelled()){ //user clicked cancel
         //$DB->update_record('block_timetracker_workunit', $formdata);
         update_unit($formdata);
 
-        $status = 'Workunit edited successfully.'; 
-        redirect($nextpage,$status,1);
+        $status = 'Work unit edited successfully.'; 
+        if(!$inpopup){
+            //error_log($nextpage);
+            unset($nextpage->unitid);
+            redirect($nextpage,$status,0);
+        } else {
+            close_window(0);
+        }
 
 } else {
     //form is shown for the first time
+    //error_log('edit unit: '.qualified_me());
     echo $OUTPUT->header();
-    $tabs = get_tabs($urlparams, $canmanage, $courseid);  
-    $tabs[] = new tabobject('editunit',
-        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php#', $urlparams),
-        'Edit Unit');
-    $tabs = array($tabs);
-    print_tabs($tabs,'editunit');
+    if(!$inpopup){
+        $tabs = get_tabs($urlparams, $canmanage, $courseid);  
+        $tabs[] = new tabobject('editunit',
+            new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php#', $urlparams),
+            'Edit Work Unit');
+        $tabs = array($tabs);
+       print_tabs($tabs,'editunit');
+    }
+
+    $mform->set_data(array('inpopup'=>$inpopup));
 
     $mform->display();
     echo $OUTPUT->footer();

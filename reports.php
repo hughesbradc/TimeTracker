@@ -80,7 +80,7 @@ $PAGE->set_heading($strtitle);
 
 
 $mform = new timetracker_reports_form($PAGE->context,
-    $userid,$courseid,$reportstart,$reportend);
+    $userid, $courseid, $reportstart, $reportend);
 
 if ($mform->is_cancelled()){ //user clicked 'cancel'
 

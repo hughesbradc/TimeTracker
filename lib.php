@@ -44,24 +44,6 @@ function expired($timein, $now=-1){
 
 }
 
-function curr_url(){
-    $pageURL = 'http';
-    if (isset($_SERVER['HTTPS']) && 
-        $_SERVER['HTTPS'] == "on") 
-        $pageURL .= "s";
-
-    $pageURL .= "://";
-    if ($_SERVER["SERVER_PORT"] != "80") {
-        $pageURL .=
-        $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-    } else {
-        $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-    }
-    return $pageURL;
-
-}
-
-
 /**
 * Given an object that holds all of the values necessary from block_timetracker_workunit,
 * Add it to the workunit table, splitting across multiple days if necessary
@@ -218,7 +200,8 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
 * it is a pending clock-in, this value will be the same as the clock-in value)
 * If the array is empty, there are no overlapping units
 */
-function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
+function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1,
+    $ispending=false){
 
     global $CFG, $COURSE, $DB;
     if($courseid == -1) $courseid = $COURSE->id;
@@ -230,8 +213,8 @@ function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
         "($timeout > timein AND $timeout <= timeout) OR ".
         "(timein >= $timein AND timein < $timeout))";
         
-    if($unitid != -1){
-      $sql.=" AND id != $unitid"; 
+    if($unitid != -1 && !$ispending){
+        $sql.=" AND id != $unitid"; 
     }
 
     $conflictingunits = $DB->get_records_sql($sql);
@@ -240,8 +223,8 @@ function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
     $baseurl = $CFG->wwwroot.'/blocks/timetracker';
     foreach ($conflictingunits as $unit){
         $entry = new stdClass();
-        $disp = 'From: '.userdate($unit->timein,
-            get_string('datetimeformat', 'block_timetracker'),99,false).
+        $disp = userdate($unit->timein,
+            get_string('datetimeformat', 'block_timetracker')).
             ' to '.userdate($unit->timeout,
             get_string('timeformat', 'block_timetracker'),99,false);
         $entry->display = $disp;
@@ -263,6 +246,10 @@ function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_pending WHERE '.
         "$userid = userid AND $courseid = courseid AND ".
         "timein BETWEEN $timein AND $timeout";
+
+    if($unitid != -1 && $ispending){
+        $sql.=" AND id != $unitid"; 
+    }
 
     $pendingconflicts = $DB->get_records_sql($sql);
     foreach ($pendingconflicts as $pending){
@@ -508,6 +495,7 @@ function get_alert_links($supervisorid, $courseid){
 
 /**
 * Generate the alert links for a course
+* XXX TODO update docs
 * @param $courseid id of the course
 * @return two-dimensional array of links. First index is the TT worker id, the second
 * index is either 'approve', 'deny', or 'change' for each of the corresponding links
@@ -530,10 +518,10 @@ function get_course_alert_links($courseid){
         $params = "?alertid=$alert->id";
         if($alert->todelete) $params.="&delete=1";
 
-        $alertlinks[$alert->userid]['approve'] = $url.$params."&action=approve";
-        $alertlinks[$alert->userid]['deny'] = $url.$params."&action=deny";
-        $alertlinks[$alert->userid]['change'] = $url.$params."&action=change";
-        $alertlinks[$alert->userid]['delete'] = $url.$params."&action=delete";
+        $alertlinks[$alert->userid][$alert->id]['approve'] = $url.$params."&action=approve";
+        $alertlinks[$alert->userid][$alert->id]['deny'] = $url.$params."&action=deny";
+        $alertlinks[$alert->userid][$alert->id]['change'] = $url.$params."&action=change";
+        $alertlinks[$alert->userid][$alert->id]['delete'] = $url.$params."&action=delete";
 
     }
 
