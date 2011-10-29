@@ -201,7 +201,8 @@ class timetracker_editunit_form extends moodleform {
                         $editaction = $OUTPUT->action_icon(
                             $conflict->editlink, 
                             new pix_icon('clock_edit', 'Edit unit', 'block_timetracker'),
-                            new popup_action('click', $conflict->editlink, 'editunit'));
+                            new popup_action('click', $conflict->editlink, 'editunit',
+                                array('height'=>400, 'width'=>745)));
     
     
                         $conflict->deletelink .=
