@@ -236,8 +236,11 @@ class timetracker_reports_form  extends moodleform {
             $workerdesc .= ' for all workers';
         } else { //specific user, this course
             if($canmanage){
-                $allurl = new moodle_url($baseurl.'/reports.php?id='.$this->courseid.
-                    '&userid=0');
+                $allurl = new moodle_url($baseurl.'/reports.php',
+                    array('id'=>$this->courseid,
+                    'userid'=>0,
+                    'repstart'=>$this->reportstart,
+                    'repend'=>$this->reportend));
                 $workerdesc .= ' for '.$user->firstname.' '.
                     $user->lastname.' [ '.$OUTPUT->action_link($allurl, 'see all').' ]';
             }
@@ -279,7 +282,7 @@ class timetracker_reports_form  extends moodleform {
                     $userurl = new moodle_url($baseurl.'/reports.php');
                     $userurl->params(array(
                         'id'=>$this->courseid,
-                        'userid'=>$this->userid,
+                        'userid'=>$unit->userid,
                         'repstart'=>$this->reportstart,
                         'repend'=>$this->reportend));
                     $row .='<td>'.$OUTPUT->action_link($userurl,
