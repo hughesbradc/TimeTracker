@@ -139,6 +139,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         if($alertunit->todelete == 1){
             $messagetext .= get_string('unitdeleted','block_timetracker');
         } else {
+            $messagetext .= get_string('emessage3','block_timetracker',
+                userdate($alertunit->timein));
             $messagetext .= get_string('emessage4','block_timetracker', 
                 userdate($alertunit->timeout));
             $messagetext .= get_string('br1','block_timetracker'); 
@@ -169,6 +171,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         if($alertunit->todelete == 1){
             $messagehtml .= get_string('unitdeleted','block_timetracker');
         } else {
+            $messagehtml .= get_string('emessage3','block_timetracker',
+                userdate($alertunit->timein));
             $messagehtml .= get_string('emessage4','block_timetracker', 
                 userdate($alertunit->timeout));
             $messagehtml .= get_string('br1','block_timetracker'); 
@@ -246,6 +250,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         if($alertunit->todelete == 1){
             $messagetext .= get_string('unitdeleted','block_timetracker');
         } else {
+            $messagetext .= get_string('emessage3','block_timetracker',
+                userdate($alertunit->timein));
             $messagetext .= get_string('emessage4','block_timetracker', 
                 userdate($alertunit->timeout));
             $messagetext .= get_string('br1','block_timetracker'); 
@@ -276,6 +282,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
         if($alertunit->todelete == 1){
             $messagehtml .= get_string('unitdeleted','block_timetracker');
         } else {
+            $messagehtml .= get_string('emessage3','block_timetracker',
+            userdate($alertunit->timein));
             $messagehtml .= get_string('emessage4','block_timetracker', 
                 userdate($alertunit->timeout));
             $messagehtml .= get_string('br1','block_timetracker'); 
@@ -420,6 +428,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 if($alertunit->todelete == 1){
                     $messagetext .= get_string('unitdeleted','block_timetracker');
                 } else {
+                    $messagetext .= get_string('emessage3','block_timetracker',
+                        userdate($alertunit->timein));
                     $messagetext .= get_string('emessage4','block_timetracker', 
                         userdate($alertunit->timeout));
                     $messagetext .= get_string('br1','block_timetracker'); 
@@ -450,6 +460,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 if($alertunit->todelete == 1){
                     $messagehtml .= get_string('unitdeleted','block_timetracker');
                 } else {
+                    $messagehtml .= get_string('emessage3','block_timetracker',
+                        userdate($alertunit->timein));
                     $messagehtml .= get_string('emessage4','block_timetracker', 
                         userdate($alertunit->timeout));
                     $messagehtml .= get_string('br1','block_timetracker'); 

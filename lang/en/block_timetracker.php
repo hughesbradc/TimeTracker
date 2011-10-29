@@ -188,7 +188,7 @@ Please wait to be redirected.';
 $string['previous'] = 'Original Work Unit';
 $string['proposed'] = 'Proposed Work Unit';
 $string['message'] = 'Message';
-$string['noalerts'] = 'No Alerts at this Time';
+$string['noalerts'] = 'There are no alerts at this time.';
 $string['managealerts'] = 'Manage Alerts&nbsp; ';
 $string['managealerts_help'] = 'This page allows the supervisor or administrator to manage alerted work units
     Typically, this indicates that the worker has issued a dispute with the recorded time, and
