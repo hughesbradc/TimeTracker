@@ -110,22 +110,7 @@ class timetracker_manageworkers_form  extends moodleform {
 
                 $urlparams['id'] = $COURSE->id;
                 $urlparams['userid'] = $worker->id;
-                $urlparams['mdluserid'] = $worker->mdluserid;
                 $urlparams['sesskey'] = sesskey();
-    
-                $editurl = new moodle_url($baseurl.'/updateworkerinfo.php',$urlparams);
-                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
-                    get_string('edit'),'block_timetracker'));
-    
-                $reportsurl = new moodle_url($baseurl.'/reports.php', $urlparams);
-                $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('report', 
-                    'Reports','block_timetracker'));
-    
-                $adduniturl = new moodle_url($baseurl.'/addunit.php', $urlparams);
-                $addunitaction = $OUTPUT->action_icon($adduniturl,
-                    new pix_icon('clock_add', 
-                    get_string('addentry', 'block_timetracker'), 'block_timetracker'));
-
 
                 $deleteurl = new moodle_url($baseurl.'/deleteworker.php', $urlparams);
                 $deleteicon = new pix_icon('user_delete', get_string('delete'),
@@ -136,6 +121,24 @@ class timetracker_manageworkers_form  extends moodleform {
                     new confirm_action(
                     'Are you sure you want to delete this worker and all this worker\'s'.
                     ' work units?'));
+    
+                //don't need anymore
+                unset($urlparams['sesskey']);
+                
+                $editurl = new moodle_url($baseurl.'/updateworkerinfo.php',$urlparams);
+                $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
+                    get_string('edit'),'block_timetracker'));
+
+                $reportsurl = new moodle_url($baseurl.'/reports.php', $urlparams);
+                $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('report', 
+                    'Reports','block_timetracker'));
+    
+                $adduniturl = new moodle_url($baseurl.'/addunit.php', $urlparams);
+                $addunitaction = $OUTPUT->action_icon($adduniturl,
+                    new pix_icon('clock_add', 
+                    get_string('addentry', 'block_timetracker'), 'block_timetracker'));
+
+
     
                 $row .= '<td style="text-align: center">'.
                     $editaction . ' ' . $deleteaction. ' '.$addunitaction.' '.$reportsaction.
