@@ -52,11 +52,14 @@ $index = new moodle_url($CFG->wwwroot.
 $alertaction = new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/alertaction.php', $urlparams);
 
+/*
 if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $_SERVER['HTTP_REFERER'];
 } else {
     $nextpage = $index;
 }
+*/
+$nextpage = $index;
 
 $course = $DB->get_record('course', array('id' => $alertunit->courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
@@ -64,13 +67,10 @@ $PAGE->set_url($alertaction);
 $PAGE->set_pagelayout('base');
 $context = $PAGE->context;
 
-
-
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
-
 
 if(!$canmanage){
     print_error('notpermissible','block_timetracker');

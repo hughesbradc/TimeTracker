@@ -61,11 +61,14 @@ $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$
 $indexparams['id'] = $courseid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
+/*
 if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $_SERVER['HTTP_REFERER'];
 } else {
     $nextpage = $reportsurl;
 }
+*/
+$nextpage = $reportsurl;
 
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);

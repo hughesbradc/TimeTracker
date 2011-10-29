@@ -29,7 +29,6 @@ require('timetracker_updateworkerinfo_form.php');
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
-$mdluserid = required_param('mdluserid', PARAM_INTEGER);
 $userid = optional_param('userid', -1, PARAM_INTEGER);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -42,10 +41,10 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 }
 
 $urlparams['id'] = $courseid;
-$urlparams['mdluserid'] = $mdluserid;
 $urlparams['userid'] = $userid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
+/*
 if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $_SERVER['HTTP_REFERER'];
 } else {
@@ -53,12 +52,13 @@ if(isset($_SERVER['HTTP_REFERER'])){
 }
 
 //if we posted to ourself from ourself
-if(strpos($nextpage, curr_url()) !== false){
+if(strpos($nextpage, qualified_me()) !== false){
     $nextpage = $SESSION->lastpage;
 } else {
     $SESSION->lastpage = $nextpage;
 }
-
+*/
+$nextpage = $index;
 
 $worker = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid));
 
@@ -84,7 +84,7 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_updateworkerinfo_form($context, $courseid, $mdluserid);
+$mform = new timetracker_updateworkerinfo_form($context, $courseid, $worker->mdluserid);
 
 if ($mform->is_cancelled()){ //user clicked cancel
     redirect($nextpage);

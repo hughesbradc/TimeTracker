@@ -50,8 +50,8 @@ class timetracker_changealert_form extends moodleform {
             
         $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
             array('id'=>$alertunit->courseid,'userid'=>$alertunit->userid));
-        if(isset($_SERVER['HTTP_REFERER'])){
-            $nextpage = $_SERVER['HTTP_REFERER'];
+        if(get_referer(false)){
+            $nextpage = get_referer(false);
         } else {
             $nextpage = $index;
         }

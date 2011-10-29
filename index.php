@@ -143,7 +143,6 @@ if ($canmanage) { //supervisor
                 $urlparams['userid'] = $unit->userid;
                 $urlparams['sesskey'] = sesskey();
                 $urlparams['unitid'] = $unit->id;
-                $urlparams['next'] = 1;
                 
                 $unitdateinfo = usergetdate($unit->timein);
                 if(!$canmanageold && expired($unit->timein, $now)){
