@@ -19,7 +19,7 @@
  * http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['datetimeformat']='%m/%d/%y, %I:%M %p';
+$string['datetimeformat']='%m/%d/%y %I:%M %p';
 $string['timeformat']='%I:%M %p';
 
 $string['couldnotclockout'] = 'Error adding clock out'; 
@@ -74,7 +74,7 @@ $string['remaining'] = 'Remaining: ';
 $string['totalytd'] = 'Year to date: ';
 $string['total'] = 'Total: ';
 $string['manage'] = 'Manage';
-$string['registerinfo'] = 'Register Work Study Information';
+$string['registerinfo'] = 'Register Work-Study Information';
 
 
 // Strings for Employee Home Page (also includes strings from the 'block' section above)
@@ -82,7 +82,7 @@ $string['welcome'] = 'Welcome';
 $string['currentstats'] = 'Current Statistics for {$a}';
 $string['contact'] = 'Contact: ';
 $string['supervisor'] = 'Supervisor';
-$string['finaid'] = 'Financial Aid Work Study Coordinator';
+$string['finaid'] = 'Financial Aid Work-Study Coordinator';
 
 
 // Strings for Employee Hourlog Page
@@ -123,7 +123,7 @@ $string['headertimein'] = 'Time In';
 $string['headertimeout'] = 'Time Out';
 $string['headeredit'] = 'Edit';
 $string['headerdelete'] = 'Delete';
-$string['editunittitle'] = 'Editing workunit for {$a}';
+$string['editunittitle'] = 'Editing work unit for {$a}';
 
 
 // Strings for Supervisor Reports Page

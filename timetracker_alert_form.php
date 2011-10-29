@@ -75,8 +75,9 @@ class timetracker_alert_form  extends moodleform {
 
         $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
             array('id'=>$this->courseid,'userid'=>$this->userid));
-        if(isset($_SERVER['HTTP_REFERER'])){
-            $nextpage = $_SERVER['HTTP_REFERER'];
+
+        if(get_referer(false)){
+            $nextpage = get_referer(false);
         } else {
             $nextpage = $index;
         }
@@ -178,6 +179,7 @@ class timetracker_alert_form  extends moodleform {
     }   
 
     function validation ($data){
+        global $OUTPUT;
         $errors = array();
 
         $teachers = $data['teacherid'];
@@ -191,6 +193,11 @@ class timetracker_alert_form  extends moodleform {
                 break;
             }
         }
+        if(!has_capability('block/timetracker:manageoldunits', $this->context) && 
+            expired($data['timeinerror'])){
+            $expired = true;            
+        }
+
 
         //if it gets here, we had no teachers selected. Use the first teacherid value to
         //place the error
@@ -199,16 +206,40 @@ class timetracker_alert_form  extends moodleform {
                 'You didn\'t select any supervisors to alert. 
                 As default, all supervisors have been selected.';
 
-        if($data['timeinerror'] > time()){
-            $errors['timeinerror'] = 'Time cannot be set in the future.';
-        }
-        
-        if($data['timeouterror'] > time()){
-            $errors['timeouterror'] = 'Time cannot be set in the future.';
+        //if delete was checked, don't check any of the times/conflicts
+        if(isset($data['deleteunit'])){
+            return $errors;  
         }
 
-        if($data['timeinerror'] > $data['timeouterror']){
+        if($expired){
+            $errors['timeinerror'] = 'You are not authorized to add work units this far in the
+            past. See an administrator for assistance';
+        } else if($data['timeinerror'] > time()){
+            $errors['timeinerror'] = 'Time cannot be set in the future.';
+        } else if($data['timeinerror'] > $data['timeouterror']){
             $errors['timeinerror'] = 'Your time out cannot be before your time in.';
+        } else if($data['timeouterror'] > time()){
+            $errors['timeouterror'] = 'Time cannot be set in the future.';
+        } else {
+            $conflicts = find_conflicts($data['timeinerror'], $data['timeouterror'],
+                $data['userid']);
+            
+            if(sizeof($conflicts) > 0){
+                $errormsg = 'Work unit conflicts with existing unit(s):<br />';
+                $errormsg .= '<table>';
+                foreach($conflicts as $conflict){
+                    $errormsg .= '<tr>';
+                    $alerticon= new pix_icon('alert',
+                        'Alert Supervisor of Error','block_timetracker');
+    
+                    //$alertaction= $OUTPUT->action_icon($conflict->alertlink, $alerticon);
+        
+                    $errormsg .= '<td>'.$conflict->display.'</td><td>';
+                    //$errormsg .= ' '.$alertaction.'</td></tr>';
+                }
+                $errormsg .= '</table>';
+                $errors['timeinerror'] = $errormsg;
+            }
         }
 
         return $errors;

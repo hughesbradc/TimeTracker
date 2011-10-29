@@ -44,24 +44,6 @@ function expired($timein, $now=-1){
 
 }
 
-function curr_url(){
-    $pageURL = 'http';
-    if (isset($_SERVER['HTTPS']) && 
-        $_SERVER['HTTPS'] == "on") 
-        $pageURL .= "s";
-
-    $pageURL .= "://";
-    if ($_SERVER["SERVER_PORT"] != "80") {
-        $pageURL .=
-        $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-    } else {
-        $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-    }
-    return $pageURL;
-
-}
-
-
 /**
 * Given an object that holds all of the values necessary from block_timetracker_workunit,
 * Add it to the workunit table, splitting across multiple days if necessary
@@ -240,7 +222,7 @@ function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
     $baseurl = $CFG->wwwroot.'/blocks/timetracker';
     foreach ($conflictingunits as $unit){
         $entry = new stdClass();
-        $disp = 'From: '.userdate($unit->timein,
+        $disp = userdate($unit->timein,
             get_string('datetimeformat', 'block_timetracker')).
             ' to '.userdate($unit->timeout,
             get_string('timeformat', 'block_timetracker'));

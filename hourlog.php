@@ -54,7 +54,6 @@ if(!$workerrecord){
     die;
 }
 
-
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
@@ -103,7 +102,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    redirect($nextpage, $status,1);
+    redirect($nextpage);
 
 } else if ($formdata=$mform->get_data()){
         $formdata->courseid = $formdata->id;

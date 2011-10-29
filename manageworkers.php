@@ -63,11 +63,14 @@ $maintabs = get_tabs($urlparams, $canmanage, $courseid);
 $manageworkerurl = new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/manageworkers.php', $urlparams);
 
+/*
 if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $_SERVER['HTTP_REFERER'];
 } else {
     $nextpage = $manageworkerurl;
 }
+*/
+$next = $manageworkerurl;
 
 $PAGE->set_url($manageworkerurl);
 $PAGE->set_pagelayout('base');
@@ -118,9 +121,6 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
             }
         }
     }
-
-    //echo $OUTPUT->heading($strtitle, 2);
-    //content goes here
     redirect($nextpage, 'Changes saved successfully',1);
 
 } else {
@@ -128,8 +128,6 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     echo $OUTPUT->header();
     $tabs = array($maintabs);
     print_tabs($tabs, 'manage');
-    //echo $OUTPUT->heading($strtitle, 2);
-    #$PAGE->print_header('Manage worker info', 'Manage worker info');
     $mform->display();
     echo $OUTPUT->footer();
 }
