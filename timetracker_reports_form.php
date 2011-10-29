@@ -244,7 +244,6 @@ class timetracker_reports_form  extends moodleform {
             $sql .= ' AND courseid='.$this->courseid.' AND userid='.$this->userid;
         }
 
-        error_log('workerdesc: '.$workerdesc);
         $sql .= ' ORDER BY timein DESC';
         $units = $DB->get_records_sql($sql);
 
@@ -277,10 +276,16 @@ class timetracker_reports_form  extends moodleform {
             foreach($units as $unit){
                 $row='<tr>';
                 if($this->userid == 0){
-                    $row .='<td><a href="'.$baseurl.
-                        '/reports.php?id='.$this->courseid.'&userid='.$unit->userid.'">'.
+                    $userurl = new moodle_url($baseurl.'/reports.php');
+                    $userurl->params(array(
+                        'id'=>$this->courseid,
+                        'userid'=>$this->userid,
+                        'repstart'=>$this->reportstart,
+                        'repend'=>$this->reportend));
+                    $row .='<td>'.$OUTPUT->action_link($userurl,
                         $workers[$unit->userid]->lastname.', '.
-                        $workers[$unit->userid]->firstname.'</a></td>';
+                        $workers[$unit->userid]->firstname).
+                        '</td>';
                 } else if($canmanage){
                     $row .='<td>'.
                         $user->lastname.', '.
