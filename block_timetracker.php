@@ -154,7 +154,7 @@
                 //print_object($worker);
                 $link =
                     '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id.
-                    '&mdluserid='.$USER->id;
+                    '&userid='.$USER->id;
                 $action = null; 
                 $this->content->text = '<center>';
                 $this->content->text .= $OUTPUT->action_link($link, 
