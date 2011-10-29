@@ -46,11 +46,6 @@ class timetracker_managealerts_form  extends moodleform {
             $canmanage = true;
         }
 
-        $issiteadmin = false;
-        if(has_capability('moodle/site:config',$this->context)){
-            $issiteadmin = true;
-        }
-
         $mform->addElement('header', 'general', 
             get_string('managealerts','block_timetracker')); 
 		$mform->addHelpButton('general','managealerts','block_timetracker');
@@ -61,45 +56,46 @@ class timetracker_managealerts_form  extends moodleform {
         $strproposed = get_string('proposed', 'block_timetracker');
         $strmsg = get_string('message', 'block_timetracker');
 
-        $mform->addElement('html', 
-        '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
+        if(!has_course_alerts($COURSE->id)){
+            $mform->addElement('html','<div style="text-align:center">');
+            $mform->addElement('html',get_string('noalerts','block_timetracker'));
+            $mform->addElement('html','</div>'); 
+            return;
+        } else {
+
+            $mform->addElement('html', 
+            '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="95%">');
         
-        $tblheaders=
-            '<tr>
-                <td><span style="font-weight: bold">'.$strname.'</span></td>
-                <td><span style="font-weight: bold">'.$strprev.'</span></td>
-                <td><span style="font-weight: bold">'.$strproposed.'</span></td>
-                <td><span style="font-weight: bold">'.$strmsg.'</span></td>';
-        if($canmanage)
+            $tblheaders=
+                '<tr>
+                    <td><span style="font-weight: bold">'.$strname.'</span></td>
+                    <td><span style="font-weight: bold">'.$strprev.'</span></td>
+                    <td><span style="font-weight: bold">'.$strproposed.'</span></td>
+                    <td><span style="font-weight: bold">'.$strmsg.'</span></td>';
+            if($canmanage)
                 $tblheaders .= '<td style="text-align: center">'.
                     '<span style="font-weight: bold">'.
                     get_string('action').'</span></td>';
-        $tblheaders .= '</tr>';
+            $tblheaders .= '</tr>';
 
-        $mform->addElement('html',$tblheaders);
+            $mform->addElement('html',$tblheaders);
 
-        if($issiteadmin && !has_course_alerts($COURSE->id)){
-            $mform->addElement('html',
-                '<tr><td colspan="5" style="text-align: center">'.
-                get_string('noalerts','block_timetracker').'</td></tr></table>');
-            return;
-        }
 
-        $alertlinks=get_course_alert_links($COURSE->id);
-        //print_object($alertlinks);
-
-        if($canmanage){
-            $alerts = $DB->get_records('block_timetracker_alertunits', 
-                array('courseid'=>$COURSE->id), 'alerttime');
-        } else {
-            $ttuserid = $DB->get_field('block_timetracker_workerinfo',
-                'id', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
-            if(!$ttuserid) print_error('Error obtaining mdluserid from workerinfo for '.
-                $USER->id);
-            $alerts = $DB->get_records('block_timetracker_alertunits',
-                array('courseid'=>$COURSE->id,'userid'=>$ttuserid));
-        }
-
+            $alertlinks=get_course_alert_links($COURSE->id);
+            //print_object($alertlinks);
+    
+            if($canmanage){
+                $alerts = $DB->get_records('block_timetracker_alertunits', 
+                    array('courseid'=>$COURSE->id), 'alerttime');
+            } else {
+                $ttuserid = $DB->get_field('block_timetracker_workerinfo',
+                    'id', array('mdluserid'=>$USER->id,'courseid'=>$COURSE->id));
+                if(!$ttuserid) print_error('Error obtaining mdluserid from workerinfo for '.
+                    $USER->id);
+                $alerts = $DB->get_records('block_timetracker_alertunits',
+                    array('courseid'=>$COURSE->id,'userid'=>$ttuserid));
+            }
+        }    
 
         foreach ($alerts as $alert){ 
             $worker = $DB->get_record('block_timetracker_workerinfo',
