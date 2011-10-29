@@ -80,7 +80,7 @@ if($mform->is_cancelled()){
     //User clicked cancel
     $reportsurl = new
         moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',$urlparams);
-    redirect($nextpage);
+    redirect($reportsurl);
 } else if($formdata=$mform->get_data()){
 
     $cid = $formdata->id;
