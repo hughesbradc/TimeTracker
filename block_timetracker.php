@@ -117,7 +117,22 @@
 
             $this->content->text .= $timesheetaction.'<a href="'.
                 $timesheeturl.'"> Timesheets</a><br />';
+           
+
+
+            /*
+
+            $notesurl = new moodle_url($CFG->wwwroot.'/notes/index.php', $indexparams);
+            $notesaction = $OUTPUT->action_icon($notesurl, 
+                new pix_icon('i/calendar', 'Notes')); 
+
+            $this->content->text .= $notesaction.'<a href="'.
+                $notesurl.'"> Notes</a><br />';
             
+            */
+
+
+
             $numtimeclock = $DB->count_records('block_timetracker_workerinfo',
                 array('courseid'=>$courseid, 'timetrackermethod'=>0));
 
