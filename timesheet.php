@@ -33,6 +33,7 @@ global $CFG, $COURSE, $USER, $DB;
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
+$userid = optional_param('userid', -1, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 
@@ -50,16 +51,16 @@ if(has_capability('block/timetracker:manageworkers', $context)){
     $canmanage = true;
 }
 
-$maintabs = get_tabs($urlparams, $canmanage, $courseid);
 
 $strtitle = get_string('timesheettitle','block_timetracker');
 $PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
 
 $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
 //$indexparams['userid'] = $userid;
 $indexparams['id'] = $courseid;
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $indexparams);
 
 /*
 if(isset($_SERVER['HTTP_REFERER'])){
@@ -68,13 +69,13 @@ if(isset($_SERVER['HTTP_REFERER'])){
     $nextpage = $reportsurl;
 }
 */
-$nextpage = $reportsurl;
+$nextpage = $index;
 
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $timetrackerurl);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_timesheet_form($context);
+$mform = new timetracker_timesheet_form($context, $userid);
 
 if($mform->is_cancelled()){
     //User clicked cancel
@@ -141,8 +142,16 @@ if($mform->is_cancelled()){
     
 } else {
     echo $OUTPUT->header();
-    $tabs = array($maintabs);
-    print_tabs($tabs, 'reports');
+
+    $tabs = get_tabs($urlparams, $canmanage, $courseid);
+    $tabs[] = new tabobject('timesheet',
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php#', $urlparams),
+        'Generate Timesheet');
+    $tabs = array($tabs);
+
+
+    print_tabs($tabs, 'timesheet');
+
     $mform->display();
     echo $OUTPUT->footer();
 }
