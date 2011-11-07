@@ -14,8 +14,8 @@ global $CFG, $DB, $USER;
 //find all workers
 $workers = $DB->get_records('block_timetracker_workerinfo');
 
-$filename = date("Y_m_d").'_Earnings.xls';
-$header = "Department \tLast Name \tFirst Name \tEarnings \tMax Term Earnings \n";
+$filename = date("Y_m_d").'_Earnings.csv';
+$header = "Department ,Last Name ,First Name ,Earnings ,Max Term Earnings \n";
 header('Content-type: application/ms-excel');
 header('Content-Disposition: attachment; filename='.$filename);
 echo $header;
@@ -29,8 +29,8 @@ foreach($workers as $worker){
     $earnings = get_earnings_this_term($worker->id,$worker->courseid);
     $course = $DB->get_record('course', array('id'=>$worker->courseid));
     
-    $contents = "$course->shortname \t $worker->lastname \t $worker->firstname \t"
-        ."$earnings \t $worker->maxtermearnings \n";
+    $contents = "$course->shortname ,$worker->lastname ,$worker->firstname ,"
+        ."$earnings ,$worker->maxtermearnings \n";
 
     //Export Data to Simple XLS file
     echo $contents;

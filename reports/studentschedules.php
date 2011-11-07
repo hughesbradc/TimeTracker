@@ -33,9 +33,9 @@ $day_names['f'] = 'Friday';
 $day_names['s'] = 'Saturday';
 
 //XLS File Generation
-$filename = date("Y_m_d").'_ScheduleConflicts.xls';
-$header = "Last Name \tFirst Name \tConflicting Course \tConflicting Unit Day \t"
-    ."Conflicting Work Unit Date & Time \tDepartment \tSupervisor(s) \n";
+$filename = date("Y_m_d").'_ScheduleConflicts.csv';
+$header = 'Last Name ,First Name ,Conflicting Course ,Conflicting Unit Day ,'
+    ."Conflicting Work Unit Date & Time ,Department ,Supervisor(s) \n";
 header('Content-type: application/ms-excel');
 header('Content-Disposition: attachment; filename='.$filename);
 echo $header;
@@ -74,8 +74,8 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
             
             foreach ($teachers as $teacher) {
                 if(is_enrolled($context, $teacher->id)){
-                    $supervisor .= $teacher->firstname.' '.$teacher->lastname .' ' .$teacher->email
-                    .',';
+                    //$supervisor .= $teacher->firstname.' '.$teacher->lastname .' ' .$teacher->email.',';
+                    $supervisor .= $teacher->firstname.' '.$teacher->lastname .',';
                 }
             }
             $supervisor = substr($supervisor,0,-1);
@@ -151,10 +151,10 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
                             */
 
                             //Simple XLS file
-                            $contents = "$worker->lastname \t $worker->firstname \t"
-                                ."$coursename $days_string $dispstarttime to $dispendtime \t"
-                                .userdate($iterator,'%m/%d/%y %A',99,false)."\t"
-                                .$conflict->display."\t".$course->shortname."\t".$supervisor."\n";
+                            $contents = "$worker->lastname ,$worker->firstname ,"
+                                ."$coursename $days_string $dispstarttime to $dispendtime ,"
+                                .userdate($iterator,'%m/%d/%y %A',99,false).","
+                                .$conflict->display.",".$course->shortname.",".$supervisor."\n";
                             echo $contents;
                             
                             /*
