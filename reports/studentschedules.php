@@ -32,10 +32,20 @@ $day_names['r'] = 'Thursday';
 $day_names['f'] = 'Friday';
 $day_names['s'] = 'Saturday';
 
-if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
+//XLS File Generation
+$filename = date("Y_m_d").'_ScheduleConflicts.xls';
+$header = "Last Name \tFirst Name \tConflicting Course \tConflicting Unit Day \t"
+    ."Conflicting Work Unit Date & Time \tDepartment \tSupervisor(s) \n";
+header('Content-type: application/ms-excel');
+header('Content-Disposition: attachment; filename='.$filename);
+echo $header;
+
+//if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
+if(($handle = fopen("../testfile.csv", "r")) !== FALSE){
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
-        $email = $data[0].'@mhc.edu';
+        //$email = $data[0].'@mhc.edu';
+        $email = $data[0];
         $coursename = $data[1];
         $days_string = $data[2];
         $starttime = $data[3];
@@ -143,15 +153,10 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
                             */
 
                             //Simple XLS file
-                            $filename = date("Y_m_d").'_ScheduleConflicts.xls';
-                            $headers = "Last Name \t First Name \t Conflicting Course \t Conflicting Unit Day \t "
-                                ."Conflicting Work Unit Date & Time \t Department \t Supervisor";
-                            $contents = "$worker->lastname \t $worker->firstname \t".
-                                "$coursename $days_string $dispstarttime to $dispendtime \t".
-                                userdate($iterator,'%m/%d/%y %A',99,false)."\t".
-                                $conflict->display."\t".$course->shortname."\t".$supervisor."\n";
-                            header('Content-type: application/ms-excel');
-                            header('Content-Disposition: attachment; filename='.$filename);
+                            $contents = "$worker->lastname \t $worker->firstname \t"
+                                ."$coursename $days_string $dispstarttime to $dispendtime \t"
+                                .userdate($iterator,'%m/%d/%y %A',99,false)."\t"
+                                .$conflict->display."\t".$course->shortname."\t".$supervisor."\n";
                             echo $contents;
                             
                             /*
