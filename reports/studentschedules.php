@@ -40,12 +40,10 @@ header('Content-type: application/ms-excel');
 header('Content-Disposition: attachment; filename='.$filename);
 echo $header;
 
-//if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
-if(($handle = fopen("../testfile.csv", "r")) !== FALSE){
+if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
-        //$email = $data[0].'@mhc.edu';
-        $email = $data[0];
+        $email = $data[0].'@mhc.edu';
         $coursename = $data[1];
         $days_string = $data[2];
         $starttime = $data[3];
