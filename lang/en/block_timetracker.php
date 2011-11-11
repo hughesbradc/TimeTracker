@@ -331,3 +331,9 @@ $string['fileformat_help'] = 'Select the file format in which you wish to genera
 
 //Terms
 $string['terms_title'] = 'Edit Terms';
+
+//Electronic Signatures
+$string['timesheet'] = 'Timesheet';
+$string['signbutton'] = 'Sign timesheet';
+$string['signature'] = 'Signature';
+

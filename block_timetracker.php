@@ -126,7 +126,8 @@
 
             $this->content->text .= $manageaction.' '.
                 $OUTPUT->action_link($manageurl, 'Manage workers').'<br />';
-            
+
+
             $numtimeclock = $DB->count_records('block_timetracker_workerinfo',
                 array('courseid'=>$courseid, 'timetrackermethod'=>0));
 
