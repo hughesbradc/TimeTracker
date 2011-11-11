@@ -49,6 +49,8 @@ $context = $PAGE->context;
 
 $PAGE->set_url($alerturl);
 $PAGE->set_pagelayout('base');
+$PAGE->set_title('Alert work unit');
+$PAGE->set_heading('Alert work unit');
 
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
     array('id'=>$userid,'courseid'=>$courseid));

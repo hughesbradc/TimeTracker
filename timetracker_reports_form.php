@@ -89,30 +89,42 @@ class timetracker_reports_form  extends moodleform {
         }
 
         $mform->addElement('header','general','Generate Monthly Timesheet');
-        $mform->addElement('html','<center><a
+        if($this->userid > 0){
+            $mform->addElement('html','<center><a
+            href="'.$CFG->wwwroot.'/blocks/timetracker/timesheet.php?id='.
+            $this->courseid.'&userid='.$this->userid.'">Generate Monthly Timesheet</a></center>');
+        } else {
+            $mform->addElement('html','<center><a
             href="'.$CFG->wwwroot.'/blocks/timetracker/timesheet.php?id='.
             $this->courseid.'">Generate Monthly Timesheet</a></center>');
+        }
 
         $mform->addElement('header', 'general', 'Report time period'); 
         $mform->addElement('hidden','id', $this->courseid);
         $mform->addElement('hidden','userid', $this->userid);
         $mform->addElement('hidden','sesskey', sesskey());
 
-        if($this->reportstart == 0){
-            $this->reportstart = $now-(60*60*24*31);
-        }
+        if($this->reportstart == 0 || $this->reportend == 0){
+            $starttime = usergetdate($now);
+            $starttime_mid = make_timestamp($starttime['year'], 
+                $starttime['mon'] - 1, $starttime['mday']);
+            $this->reportstart = $starttime_mid;
 
-        if($this->reportend == 0){
-            $this->reportend = $now;
+            $endtime = usergetdate($now);
+            $endtime_mid = make_timestamp($endtime['year'], 
+                $endtime['mon'], $endtime['mday'], 23, 59, 59);
+            $this->reportend = $endtime_mid;
         } 
 
-        $mform->addElement('date_selector', 'reportstart',
-            get_string('startreport','block_timetracker'));
+        $mform->addElement('date_time_selector', 'reportstart',
+            get_string('startreport','block_timetracker'),
+            array('optional'=>false, 'step'=>1));
         $mform->setDefault('reportstart',$this->reportstart);
         $mform->addHelpButton('reportstart', 'startreport', 'block_timetracker');
 
-        $mform->addElement('date_selector', 'reportend', 
-            get_string('endreport','block_timetracker'));
+        $mform->addElement('date_time_selector', 'reportend', 
+            get_string('endreport','block_timetracker'),
+            array('optional'=>false, 'step'=>1));
         $mform->setDefault('reportend',$this->reportend);
 		$mform->addHelpButton('reportend','endreport','block_timetracker');
 
@@ -227,8 +239,9 @@ class timetracker_reports_form  extends moodleform {
 
         $workerdesc = 'Completed work units';
         $endtime = $this->reportend + ((60*60*23)+60*59); //23:59
-        $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE timeout '.
-            'BETWEEN '.$this->reportstart.' AND '.$endtime.' ';
+        $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE (timeout '.
+            'BETWEEN '.$this->reportstart.' AND '.$endtime.' '.
+            'OR timein BETWEEN '.$this->reportstart.' AND '.$endtime.') ';
         if($this->userid==0 && $this->courseid == 0){ //see all workers, all courses
             $units = $DB->get_records_sql($sql);
         } else if ($this->userid==0 && $this->courseid!=0){ //see all workers, this course
@@ -248,6 +261,7 @@ class timetracker_reports_form  extends moodleform {
         }
 
         $sql .= ' ORDER BY timein DESC';
+        //error_log($sql);
         $units = $DB->get_records_sql($sql);
 
         $mform->addElement('header', 'general', $workerdesc); 
@@ -264,19 +278,20 @@ class timetracker_reports_form  extends moodleform {
 
             }
             $headers .=
-                    '<td style="font-weight: bold; text-align: center">Time in</td>
-                    <td style="font-weight: bold; text-align: center">Time out</td>
-                    <td style="font-weight: bold; text-align: center">Elapsed</td>
-                ';
+                    '<td style="font-weight: bold; text-align: center">Time in/out</td>'.
+                    //'<td style="font-weight: bold; text-align: center">Time out</td>'.
+                    '<td style="font-weight: bold; text-align: center">Elapsed</td>';
             $headers .='<td style="font-weight: bold; text-align: center">'.
                 get_string('action').'</td>';
             $headers .='</tr>';
 
             $mform->addElement('html',$headers);
 
-
             $total = 0;
+
+            //print_object($workers);
             foreach($units as $unit){
+                
                 $row='<tr>';
                 if($this->userid == 0){
                     $userurl = new moodle_url($baseurl.'/reports.php');
@@ -294,20 +309,94 @@ class timetracker_reports_form  extends moodleform {
                         $user->lastname.', '.
                         $user->firstname.'</td>';
                 }
-                $row.='<td style="text-align: center">'.
-                    userdate($unit->timein,
-                    get_string('datetimeformat','block_timetracker')).'</td>';
 
-                $row.='<td style="text-align: center">'.
-                    userdate($unit->timeout,
-                    get_string('datetimeformat','block_timetracker')).'</td>';
+                //print them here? print all, w/br?
+                if($unit->timein < $this->reportstart ||
+                    $unit->timeout > $this->reportend){
+                    $singleurl = new moodle_url($baseurl.'/reports.php');
+                    $singleurl->params(array(
+                        'id'=>$this->courseid,
+                        'userid'=>$unit->userid,
+                        'repstart'=>($unit->timein - 1),
+                        'repend'=>($unit->timeout +1)));
 
-                $currelapsed = $unit->timeout - $unit->timein;  
-                $total += round_time($currelapsed);
+                    $splitunits = split_unit($unit);
+                    $row.='<td style="text-align: center">';
+                    foreach($splitunits as $subunit){
+                        $straddle = false;
+                        if($subunit->timein < $this->reportstart || 
+                            $subunit->timeout > $this->reportend){
+                            $straddle = true;
+                        }
+                        /*
+                        if($straddle){
+                            $row .='<span style="text-decoration: line-through">';
+                        }
+                        */
+                        if(!$straddle){
+                            $row.= userdate($subunit->timein,
+                                get_string('datetimeformat','block_timetracker'));
+                            $row.= ' to '.userdate($subunit->timeout,
+                                get_string('datetimeformat','block_timetracker'));
+                            $row .='<br />';
+                        }
 
-                $row.='<td style="text-align: center">'.
-                    //format_elapsed_time($currelapsed).'</td>';
-                    get_hours($currelapsed).' hour(s)</td>';
+                        /*
+                        if($straddle){
+                            $row .='</span>';
+                        }
+                        */
+    
+                    }
+                    $row .= 'Partial unit. ';
+                    $row .= $OUTPUT->action_link($singleurl, '[ view complete work unit ]');
+                    $row .= '</td>'."\n";
+    
+                    $row .= '<td style="text-align: center">';
+                    foreach($splitunits as $subunit){
+                        $straddle = false;
+                        if($subunit->timein < $this->reportstart || 
+                            $subunit->timeout > $this->reportend){
+                            $straddle = true;
+                        }
+                        
+                        /*
+                        if($straddle){
+                            $row .='<span style="text-decoration: line-through">';
+                        }
+                        */
+
+                        if(!$straddle){
+                            $currelapsed = $subunit->timeout - $subunit->timein;  
+                            $total += round_time($currelapsed);
+
+                            $row .= get_hours($currelapsed).' hour(s)';
+                            $row .= '<br />';
+                        }
+    
+                        /*
+                        if($straddle){
+                            $row .= '</span>';
+                        }
+                        */
+
+                    }
+                    $row .= '</td>'."\n";
+                } else { //unit occurs all in one repstart-repend
+                    $row.='<td style="text-align: center">';
+                    $row.= userdate($unit->timein,
+                        get_string('datetimeformat','block_timetracker'));
+                    $row.= ' to '.userdate($unit->timeout,
+                        get_string('datetimeformat','block_timetracker'));
+                    $row .= '</td>';
+                    
+                    $row .= '<td style="text-align: center">';
+
+                    $currelapsed = $unit->timeout - $unit->timein;  
+                    $total += round_time($currelapsed);
+                    $row .= get_hours($currelapsed).' hour(s)</td>';
+    
+                }
 
                 if($canmanage){
 
@@ -317,9 +406,6 @@ class timetracker_reports_form  extends moodleform {
                     $urlparams['unitid'] = $unit->id;
 
                     $unitdateinfo = usergetdate($unit->timein);
-                    //error_log (($now - $unit->timein)-(86400*35));
-                    //error_log("now: $now");
-                    //error_log("timein: $unit->timein");
 
                     if(!$canmanageold && expired($unit->timein, $now)){
                         
@@ -336,19 +422,23 @@ class timetracker_reports_form  extends moodleform {
                             '</td>';
                     }else {
                  
-                        //error_log (($now - $unit->timein)-(86400*35));
-                        $editurl = new
-                            moodle_url($baseurl.'/editunit.php', $urlparams);
-                        $editaction = $OUTPUT->action_icon($editurl, 
-                            new pix_icon('clock_edit', get_string('edit'),'block_timetracker'));
             
-                        $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php', $urlparams);
+                        $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php', 
+                            $urlparams);
                         $deleteicon = new pix_icon('clock_delete',
                             get_string('delete'),'block_timetracker');
                         $deleteaction = $OUTPUT->action_icon(
                             $deleteurl, $deleteicon, 
                             new confirm_action(
                             'Are you sure you want to delete this work unit?'));
+
+                        //error_log (($now - $unit->timein)-(86400*35));
+                        $editurl = new
+                            moodle_url($baseurl.'/editunit.php', $urlparams);
+                        $editurl->remove_params('sesskey');
+                        $editaction = $OUTPUT->action_icon($editurl, 
+                            new pix_icon('clock_edit', 
+                            get_string('edit'),'block_timetracker'));
         
                         $row .= '<td style="text-align: center">'.$editaction . ' '.
                             $deleteaction.'</td>';

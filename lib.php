@@ -27,8 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 /**
 * Tell whether a unit can be editable, based on the following:
 * A unit may be edited until the 5th day of the next month
+*
+* Question about this is whethere we should look at timein
+* or timeout, now that we're not splitting up work units
+* before adding them to the db TODO
 */
-function expired($timein, $now=-1){
+function expired($timein, $now = -1){
     if($now == -1) $now = time();
 
     $currdateinfo = usergetdate($now);
@@ -45,16 +49,69 @@ function expired($timein, $now=-1){
 }
 
 /**
-* Given an object that holds all of the values necessary from block_timetracker_workunit,
-* Add it to the workunit table, splitting across multiple days if necessary
-* @return true if worked, false if failed
+* Given a userid, courseid, start time and end time, find all units
+* that meet within this time period, and split them up across the day boundary.
+* For Example:
+* DB work unit 10/01/11 09:00am to 10/02/11 02:00am
+* this function would return:
+*
+* array[0]: 10/01/11 09:00am - 11:59:59
+* array[1]: 10/02/11 12:00am - 02:00am
+*
+* Note: some $unit->id may be the same, since a single unit will be broken
+* up across many days.
+*
+* @return an array of objects, each having all the properties of a workunit
 */
-function add_unit($unit,$hourlog=false){
-    global $DB;
+function get_split_units($start, $end, $userid=0, $courseid=0, $sort='ASC'){
+    global $CFG, $DB;
 
-    if(!is_object($unit)) return 0;    
-    if(isset($unit->id)) unset($unit->id);
+    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        '(timein BETWEEN '.
+        $start. ' AND '.$end.' OR timeout BETWEEN '.
+        $start. ' AND '.$end.') ';
+
+    if($userid > 0){
+        $sql .= ' AND userid='.$userid;
+    }
+    
+    if($courseid > 0){
+        $sql .= ' AND courseid='.$courseid;
+    }
+
+    $sql .= ' ORDER BY timein '.$sort;
+
+    $units = $DB->get_records_sql($sql);
+
+    if(!$units) {
+        //error_log("no units from db");    
+        return;
+    }
+
+    $splitunits = array(); 
     $nowtime = time();
+
+    foreach($units as $unit){
+        $splits = split_unit($unit);
+
+        $splitunits = array_merge($splitunits, $splits);
+
+    }
+    return $splitunits;
+}
+
+/**
+* Given a $unit (full of workunit table data), return an array of $unit objects
+* That are split across the day boundary
+* TO NOTE: Units that are split up have a 'partial' property that is set to True.
+* @return an array of workunits split up into days
+*/
+function split_unit($unit){
+    //error_log("in split_unit()");
+    $splitunits = array();
+
+    if(!is_object($unit)) return $splitunits;
+
     $timein = usergetdate($unit->timein);
     $timeout = usergetdate($unit->timeout);
 
@@ -63,52 +120,50 @@ function add_unit($unit,$hourlog=false){
         $timein['month'] == $timeout['month'] &&
         $timein['mday'] == $timeout['mday']){
 
-        $unitid = $DB->insert_record('block_timetracker_workunit', $unit);
-        if($unitid){
-            if($hourlog)
-                add_to_log($unit->courseid, '', 'add work unit', '', 'TimeTracker hourlog');
-            else
-                add_to_log($unit->courseid, '', 'add clock-out', '', 'TimeTracker clock-out');
-        } else {
-            if($hourlog){
-                add_to_log($unit->courseid, '', 
-                    'error adding work unit', '', 'ERROR:  User hourlog failed.');
-            } else {
-                add_to_log($unit->courseid, '', 
-                    'error clocking-out', '', 'ERROR:  User clock-out failed.');
-            }
-            return false; 
-        }
-        return true;
+        $newunit = new stdClass();
+        $newunit->timein = $unit->timein;
+        $newunit->timeout = $unit->timeout;
+        $newunit->payrate = $unit->payrate;
+        $newunit->lastedited = $unit->lastedited;
+        $newunit->lasteditedby = $unit->lasteditedby;
+        $newunit->id = $unit->id;
+        $newunit->userid = $unit->userid;
+        $newunit->courseid = $unit->courseid;
+        $newunit->partial = 0;
+    
+        $splitunits[] = $newunit;
     } else { //spans multiple days
-
+    
         $origtimein = $unit->timein;
         $checkout = $unit->timeout;
         $endofday = (86400+(usergetmidnight($unit->timein)-1));
-
+    
         $usersdate = usergetdate($endofday);
         if($usersdate['hours'] == 22){ 
             $endofday += 60 * 60;
         } else if ($usersdate['hours'] == 0){
             $endofday -= 60 * 60;
         }
-
+    
         while ($unit->timein < $checkout){
         
-            //add to $DB
+            //add to array
             $unit->timeout = $endofday;
-            $worked = $DB->insert_record('block_timetracker_workunit', $unit);
-            if(!$worked){
-                add_to_log($unit->courseid, '', 'error adding work unit', 
-                    '', 'TimeTracker add work unit failed.');
-                return false; 
-            } else {
-                add_to_log($unit->courseid, '', 'add work unit', 
-                    '', 'TimeTracker work unit added.');
-            }
-        
-            $unit->timein = $endofday + 1;
 
+            $newunit = new stdClass();
+            $newunit->timein = $unit->timein;
+            $newunit->timeout = $unit->timeout;
+            $newunit->payrate = $unit->payrate;
+            $newunit->lastedited = $unit->lastedited;
+            $newunit->lasteditedby = $unit->lasteditedby;
+            $newunit->id = $unit->id;
+            $newunit->userid = $unit->userid;
+            $newunit->courseid = $unit->courseid;
+            $newunit->partial = true;
+    
+            $splitunits[] = $newunit;
+    
+            $unit->timein = $endofday + 1;
             //find next 23:59:59
             $endofday = 86400 + (usergetmidnight($unit->timein)-1);
         
@@ -119,21 +174,72 @@ function add_unit($unit,$hourlog=false){
             } else if ($usersdate['hours'] == 0){
                 $endofday -= 60 * 60;
             }
-        
+    
             //if not a full day, don't go to 23:59:59 
             //but rather checkout time
             if($endofday > $checkout){
                 $endofday = $unit->timein + ($checkout - $unit->timein);
             } 
         }
-        return true;
     }
+    return $splitunits;
+}
 
+
+/*
+* uses get_split_units() to return an array of unit objects, none of
+* which cross the day boundary. Note: id of these units may be shared.
+* @return array of unit objects
+*
+*/
+function get_split_month_work_units($userid, $courseid, $month, $year){
+    $info = get_month_info($month, $year);
+
+    return get_split_units($info['firstdaytimestamp'], $info['lastdaytimestamp'],
+        $userid, $courseid);
+}
+
+
+/**
+* Given an object that holds all of the values necessary from block_timetracker_workunit,
+* Add it to the workunit table.
+* @return true if worked, false if failed
+*/
+function add_unit($unit, $hourlog=false){
+    global $DB, $CFG, $OUTPUT;
+
+    if(!is_object($unit)) return false;
+    if(isset($unit->id)) unset($unit->id);
+
+    $unitid = $DB->insert_record('block_timetracker_workunit', $unit);
+
+    $url = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php');
+    $url->params(array('id'=>$unit->courseid, 
+        'userid'=>$unit->userid,
+        'reportstart'=>($unit->timein-1),
+        'reportend'=>($unit->timeout+1)));
+
+    if($unitid){
+        if($hourlog)
+            add_to_log($unit->courseid, '', 'add work unit', '', 'TimeTracker add work unit');
+        else
+            add_to_log($unit->courseid, '', 'add clock-out', '', 'TimeTracker clock-out');
+    } else {
+        if($hourlog){
+            add_to_log($unit->courseid, '', 
+                'error adding work unit', '', 'ERROR:  User hourlog failed.');
+        } else {
+            add_to_log($unit->courseid, '', 
+                'error clocking-out', '', 'ERROR:  User clock-out failed.');
+        }
+        return false; 
+    }
+    return true;
 }
 
 /**
 * Given an object that holds all of the values necessary from block_timetracker_workunit,
-* add update it in the DB, splitting it across multiple days if necessary
+* add update it in the DB
 * @return the true if updated successfully, false if not
 *
 */
@@ -160,7 +266,6 @@ function update_unit($unit){
 * @return T if overlaps
 */
 function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
-
     global $CFG, $COURSE, $DB;
     if($courseid == -1) $courseid = $COURSE->id;
     
@@ -181,8 +286,6 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
         "timein BETWEEN $timein AND $timeout";
 
     $numpending = $DB->count_records_sql($sql);
-
-    //error_log("numpending is $numpending");
 
     if($numexistingunits == 0 && $numpending == 0) return false;
     return true;
@@ -226,7 +329,7 @@ function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1,
         $disp = userdate($unit->timein,
             get_string('datetimeformat', 'block_timetracker')).
             ' to '.userdate($unit->timeout,
-            get_string('timeformat', 'block_timetracker'),99,false);
+            get_string('datetimeformat', 'block_timetracker'),99,false);
         $entry->display = $disp;
         $entry->deletelink = $baseurl.'/deleteworkunit.php?id='.$unit->courseid.
             '&userid='.$unit->userid.'&unitid='.$unit->id.
@@ -273,7 +376,8 @@ function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1,
 }
 
 /**
-*@return array of tabobjects 
+* Used in navigation
+* @return array of tabobjects 
 */
 function get_tabs($urlparams, $canmanage = false, $courseid = -1){
     global $CFG;
@@ -286,9 +390,11 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
         $urlparams),'Reports');
     $numalerts = '';
     if($canmanage){
-        $tabs[] = new tabobject('manage',
-            new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams),
-            'Manage Workers');
+        $manageurl = 
+            new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', 
+            $urlparams);
+        $manageurl->remove_params('userid');
+        $tabs[] = new tabobject('manage', $manageurl, 'Manage Workers');
         $tabs[] = new tabobject('terms',
             new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php', $urlparams),
             'Terms');
@@ -308,7 +414,7 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
 }
 
 function add_enrolled_users($context){
-    global $COURSE,$DB;
+    global $COURSE, $DB;
 
     //before displaying anything, add any enrolled users NOT in the WORKERINFO table.
     //consider moving this to a 'refresh' link or something so it doesn't do it everytime?
@@ -339,8 +445,6 @@ function add_enrolled_users($context){
     }
 
 }
-
-
 
 /*
 * rounds to nearest 15 minutes (900 secs)
@@ -390,15 +494,8 @@ function format_elapsed_time($totalsecs=0){
 * @return total money earned
 */
 function get_total_earnings($userid, $courseid){
-    global $CFG, $DB;
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
-        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
-            'block_timetracker_workerinfo.id AND '.
-        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid;
 
-    $workerunits = $DB->get_recordset_sql($sql);
+    $workerunits = get_split_units(0, time(), $userid, $courseid);
 
     if(!$workerunits) return 0;
 
@@ -417,102 +514,37 @@ function get_total_earnings($userid, $courseid){
 * @return 0 if no alerts are pending, # of alerts if they exist.
 */
 function has_course_alerts($courseid){
-    global $CFG,$DB;
+    global $CFG, $DB;
     //check the alert* tables to see if there are any outstanding alerts:
-    //$sql = 'SELECT COUNT('.$CFG->prefix.'block_timetracker_alertunits.*) FROM '.
     $sql = 'SELECT COUNT(*) FROM '.
         $CFG->prefix.'block_timetracker_alertunits'.
         ' WHERE courseid='.$courseid.
             ' ORDER BY alerttime';
-
     //error_log($sql);
     $numalerts = $DB->count_records_sql($sql);
-    //error_log($numalerts." alerts found! CID: $courseid");
     return $numalerts;
 
 }
 
-/**
-* Determine if the supervisor has alerts waiting
-* @param $supervisorid of the supervisor in question
-* @param $courseid id of the course
-* @return T if alerts are pending, F if not.
-* @deprecated. Design decision to show ALL SUPERVISORS ALL ALERTS.
-*/
-function has_alerts($supervisorid, $courseid){
-    /*
-    global $CFG,$DB;
-    //check the alert* tables to see if there are any outstanding alerts:
-    //$sql = 'SELECT COUNT('.$CFG->prefix.'block_timetracker_alertunits.*) FROM '.
-    $sql = 'SELECT COUNT(*) FROM '.
-        $CFG->prefix.'block_timetracker_alertunits,'.
-        ' WHERE courseid='.$courseid.' ORDER BY alerttime';
-
-    $numalerts = $DB->count_records_sql($sql);
-    //error_log($numalerts." alerts found! USERID: $supervisorid CID: $courseid");
-    return ($numalerts != 0);
-    */
-    return has_course_alerts($courseid);
-
-}
-
-/**
-* Generate the alert links for a supervisor
-* @param $supervisorid of the supervisor in question
-* @param $courseid id of the course
-* @return two-dimensional array of links. First index is the TT worker id, the second
-* index is either 'approve', 'deny', or 'change' for each of the corresponding links
-* @deprecated DO NOT USE!!!
-*/
-function get_alert_links($supervisorid, $courseid){
-    /*
-    global $CFG,$DB;
-    //check the alert* tables to see if there are any outstanding alerts:
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_alertunits.* FROM '.
-        $CFG->prefix.'block_timetracker_alertunits,'.
-        $CFG->prefix.'block_timetracker_alert_com WHERE mdluserid='.
-        $supervisorid.' AND courseid='.$courseid.' ORDER BY alerttime';
-    //print_object($sql);
-
-    $alerts = $DB->get_recordset_sql($sql);
-    $alertlinks = array();
-    foreach ($alerts as $alert){
-        //print_object($alert);
-        $url = $CFG->wwwroot.'/blocks/timetracker/alertaction.php';
-        
-        $params = "?alertid=$alert->id";
-        if($alert->todelete) $params.="&delete=1";
-
-        $alertlinks[$alert->userid]['approve'] = $url.$params."&action=approve";
-        $alertlinks[$alert->userid]['deny'] = $url.$params."&action=deny";
-        $alertlinks[$alert->userid]['change'] = $url.$params."&action=change";
-
-    }
-    */
-
-    return get_course_alert_links($courseid);
-}
 
 /**
 * Generate the alert links for a course
-* XXX TODO update docs
 * @param $courseid id of the course
-* @return two-dimensional array of links. First index is the TT worker id, the second
-* index is either 'approve', 'deny', or 'change' for each of the corresponding links
+* @return three-dimensional array of links. First index is the TT worker id, the second is 
+* the alertid, while the third index is either 'approve', 'deny', or 'change' for each of
+* the corresponding links
 */
 function get_course_alert_links($courseid){
-    global $CFG,$DB;
+    global $CFG, $DB;
     //check the alert* tables to see if there are any outstanding alerts:
     $sql = 'SELECT '.$CFG->prefix.'block_timetracker_alertunits.* FROM '.
         $CFG->prefix.'block_timetracker_alertunits '.
         'WHERE courseid='.$courseid.
             ' ORDER BY alerttime';
-    //print_object($sql);
 
     $alerts = $DB->get_recordset_sql($sql);
     $alertlinks = array();
     foreach ($alerts as $alert){
-        //print_object($alert);
         $url = $CFG->wwwroot.'/blocks/timetracker/alertaction.php';
         
         $params = "?alertid=$alert->id";
@@ -534,17 +566,8 @@ function get_course_alert_links($courseid){
 * @return total hous worked in decimal format rounded to the nearest interval.
 */
 function get_total_hours($userid, $courseid){
-    global $CFG, $DB;
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workerinfo.firstname, '.
-        $CFG->prefix.'block_timetracker_workerinfo.lastname, '.$CFG->prefix.
-            'block_timetracker_workunit.* FROM '.
-        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
-            'block_timetracker_workerinfo.id AND '.
-        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid;
 
-    $workerunits = $DB->get_recordset_sql($sql);
+    $workerunits = get_split_units(0, time(), $userid, $courseid);
 
     if(!$workerunits) return 0;
 
@@ -561,22 +584,16 @@ function get_total_hours($userid, $courseid){
 * @return earnings (in dollars) for this month
 *
 */
-function get_earnings_this_month($userid,$courseid){
-    global $CFG, $DB;
+function get_earnings_this_month($userid, $courseid, $month = -1, $year = -1){
     $currtime = usergetdate(time());
 
-    $firstofmonth = time() - ((($currtime['mday']-1) * (24*3600)) + ($currtime['hours']*3600) + 
-        ($currtime['minutes']*60) + ($currtime['seconds']));
-
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
-        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.$firstofmonth.' AND '.time().' AND '.
-        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
-            'block_timetracker_workerinfo.id AND '.
-        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid;
-
-    $units = $DB->get_recordset_sql($sql);
+    if($month == -1 || $year == -1){
+        $units = get_split_month_work_units($userid, $courseid, 
+            $currtime['mon'], $currtime['year']);
+    } else {
+        $units = get_split_month_work_units($userid, $courseid, 
+            $month, $year);
+    }
 
     if(!$units) return 0;
     $earnings = 0;
@@ -596,18 +613,18 @@ function get_earnings_this_month($userid,$courseid){
     $monthinfo['lastday'] <= the last day of this month
     $monthinfo['monthname'] <= the name of this month
 */
-function get_month_info($month,$year){
+function get_month_info($month, $year){
     $monthinfo = array();
     
-    $timestamp = make_timestamp($year,$month); //timestamp of midnight, first day of $month
+    $timestamp = make_timestamp($year, $month); //timestamp of midnight, first day of $month
     $monthinfo['firstdaytimestamp'] = $timestamp;
-    $monthinfo['lastday'] = date('t',$timestamp);
+    $monthinfo['lastday'] = date('t', $timestamp);
 
     $thistime = usergetdate($timestamp);
     $monthinfo['dayofweek'] = $thistime['wday'];
     $monthinfo['monthname'] = $thistime['month'];
 
-    $timestamp = make_timestamp($year,$month,$monthinfo['lastday'],23,59,59);
+    $timestamp = make_timestamp($year, $month, $monthinfo['lastday'],23,59,59);
     $monthinfo['lastdaytimestamp'] = $timestamp; //23:59:59pm
 
     return $monthinfo;
@@ -618,22 +635,15 @@ function get_month_info($month,$year){
 * @return hours (in decimal) for this month
 *
 */
-function get_hours_this_month($userid,$courseid){
-    global $CFG, $DB;
+function get_hours_this_month($userid, $courseid, $month = -1, $year = -1){
     $currtime = usergetdate(time());
-
-    $firstofmonth = time() - ((($currtime['mday']-1) * (24*3600)) + ($currtime['hours']*3600) + 
-        ($currtime['minutes']*60) + ($currtime['seconds']));
-
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
-        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.$firstofmonth.' AND '.time().' AND '.
-        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
-            'block_timetracker_workerinfo.id AND '.
-        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid;
-
-    $units = $DB->get_recordset_sql($sql);
+    if($month == -1 || $year == -1){
+        $units = get_split_month_work_units($userid, $courseid,
+            $currtime['mon'], $currtime['year']);
+    } else {
+        $units = get_split_month_work_units($userid, $courseid,
+            $month, $year);
+    }
 
     if(!$units) return 0;
     $total = 0;
@@ -647,23 +657,13 @@ function get_hours_this_month($userid,$courseid){
 * @return earnings (in dollars) for this calendar year
 *
 */
-function get_earnings_this_year($userid,$courseid){
-    global $CFG, $DB;
-
+function get_earnings_this_year($userid, $courseid){
     $currtime = usergetdate(time());
-    $firstofyear = time() - ((($currtime['yday']-1) * (24*3600)) + ($currtime['hours']*3600) + 
-        ($currtime['minutes']*60) + ($currtime['seconds']));
 
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
-        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.$firstofyear.' AND '.time().' AND '.
-        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
-            'block_timetracker_workerinfo.id AND '.
-        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid;
+    $firstofyear = make_timestamp($currtime['year']); //defaults to jan 1 midnight
+    $endofyear = make_timestamp($currtime['year'], 12, 31, 23, 59, 59);
 
-    $units = $DB->get_recordset_sql($sql);
-
+    $units = get_split_units($firstofyear, $endofyear, $userid, $courseid);
 
     if(!$units) return 0;
     $earnings = 0;
@@ -677,22 +677,14 @@ function get_earnings_this_year($userid,$courseid){
 * @return hours (in decimal) for this calendar year
 *
 */
-function get_hours_this_year($userid,$courseid){
-    global $CFG, $DB;
+function get_hours_this_year($userid, $courseid){
     $currtime = usergetdate(time());
-    $firstofyear = time() - ((($currtime['yday']-1) * (24*3600)) + ($currtime['hours']*3600) + 
-        ($currtime['minutes']*60) + ($currtime['seconds']));
 
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
-        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.$firstofyear.' AND '.time().' AND '.
-        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
-            'block_timetracker_workerinfo.id AND '.
-        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid;
+    $firstofyear = make_timestamp($currtime['year']); //defaults to jan 1 midnight
+    $endofyear = make_timestamp($currtime['year'], 12, 31, 23, 59, 59);
 
-    $units = $DB->get_recordset_sql($sql);
-
+    $units = get_split_units($firstofyear, $endofyear, $userid, $courseid);
+    
     if(!$units) return 0;
     $total = 0;
     foreach($units as $unit){
@@ -710,7 +702,8 @@ function get_term_boundaries($courseid){
     $currtime = time();
     $year = date("Y");
 
-    $terms = $DB->get_records('block_timetracker_term',array('courseid'=>$courseid), 'month, day');
+    $terms = $DB->get_records('block_timetracker_term',
+        array('courseid'=>$courseid), 'month, day');
 
     $termstart = 0;
     $termend = 0;
@@ -719,10 +712,10 @@ function get_term_boundaries($courseid){
         $term_times = array();
         $counter = 0;
         foreach($terms as $term){
-            $tstart = mktime(0,0,0,$term->month,$term->day,$year);
+            $tstart = mktime(0,0,0, $term->month, $term->day, $year);
             $term_times[] = $tstart; 
             if($counter == 0){
-                $term_times[] = mktime(0,0,0,$term->month,$term->day,$year+1);
+                $term_times[] = mktime(0,0,0, $term->month, $term->day, $year+1);
             }
             $counter++;
         }
@@ -749,19 +742,10 @@ function get_term_boundaries($courseid){
 */
 function get_hours_this_term($userid, $courseid){
 
-    global $CFG, $DB;
     $boundaries = get_term_boundaries($courseid);
-
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
-        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.
-        $boundaries['termstart'].' AND '.$boundaries['termend'].' AND '.
-        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
-            'block_timetracker_workerinfo.id AND '.
-        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid;
-
-    $units = $DB->get_recordset_sql($sql);
+    
+    $units = get_split_units($boundaries['termstart'], $boundaries['termend'],
+        $userid, $courseid);
 
     if(!$units) return 0;
     $total = 0;
@@ -771,22 +755,12 @@ function get_hours_this_term($userid, $courseid){
     return get_hours($total);
 }
 
-function get_earnings_this_term($userid,$courseid){
-
-    global $CFG, $DB;
+function get_earnings_this_term($userid, $courseid){
 
     $boundaries = get_term_boundaries($courseid);
-
-    $sql = 'SELECT '.$CFG->prefix.'block_timetracker_workunit.* FROM '.
-        $CFG->prefix.'block_timetracker_workerinfo,'.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        $CFG->prefix.'block_timetracker_workunit.timein BETWEEN '.
-        $boundaries['termstart'].' AND '.$boundaries['termend'].' AND '.
-        $CFG->prefix.'block_timetracker_workunit.userid='.$CFG->prefix.
-            'block_timetracker_workerinfo.id AND '.
-        $CFG->prefix.'block_timetracker_workerinfo.id='.$userid.' AND '.$CFG->prefix.
-            'block_timetracker_workunit.courseid='.$courseid;
-
-    $units = $DB->get_recordset_sql($sql);
+    
+    $units = get_split_units($boundaries['termstart'], $boundaries['termend'],
+        $userid, $courseid);
 
     if(!$units) return 0;
     $earnings = 0;
@@ -816,18 +790,18 @@ function get_earnings_this_term($userid,$courseid){
 * $stats['termearnings']
 * @return an array with useful values
 */
-function get_worker_stats($userid,$courseid){
+function get_worker_stats($userid, $courseid){
     global $DB;
 
-    $stats['totalhours'] = get_total_hours($userid,$courseid);
+    $stats['totalhours'] = get_total_hours($userid, $courseid);
     $stats['monthhours'] = get_hours_this_month($userid, $courseid);
     $stats['yearhours'] = get_hours_this_year($userid, $courseid);
     $stats['termhours'] = get_hours_this_term($userid, $courseid);
 
-    $stats['totalearnings'] = get_total_earnings($userid,$courseid);
-    $stats['monthearnings'] =get_earnings_this_month($userid,$courseid);
-    $stats['yearearnings'] = get_earnings_this_year($userid,$courseid);
-    $stats['termearnings'] = get_earnings_this_term($userid,$courseid);
+    $stats['totalearnings'] = get_total_earnings($userid, $courseid);
+    $stats['monthearnings'] =get_earnings_this_month($userid, $courseid);
+    $stats['yearearnings'] = get_earnings_this_year($userid, $courseid);
+    $stats['termearnings'] = get_earnings_this_term($userid, $courseid);
 
 
     return $stats; 
@@ -901,21 +875,12 @@ function get_timetracker_config($courseid){
     $config = array();
     $confs = $DB->get_records('block_timetracker_config',array('courseid'=>$courseid));
     foreach ($confs as $conf){
-        $key = preg_replace('/block\_timetracker\_/','',$conf->name);
+        $key = preg_replace('/block\_timetracker\_/','', $conf->name);
         $config[$key] = $conf->value;
     }
 
     return $config;
 }
 
-/**
-* for admin usage. Find all units that 
-*
-*/
-/*
-function find_units($startafter, $endbefore){
-
-}
-*/
 
 

@@ -2,8 +2,8 @@
 <?php
 
 define('CLI_SCRIPT', true);
-require_once('../../config.php');
-require_once('lib.php');
+require_once('../../../config.php');
+require_once('../lib.php');
 //require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
 global $CFG, $DB, $USER;
@@ -41,9 +41,13 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
         $days_string = $data[2];
         $starttime = $data[3];
         $endtime = $data[4];
+        if($email == 's000189308@mhc.edu'){
+            echo "$email $coursename $days_string $starttime $endtime\n";
+            exit;
+        }
 
         if(strtolower($days_string) == 'tba') continue;
-        if(strtolower($days_string) == 'mtof') $days_string='mtwrf';
+        if(strtolower($days_string) == 'mtof') $days_string='MTWRF';
 
         $workers = $DB->get_records('block_timetracker_workerinfo',
             array('email'=>$email)); 
@@ -67,8 +71,9 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
             
             foreach ($teachers as $teacher) {
                 if(is_enrolled($context, $teacher->id)){
-                    $supervisor .= $teacher->firstname.' '.$teacher->lastname .' ' .$teacher->email
-                    .',';
+                    $supervisor .= $teacher->firstname.' '.
+                        $teacher->lastname .' ' .$teacher->email
+                        .',';
                 }
             }
             $supervisor = substr($supervisor,0,-1);

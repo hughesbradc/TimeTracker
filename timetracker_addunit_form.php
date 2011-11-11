@@ -28,12 +28,12 @@ require_once ('lib.php');
 
 class timetracker_addunit_form  extends moodleform {
 
-    function timetracker_addunit_form($context, $userid, $courseid, $timein=0, $timeout=0){
+    function timetracker_addunit_form($context, $userid, $courseid, $start=0, $end=0){
         $this->context = $context;
         $this->userid = $userid;
         $this->courseid = $courseid;
-        $this->timein = $timein;
-        $this->timeout = $timeout;
+        $this->timein = $start;
+        $this->timeout = $end;
         parent::__construct();
     }
 
@@ -77,7 +77,7 @@ class timetracker_addunit_form  extends moodleform {
                 array('optional'=>false,'step'=>1));
 		    $mform->addHelpButton('timein','timein','block_timetracker');
             if($this->timein != 0){
-                $mform->setDefault('timein',$this->timein);
+                $mform->setDefault('timein', $this->timein);
             }
         
             $mform->addElement('date_time_selector','timeout','Time Out: ',
@@ -114,20 +114,26 @@ class timetracker_addunit_form  extends moodleform {
                 $params['timein'] = $data['timein'];
                 $params['timeout'] = $data['timeout'];
 
+                /*
                 $next = new moodle_url(qualified_me(), $params);
                 $SESSION->fromurl = $next;
+                */
 
                 $errormsg = 'Work unit conflicts with existing unit(s):<br />';
                 $errormsg .= '<table>';
                 foreach($conflicts as $conflict){
                     $errormsg .= '<tr>';
-                    $conflict->editlink .= '&inpopup=true';
+
+                    $extras = '&next=addunit&astart='.$data['timein'].
+                        '&aend='.$data['timeout'];
+
+                    $conflict->editlink .= $extras;
 
                     $editaction = $OUTPUT->action_icon(
                         $conflict->editlink, 
-                        new pix_icon('clock_edit', 'Edit unit', 'block_timetracker'),
-                        new popup_action('click', $conflict->editlink, 'editunit',
-                            array('height'=>520, 'width'=>745)));
+                        new pix_icon('clock_edit', 'Edit unit', 'block_timetracker'));
+
+                    $conflict->deletelink .= $extras;
         
                     $deleteaction = $OUTPUT->action_icon(
                         $conflict->deletelink, new pix_icon('clock_delete',

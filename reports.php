@@ -53,6 +53,7 @@ else if ($userid == -1 && $canmanage) $userid = 0;
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
+
 if($reportstart) $urlparams['repstart'] = $reportstart;
 if($reportend) $urlparams['repend'] = $reportend;
 
