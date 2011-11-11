@@ -20,7 +20,8 @@ global $CFG, $DB, $USER;
 
 //start/stop time for search
 //$from=1314849600; //Sept 1
-$from=1317441600; //Oct 1
+//$from=1317441600; //Oct 1
+$from=1320119998; //nov 1
 $to=time();
 $datetimeformat='%m/%d/%y %I:%M %p';
 
@@ -37,14 +38,12 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
         $email = $data[0].'@mhc.edu';
+        //if($email != 's000168502@mhc.edu') continue;
         $coursename = $data[1];
         $days_string = $data[2];
         $starttime = $data[3];
         $endtime = $data[4];
-        if($email == 's000189308@mhc.edu'){
-            echo "$email $coursename $days_string $starttime $endtime\n";
-            exit;
-        }
+
 
         if(strtolower($days_string) == 'tba') continue;
         if(strtolower($days_string) == 'mtof') $days_string='MTWRF';
@@ -76,22 +75,27 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
                         .',';
                 }
             }
+
             $supervisor = substr($supervisor,0,-1);
 
             $days_array = preg_split('//', $days_string, -1, PREG_SPLIT_NO_EMPTY); 
+            //print_object($days_array);
             foreach($days_array as $day){
                 $day = strtolower($day);
+                //echo "Checking $day\n";
                 if(!isset($day_names[$day])) {
                     echo "Day $day does not exist in day_names array\n";
                     continue;
                 }
 
                 $iterator = strtotime("Next $day_names[$day]", $from);
+                //echo "Next ".$day_names[$day]."\n";
+                //echo "Starting at ".userdate($iterator, $datetimeformat)."\n";
                 if($starttime > 1200){
                     $dispstarttime = $starttime - 1200;
                     $dispstarttime .='pm';
                 } else {
-                    $dispstarttime = $startime.'am';
+                    $dispstarttime = $starttime.'am';
                 }
 
                 if($endtime > 1200){
@@ -133,20 +137,23 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
 
                     $out = make_timestamp($tdate['year'], $tdate['mon'], $tdate['mday'],
                         $tdate['hours'], $tdate['minutes']);
-                    //echo "Out: ".userdate($out, $datetimeformat)."\n";
 
+                    //echo "Out: ".userdate($out, $datetimeformat)."\n";
 
                     $conflicts = find_conflicts($in, $out, $worker->id, -1,
                         $worker->courseid);
                     if(sizeof($conflicts) > 0){
                         foreach($conflicts as $conflict){
-                            echo "$worker->lastname,$worker->firstname,".
-                                "$coursename $days_string $dispstarttime to $dispendtime,".
-                                userdate($iterator,'%m/%d/%y %A',99,false).",".
-                                $conflict->display.','.$course->shortname.','.$supervisor."\n";
+                            echo "\"$worker->lastname\",\"$worker->firstname\",".
+                                "\"$coursename $days_string ". 
+                                "$dispstarttime to $dispendtime\",\"".
+                                userdate($iterator,'%m/%d/%y %A',99,false).'","'.
+                                $conflict->display.'","'.
+                                $course->shortname.'","'.$supervisor."\"\n";
                         }
                     }
-                    $iterator = $iterator + (7 * 86400);
+                    //$iterator = $iterator + (7 * 86400);
+                    $iterator = strtotime('+1 week', $iterator);
                 }
             }
             break;

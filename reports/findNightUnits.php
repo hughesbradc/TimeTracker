@@ -37,9 +37,10 @@ foreach($courses as $course){
         //$count = 0;
         foreach($units as $unit){
             //echo ($unit->timein."\t".$unit->timeout."\n");
-            //check to see if the unit is between starts after 12am & ends before 7am
+            //check to see if the unit starts after 12am & ends before 7am
 
             if($unit->timeout <= usergetmidnight($unit->timeout)+(7*3600)){
+                if(($unit->timeout - $unit->timein) < 450) continue;
                 /*
                 echo ("<br />\n**ERROR**<br />\n");
                 echo ("Department: $fullcourse->shortname<br />\n");
