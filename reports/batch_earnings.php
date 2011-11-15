@@ -6,6 +6,8 @@ require_once('../lib.php');
 
 require_login();
 
+$catid = required_param('catid', PARAM_INTEGER);
+
 /**
  The purpose of this script is to find earnings/max earnings for this term
 */
@@ -15,7 +17,7 @@ global $CFG, $DB, $USER;
 //$courseid = required_param('id', PARAM_INTEGER);
 //$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
-$context = get_context_instance(CONTEXT_SYSTEM);
+$context = get_context_instance(CONTEXT_COURSECAT, $catid);
 $PAGE->set_context($context);
 
 if (!has_capability('block/timetracker:manageworkers', $context)) { 
@@ -39,7 +41,7 @@ foreach($workers as $worker){
         continue;
     }
 
-    $earnings = get_earnings_this_term($worker->id,$worker->courseid);
+    $earnings = get_earnings_this_term($worker->id, $worker->courseid);
     $course = $DB->get_record('course', array('id'=>$worker->courseid));
     $remaining = $worker->maxtermearnings - $earnings; 
     $contents = "$course->shortname,$worker->lastname,$worker->firstname,$worker->email,"

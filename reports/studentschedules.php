@@ -7,6 +7,8 @@ require_login();
 
 global $CFG, $DB, $USER;
 
+$cat = required_param('catid', PARAM_INT);
+
 /*
     0 - username
     1 - course name
@@ -16,7 +18,7 @@ global $CFG, $DB, $USER;
 
     Checks for work units that occured during classes
 */
-$context = get_context_instance(CONTEXT_SYSTEM);
+$context = get_context_instance(CONTEXT_COURSECAT, $cat);
 $PAGE->set_context($context);
 
 if (!has_capability('block/timetracker:manageworkers', $context)) { 
@@ -26,7 +28,8 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
 
 //start/stop time for search
 //$from=1314849600; //Sept 1
-$from=1317441600; //Oct 1
+//$from=1317441600; //Oct 1
+$from=1320119998; //Nov 1
 $to=time();
 $datetimeformat='%m/%d/%y %I:%M %p';
 
@@ -47,12 +50,12 @@ header('Content-Disposition: attachment; filename='.$filename);
 
 echo $header;
 
-if(($handle = fopen("../testfile.csv", "r")) !== FALSE){
-//if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
+//if(($handle = fopen("../testfile.csv", "r")) !== FALSE){
+if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
-        $email = $data[0];
-        //$email = $data[0].'@mhc.edu';
+        //$email = $data[0];
+        $email = $data[0].'@mhc.edu';
         $coursename = $data[1];
         $days_string = $data[2];
         $starttime = $data[3];
