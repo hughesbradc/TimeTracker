@@ -7,6 +7,7 @@ require_once('../lib.php');
 require_login();
 
 $catid = required_param('catid', PARAM_INTEGER);
+$active = optional_param('active', 0, PARAM_INTEGER);
 
 /**
  The purpose of this script is to find earnings/max earnings for this term
@@ -24,8 +25,13 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
     print_error('You do not have permission to run this report.');
 }
 
-//find all workers
-$workers = $DB->get_records('block_timetracker_workerinfo');
+if($active){
+    //find all active workers
+    $workers = $DB->get_records('block_timetracker_workerinfo', array('active'=>1));
+} else {
+    //find all workers
+    $workers = $DB->get_records('block_timetracker_workerinfo');
+}
 
 $filename = date("Y_m_d").'_Earnings.csv';
 $header = "Department ,Last Name ,First Name ,Earnings ,Max Term Earnings \n";
