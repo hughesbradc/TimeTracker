@@ -28,8 +28,9 @@ require_once ('lib.php');
 
 class timetracker_timesheet_form  extends moodleform {
 
-    function timetracker_timesheet_form($context){
+    function timetracker_timesheet_form($context, $userid=-1){
         $this->context = $context;
+        $this->userid = $userid;
         parent::__construct();
     }
 
@@ -60,6 +61,9 @@ class timetracker_timesheet_form  extends moodleform {
             $select->setMultiple(true);
             $mform->addHelpButton('workerid','workerid','block_timetracker');
             $mform->addRule('workerid', null, 'required', null, 'client', 'false');
+            if($this->userid > 0){
+                $mform->setDefault('workerid', $this->userid);
+            }
         } else {
             $worker =
                 $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id,
@@ -69,6 +73,13 @@ class timetracker_timesheet_form  extends moodleform {
             }
             $mform->addElement('hidden','workerid',$worker->id);    
         }
+
+
+
+        //$mform->addElement('button','selectall','Select All Students','disabled');
+        //$mform->addElement('button','selectall','Select All Students');
+
+
 
         $months = array(
             1 =>'January',
@@ -93,8 +104,9 @@ class timetracker_timesheet_form  extends moodleform {
             'block_timetracker_workunit ORDER BY timein LIMIT 1';
         $earliestyear = $DB->get_record_sql($sql);
 
-        $earliestyear = date("Y", $earliestyear->timein);
+
         if(!$earliestyear) $earliestyear = date("Y"); 
+        else $earliestyear = date("Y", $earliestyear->timein);
         
         $years = array();
         foreach(range($earliestyear,date("Y")) as $year){

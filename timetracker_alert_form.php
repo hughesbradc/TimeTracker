@@ -212,7 +212,9 @@ class timetracker_alert_form  extends moodleform {
             return $errors;  
         }
 
-        if($expired){
+        if(!has_capability('block/timetracker:manageoldunits', $this->context) && 
+            $expired){
+            //error_log(expired($data['timein']));
             $errors['timeinerror'] = 'You are not authorized to add work units this far in the
             past. See an administrator for assistance';
         } else if($data['timeinerror'] > time()){

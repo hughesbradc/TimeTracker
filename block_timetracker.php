@@ -81,8 +81,8 @@
                 }
             }
 
-            $hasalerts = has_alerts($USER->id,$COURSE->id);
-            if(has_capability('moodle/site:config',$this->context)){
+            $hasalerts = has_course_alerts($COURSE->id);
+            if(has_capability('moodle/site:config', $this->context)){
                 $hasalerts = has_course_alerts($COURSE->id);
             }
 
@@ -102,22 +102,32 @@
             $timeclockdataicon = new pix_icon('manage', 'Manage', 'block_timetracker');
             $timeclockdataaction = $OUTPUT->action_icon($index, $timeclockdataicon);
     
-            $this->content->text .= $timeclockdataaction.' <a href="'.$index.
-                '">Main</a><br />';
+            $this->content->text .= $timeclockdataaction.' '.
+                $OUTPUT->action_link($index, 'Main').'<br />';
 
             $reportsurl = new moodle_url($baseurl.'/reports.php', $indexparams);
             $reportsaction=$OUTPUT->action_icon($reportsurl, new pix_icon('report', 
                 'Reports','block_timetracker'));
 
-            $this->content->text .= $reportsaction.'<a href="'.$reportsurl.'"> Reports<br />';
+            $this->content->text .= $reportsaction.' '.
+                $OUTPUT->action_link($reportsurl, 'Reports').'<br />';
 
             $timesheeturl = new moodle_url($baseurl.'/timesheet.php', $indexparams);
             $timesheetaction=$OUTPUT->action_icon($timesheeturl, 
                 new pix_icon('i/calendar', 'Timesheets')); 
 
-            $this->content->text .= $timesheetaction.'<a href="'.
-                $timesheeturl.'"> Timesheets</a><br />';
-            
+            $this->content->text .= $timesheetaction.' '.
+                $OUTPUT->action_link($timesheeturl, 'Timesheet').'<br />';
+
+            $manageurl = new moodle_url($baseurl.'/manageworkers.php', 
+                array('id'=>$COURSE->id));
+            $manageaction=$OUTPUT->action_icon($manageurl, 
+                new pix_icon('user_group', 'Manage workers', 'block_timetracker')); 
+
+            $this->content->text .= $manageaction.' '.
+                $OUTPUT->action_link($manageurl, 'Manage workers').'<br />';
+
+
             $numtimeclock = $DB->count_records('block_timetracker_workerinfo',
                 array('courseid'=>$courseid, 'timetrackermethod'=>0));
 

@@ -9,10 +9,8 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
-
-
 //find all workers
-$workers = $DB->get_records('block_timetracker_workerinfo');
+$workers = $DB->get_records('block_timetracker_workerinfo', array(), 'lastname');
 
 foreach($workers as $worker){
     //demo courses, et. al.
@@ -20,10 +18,23 @@ foreach($workers as $worker){
         continue;
     }
 
-    $earnings = get_earnings_this_term($worker->id,$worker->courseid);
+    //$earnings = get_hours_this_month($worker->id, $worker->courseid, 11, 2011);
+    $earnings = get_earnings_this_term($worker->id, $worker->courseid);
     
     $course = $DB->get_record('course', array('id'=>$worker->courseid));
-    echo $course->shortname.','.$worker->lastname.','.$worker->firstname.
-        ','.$earnings.','.$worker->maxtermearnings."\n";
+    $id = str_replace('@mhc.edu', '', $worker->email);
 
+    $remain = $worker->maxtermearnings - $earnings;
+    if($remain <= 0){
+        $hours_remain = 0;
+    } else {
+        $hours_remain = round($remain/$worker->currpayrate,2);
+    }
+
+    echo '"'.$worker->lastname.'","'.$worker->firstname.'","'.
+        $course->shortname.'","'.$earnings.'","'.$worker->maxtermearnings.'","'.
+        $worker->currpayrate.'","'.
+        $remain.'","'.$hours_remain.'"'.
+        "\n";
+    
 }

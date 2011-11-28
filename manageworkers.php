@@ -31,6 +31,7 @@ require_login();
 
 
 $courseid = required_param('id', PARAM_INTEGER);
+$loadusers = optional_param('reload', 0, PARAM_BOOL);
 
 $urlparams['id'] = $courseid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
@@ -47,6 +48,11 @@ if($courseid){
 
 //print_object($context);
 //error_log("in manage workers and $COURSE->id");
+
+if($loadusers){
+    //error_log("loading new users");
+    add_enrolled_users($context);
+}
 
 
 $canmanage = false;

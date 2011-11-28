@@ -61,10 +61,17 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
-if(isset($_SERVER['HTTP_REFERER'])){
-    $nextpage = $_SERVER['HTTP_REFERER'];
+if(get_referer(false)){
+    $nextpage = get_referer(false);
 } else {
     $nextpage = $index;
+}
+
+//if we posted to ourself from ourself
+if(strpos($nextpage, qualified_me()) !== false){
+    $nextpage = new moodle_url($SESSION->lastpage);
+} else {
+    $SESSION->lastpage = $nextpage;
 }
 
 if($USER->id != $workerrecord->mdluserid && !$canmanage){
@@ -101,7 +108,7 @@ if($workerrecord->active == 0){
 }
 
 if ($mform->is_cancelled()){ //user clicked cancel
-    redirect($index);
+    redirect($nextpage);
 
 } else if ($formdata=$mform->get_data()){
         $formdata->courseid = $formdata->id;

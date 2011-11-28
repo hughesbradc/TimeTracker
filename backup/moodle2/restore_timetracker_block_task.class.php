@@ -20,7 +20,7 @@ class restore_timetracker_block_task extends restore_block_task {
      */
     protected function define_my_steps() {
         // Choice only has one structure step
-        error_log('adding step now in clas');
+        //error_log('adding step now in clas');
         $this->add_step(new restore_timetracker_block_structure_step('timetracker_structure',
             'timetracker.xml'));
     }

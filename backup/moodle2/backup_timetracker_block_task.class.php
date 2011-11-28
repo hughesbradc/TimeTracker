@@ -16,7 +16,7 @@ class backup_timetracker_block_task extends backup_block_task {
     }
 
     protected function define_my_steps() {
-        error_log("in define_my_steps");
+        //error_log("in define_my_steps");
         $this->add_step(new backup_timetracker_block_structure_step(
             'timetracker_structure', 'timetracker.xml'));
     }

@@ -40,10 +40,11 @@ class timetracker_manageworkers_form  extends moodleform {
 
         $mform =& $this->_form; // Don't forget the underscore! 
 
-        add_enrolled_users($this->context);
+        //add_enrolled_users($this->context);
 
         $mform->addElement('header', 'general', get_string('manageworkers',
             'block_timetracker')); 
+
 		$mform->addHelpButton('general','manageworkers','block_timetracker');
 
 
@@ -51,6 +52,16 @@ class timetracker_manageworkers_form  extends moodleform {
         $strfirstname = get_string('firstname', 'block_timetracker');
         $strlastname = get_string('lastname', 'block_timetracker');
         $stremail = get_string('email', 'block_timetracker');
+
+        $me = new moodle_url(qualified_me());
+        $me->params(array('reload'=>true));
+
+        $reloadaction = $OUTPUT->action_icon($me, new pix_icon('refresh', 'Refresh worker list',
+            'block_timetracker'));
+
+        $mform->addElement('html', $reloadaction.' '.$OUTPUT->action_link($me, 
+            'Refresh worker list'));
+
 
         $mform->addElement('html', 
             '<table align="center" border="1" cellspacing="10px" '.

@@ -34,34 +34,66 @@ global $SESSION;
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
 $unitid = required_param('unitid', PARAM_INTEGER);
-//$inpopup = optional_param('inpopup', 0, PARAM_BOOL);
-$next = optional_param('next', '', PARAM_ALPHA);
+
+//For redirect nightmare -- HACK!
+$camefrom = optional_param('next', '', PARAM_ALPHA);
+$prevunitid = optional_param('eunitid', -1, PARAM_INTEGER); //editunit
+$astart = optional_param('astart', 0, PARAM_INTEGER); //addunit
+$aend = optional_param('aend', 0, PARAM_INTEGER); //addunit
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
+$nextdata['next'] = $camefrom;
+$nextdata['eunitid'] = $prevunitid;
+$nextdata['astart'] = $astart;
+$nextdata['aend'] = $aend;
 
-$nextpage = $index;
-if(get_referer(false)){
-    $nextpage = new moodle_url(get_referer(false));
+//redirect madness
+if($camefrom){
+    $baseurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/'.$camefrom.'.php');
+    $baseurl->params(array('id'=>$courseid,
+        'userid'=>$userid));  
+    $nextpage = $baseurl;
+    if($astart != 0){
+        $nextpage->params(array(
+            'start'=>$astart));
+    }
+    if($aend != 0){
+        $nextpage->params(array(
+            'end'=>$aend));
+    }
+    if($camefrom == 'editunit'){
+        if($prevunitid != -1){
+            $nextpage->params(array('unitid'=>$prevunitid));
+        }
+    }
 } else {
-    $nextpage = $index;
+    if(get_referer(false)){
+        $nextpage = new moodle_url(get_referer(false));
+    } else {
+        $nextpage = $index;
+    }
+    
+    //if we posted to ourself from ourself
+    if(strpos($nextpage, qualified_me()) !== false){
+        $nextpage = new moodle_url($SESSION->lastpage);
+    } else {
+        $SESSION->lastpage = $nextpage;
+    }
+        
+    if (isset($SESSION->fromurl) &&
+        !empty($SESSION->fromurl)){
+        $nextpage = new moodle_url($SESSION->fromurl);
+        unset($SESSION->fromurl);
+    }
 }
-
-/*
-//if we posted to ourself from ourself
-if(strpos($nextpage, me()) !== false){
-    $nextpage = new moodle_url($SESSION->lastpage);
-} else {
-    $SESSION->lastpage = $nextpage;
-}
-*/
 
 //error_log('in delete: '.$SESSION->fromurl);
 if (isset($SESSION->fromurl) &&
     !empty($SESSION->fromurl)){
-    error_log($SESSION->fromurl);
+    //error_log($SESSION->fromurl);
     $nextpage = new moodle_url($SESSION->fromurl);
     unset($SESSION->fromurl);
 }
@@ -86,7 +118,6 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
         print_error('errordeleting','block_timetracker', 
             $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
     }
-    unset($SESSION->afterdelete);
 }
 
 redirect($nextpage, 'Unit deleted', 1);

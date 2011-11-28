@@ -30,7 +30,7 @@ require_once('lib.php');
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
-$userid = optional_param('userid',0, PARAM_INTEGER);
+//$userid = optional_param('userid',0, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 
@@ -86,6 +86,7 @@ echo $OUTPUT->header();
 $tabs = get_tabs($urlparams, $canmanage, $courseid);
 $tabs = array($tabs);
 print_tabs($tabs, 'home');
+
 
 if ($canmanage) { //supervisor
     echo $OUTPUT->box_start('generalbox boxaligncenter');
@@ -184,8 +185,8 @@ if ($canmanage) { //supervisor
 
     //now print out roster
     echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo '<table align="center" cellspacing="10px" 
-                cellpadding="5px" width="95%" style="border: 1px solid #000;">';
+    echo '<table align="center" cellspacing="1px" 
+                cellpadding="1px" width="95%" style="border: 1px solid #000;">';
     echo '<tr><th colspan="7">Worker Roster</th></tr>'."\n";
     echo '<tr>
             <td style="font-weight: bold">Worker name</td>
@@ -257,6 +258,7 @@ if ($canmanage) { //supervisor
         array('userid'=>$worker->id),'timeout DESC','*',0,10);
     $userPending = $DB->get_records('block_timetracker_pending', 
         array('userid'=>$worker->id));
+
 
     //add clockin/clockout box
     if($worker->active == 0){

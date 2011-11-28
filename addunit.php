@@ -33,16 +33,17 @@ require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
-$timein = optional_param('timein', 0, PARAM_INTEGER);
-$timeout = optional_param('timeout', 0, PARAM_INTEGER);
+$start = optional_param('start', 0, PARAM_INTEGER);
+$end = optional_param('end', 0, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 
 //set up page URLs
 $url = new moodle_url($CFG->wwwroot.'/blocks/timetracker/addunit.php', $urlparams);
-$url->params(array('timein'=>"$timein"));
-$url->params(array('timeout'=>"$timeout"));
+$url->params(array('start'=>$end));
+$url->params(array('end'=>$start));
+
 $manage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', $urlparams);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -96,7 +97,7 @@ $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $manage);
 $PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_addunit_form($context, $userid, $courseid,
-    $timein, $timeout);
+    $start, $end);
 
 if($workerrecord->active == 0){
     echo $OUTPUT->header();
@@ -115,7 +116,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
     $formdata->payrate = $workerrecord->currpayrate;
     $formdata->lastedited = time();
     $formdata->lasteditedby = $formdata->editedby;
-    $result = add_unit($formdata);
+    $result = add_unit($formdata, true);
     //$DB->insert_record('block_timetracker_workunit', $formdata);
     if($result) {
         $status = 'Work unit(s) added successfully.'; 

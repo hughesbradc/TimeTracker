@@ -209,13 +209,7 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
     
     // Number the Days and add data
     
-    $sql = 'SELECT * from ' .$CFG->prefix.'block_timetracker_workunit '.
-        'WHERE userid='.$userid.
-        ' AND courseid='.$courseid.' AND timein BETWEEN '. 
-        $monthinfo['firstdaytimestamp'] .' AND '.
-        $monthinfo['lastdaytimestamp']. ' ORDER BY timein';
-    
-    $units = $DB->get_recordset_sql($sql);
+    $units = get_split_month_work_units($workerrecord->id, $courseid, $month, $year);
     
     $date = 1;
     $dayofweek = $monthinfo['dayofweek']; 
@@ -236,19 +230,19 @@ function generate_xls($month, $year, $userid, $courseid, $method = 'I', $base=''
             $wustr = "";
             $mid = (86400 * ($date -1)) + $monthinfo['firstdaytimestamp'];
             $eod = (86400 * ($date -1)) + ($monthinfo['firstdaytimestamp'] + 86399);
-    
-            foreach($units as $unit){
-                if($unit->timein < $eod && $unit->timein >= $mid){
-                    $in = userdate($unit->timein, 
-                        get_string('timeformat','block_timetracker'));
-                    $out = userdate($unit->timeout, 
-                        get_string('timeformat','block_timetracker'));
-                    if(($unit->timeout - $unit->timein) >449){
-                        $wustr .= "In: $in\nOut: $out\n";
-                        $weeksum += get_hours(($unit->timeout - $unit->timein));
+            
+            if($units){
+                foreach($units as $unit){
+                    if($unit->timein < $eod && $unit->timein >= $mid){
+                        $in = userdate($unit->timein, 
+                            get_string('timeformat','block_timetracker'));
+                        $out = userdate($unit->timeout, 
+                            get_string('timeformat','block_timetracker'));
+                        if(($unit->timeout - $unit->timein) >449){
+                            $wustr .= "In: $in\nOut: $out\n";
+                            $weeksum += get_hours(($unit->timeout - $unit->timein));
+                        }
                     }
-                } else {
-                    break;
                 }
             }
             

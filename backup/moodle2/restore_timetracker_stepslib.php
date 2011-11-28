@@ -34,12 +34,12 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
  
     protected function process_block($data) {
         global $DB;
-        error_log('before getting userinfo'); 
+        //error_log('before getting userinfo'); 
         $userinfo = $this->get_setting_value('users');
 
         $data = (object)$data;
 
-        error_log('Before checking blockid');
+        //error_log('Before checking blockid');
         if(!$this->task->get_blockid()){
             return;
         }
@@ -61,7 +61,7 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
             $citem = (object)$citem;
             unset($citem->id);
             $citem->courseid = $this->get_courseid();
-            error_log("adding config item $citem->name");
+            //error_log("adding config item $citem->name");
             $DB->insert_record('block_timetracker_config',$citem);
         }
         
@@ -74,8 +74,8 @@ class restore_timetracker_block_structure_step extends restore_structure_step {
                     $workerinfo->courseid = $this->get_courseid();
                     $oldid = $workerinfo->id;
                     unset($workerinfo->id);
-                    error_log("inserting worker 
-                        $worker->firstname $worker->lastname $worker->oldid");
+                    //error_log("inserting worker 
+                        //$worker->firstname $worker->lastname $worker->oldid");
                     $newinfoid = $DB->insert_record('block_timetracker_workerinfo',
                         $workerinfo);
     

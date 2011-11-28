@@ -6,7 +6,7 @@
 class backup_timetracker_block_structure_step extends backup_block_structure_step {
 
     protected function define_structure() {
-        error_log("in define_structure()");
+        //error_log("in define_structure()");
         global $DB,$CFG;
 
         // To know if we are including userinfo

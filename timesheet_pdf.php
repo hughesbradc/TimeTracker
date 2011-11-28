@@ -46,12 +46,8 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
     $mdluser= $DB->get_record('user', array('id'=>$workerrecord->mdluserid));
     $conf = get_timetracker_config($courseid);
     
-    $sql = 'SELECT * from ' .$CFG->prefix.'block_timetracker_workunit '. 'WHERE userid='.
-        $userid.' AND courseid='.$courseid.' AND timein BETWEEN '.
-        $monthinfo['firstdaytimestamp'] .' AND '.
-        $monthinfo['lastdaytimestamp']. ' ORDER BY timein';
-    
-    $units = $DB->get_recordset_sql($sql);
+    $units = get_split_month_work_units($workerrecord->id, $courseid, $month, $year);
+    //error_log(sizeof($units));
     
     // ********** BEGIN PDF ********** //
     // Create new PDF
@@ -97,7 +93,7 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
                 .strtoupper($workerrecord->firstname).'<br />'
             .'ID: '.$workerrecord->idnum.'<br />'
             .'ADDRESS: '.$workerrecord->address.'<br />
-            YTD Earnings: $ '.number_format(get_earnings_this_year($userid,$courseid), 2).
+            YTD Earnings: $ '.number_format(get_earnings_this_year($userid, $courseid), 2).
             '</b></font></td>
             <td><font size="8"><b>SUPERVISOR: '.$conf['supname'].'<br />'
             .'DEPARTMENT: '.$conf['department'].'<br />'
@@ -162,37 +158,32 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
             $mid = (86400 * ($date -1)) + $monthinfo['firstdaytimestamp'];
             $eod = (86400 * ($date -1)) + ($monthinfo['firstdaytimestamp'] + 86399);
     
-            foreach($units as $unit) {
-                //print_object($unit);
-                //echo("$eod and $mid");
-                if($unit->timein < $eod && $unit->timein >= $mid){
-                    $in = userdate($unit->timein,
-                        get_string('timeformat','block_timetracker'));
-                    $out = userdate($unit->timeout,
-                        get_string('timeformat','block_timetracker'));
-                    if(($unit->timeout - $unit->timein) > 449){
-                        $wustr .= "In: $in<br />Out: $out<br />";
-                        $weeksum += get_hours(($unit->timeout - $unit->timein));
-                        //error_log('current weeksum is: '.$weeksum);
+            if($units){
+                foreach($units as $unit) {
+                    //print_object($unit);
+                    //echo("$mid and $eod");
+                    if($unit->timein < $eod && $unit->timein >= $mid){
+                        $in = userdate($unit->timein,
+                            get_string('timeformat','block_timetracker'));
+                        $out = userdate($unit->timeout,
+                            get_string('timeformat','block_timetracker'));
+                        if(($unit->timeout - $unit->timein) > 449){
+                            $wustr .= "In: $in<br />Out: $out<br />";
+                            $weeksum += get_hours(($unit->timeout - $unit->timein));
+                        }
                     }
-                } else {
-                    break;
                 }
             }
             
             $vals[] = '<td style="height: 75px"><font size="7">'.$wustr.'</font></td>';
-            //end of print work units
             
             //if day of week = 7, copy value over and reset weekly sum to 0.        
-        
             // Calculate total hours
-    
             if($dayofweek == 6){
                 //Add week sum to monthly sum
                 //Print value in weekly totals column 
                 //clear weekly sum
                 $monthsum = $monthsum + $weeksum;
-                //$worksheet[1]->write_string($currentrow +1, 7, $weeksum, $format_cal_total);
                 $days[] = '<td style="height: 10px">&nbsp;</td>';
                 $vals[] = 
                     '<td style="height: 75px" align="center"><font size="11"><b><br /><br />'.
@@ -206,7 +197,6 @@ function generate_pdf($month, $year, $userid, $courseid, $method = 'I', $base=''
                     $dayofweek++;
                 }
                 $monthsum = $monthsum + $weeksum;
-                //$worksheet[1]->write_string($currentrow +1, 7, $weeksum, $format_cal_total);
                 $days[] = '<td style="height: 10px">&nbsp;</td>';
                 $vals[] = 
                     '<td style="height: 75px" align="center"><font size="11"><b><br /><br />'.

@@ -77,8 +77,20 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
         //purge them from the db
         //print_object($userid);
         $DB->delete_records('block_timetracker_workerinfo',array('id'=>$userid));    
-        $DB->delete_records('block_timetracker_workunit',array('userid'=>$userid));    
-        $DB->delete_records('block_timetracker_pending',array('userid'=>$userid));    
+        $DB->delete_records('block_timetracker_workunit',array('userid'=>$userid,
+            'courseid'=>$courseid));    
+        $DB->delete_records('block_timetracker_pending',array('userid'=>$userid,
+            'courseid'=>$courseid));    
+        $alerts = $DB->get_records('block_timetracker_alertunits', 
+            array('userid'=>$userid));
+        if($alerts){
+
+            foreach($alerts as $alert){
+                $DB->delete_records('block_timetracker_alert_com',array('alertid'=>$alert->id));    
+                $DB->delete_records('block_timetracker_alertunits',array('id'=>$alert->id));    
+            }
+        }
+
         redirect($manageworkerurl, 'All worker data has been deleted. Un-enroll the
             worker from the course to completely remove them.', 3);
     } else {

@@ -102,7 +102,11 @@ class timetracker_managealerts_form  extends moodleform {
                 array('id'=>$alert->userid));
 
             $mform->addElement('html','<tr>'); 
-            $row ='<td>'.$worker->lastname.', '.$worker->firstname .'</td>';
+            $row ='<td>'.$worker->lastname.', '.$worker->firstname .
+                '<br />Submitted: '.
+                userdate($alert->alerttime, get_string('datetimeformat',
+                'block_timetracker')).
+                '</td>';
             $row.='<td>In: '.userdate($alert->origtimein, 
                 get_string('datetimeformat','block_timetracker'));
 
