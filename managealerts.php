@@ -56,16 +56,14 @@ if(isset($_SERVER['HTTP_REFERER'])){
 $alertsurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams);
 $nextpage = $alertsurl;
 
-$PAGE->set_url($alertsurl);
-$PAGE->set_pagelayout('base');
 
 $strtitle = get_string('managealerts','block_timetracker');
 
+$PAGE->set_url($alertsurl);
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
+$PAGE->set_pagelayout('base');
 
-
-//$PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname', 'block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
