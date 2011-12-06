@@ -9,40 +9,22 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
-//find all workers
-//$workers = $DB->get_records('block_timetracker_workerinfo', array(), 'lastname');
+$courses = get_courses(4, 'fullname ASC', 'c.id');
+echo sizeof($courses)." courses\n";
 
-//foreach($workers as $worker){
-if(($handle = fopen("2011_11_08FINAL_SUBMISSION.csv", "r")) !== FALSE){
-    while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
-    
-        $id = $data[0];
-        $hours = $data[1];
-        $userid = $data[2];
-        $last = $data[3];
-        $first = $data[4];
-        $dept = $data[5];
-    
-        $email = $userid.'@mhc.edu';
-    
-        $sql = "SELECT * FROM ".$CFG->prefix."block_timetracker_workerinfo WHERE ".
-            'email=\''.$email.'\' AND courseid NOT IN (73, 74, 75, 76)';
-        //error_log($sql);
-        $worker = $DB->get_record_sql($sql);
-        if($worker){
-            echo '"'.$id.'","'.$hours.'","'.
-                $worker->currpayrate.
-                '","'.
-                $last.
-                '","'.
-                $first.
-                '","'.
-                $dept.'"'."\n";
-        } else {
-            echo "NOT FOUND!! $email\n";
+foreach($courses as $course){
+    $id = $course->id;
+
+    $users = $DB->get_records('block_timetracker_workerinfo', array('courseid'=>$id));
+
+    foreach($users as $user){
+        $user->email = strtolower($user->email);
+        $user->idnum = strtolower($user->idnum);
+        $user->idnum = str_replace('s000', '', $user->idnum);
+        //print_object($user);
+        $worked = $DB->update_record('block_timetracker_workerinfo', $user);
+        if(!$worked){
+            echo "Did not update $user->firstname $user->lastname correctly\n";
         }
     }
-    
-} else {
-    echo("Error opening file\n");
 }

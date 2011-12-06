@@ -9,12 +9,15 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
+$courses = get_courses(2, 'fullname ASC', 'c.id, c.shortname');
+
 //foreach($workers as $worker){
-if(($handle = fopen("sept_to_BO.csv", "r")) !== FALSE){
+if(($handle = fopen("12_2november.csv", "r")) !== FALSE){
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
-        $fileid = $data[2]; 
+        $fileid = $data[0]; 
         $email = $fileid.'@mhc.edu';
+
     
         $workers = $DB->get_records('block_timetracker_workerinfo', array('email'=>$email));
     
@@ -28,9 +31,14 @@ if(($handle = fopen("sept_to_BO.csv", "r")) !== FALSE){
                 continue;
             }
 
-            $earnings = get_hours_this_month($worker->id,$worker->courseid, 9, 2011);
+            $course = $courses[$worker->courseid];
+            if(!$course){ //not a course in this category;
+                continue;
+            }
+
+            $earnings = get_hours_this_month($worker->id,$worker->courseid, 11, 2011);
         
-            $course = $DB->get_record('course', array('id'=>$worker->courseid));
+
             $id = str_replace('@mhc.edu', '', $worker->email);
         
             echo '"'.$id.'","'.$earnings.'","'.$worker->lastname.'","'.
