@@ -171,7 +171,7 @@ class timetracker_manageworkers_form  extends moodleform {
     
             $mform->addElement('hidden','id', $COURSE->id);
     
-            $this->add_action_buttons(true, 'Save Changes');
+            $this->add_action_buttons(false, 'Save Activation Changes');
     
             }
     }

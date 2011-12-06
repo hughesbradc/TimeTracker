@@ -139,7 +139,8 @@ if ($mform->is_cancelled()){
             userdate($formdata->origtimeout)); 
         $messagetext .= get_string('br1','block_timetracker');
         $messagetext .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($formdata->origtimeout - $formdata->origtimein));
+            format_elapsed_time($formdata->origtimeout - $formdata->origtimein,
+            $course->id));
     }
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage5','block_timetracker');
@@ -156,7 +157,8 @@ if ($mform->is_cancelled()){
             userdate($formdata->timeouterror));
         $messagetext .= get_string('br1','block_timetracker');
         $messagetext .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($formdata->timeouterror - $formdata->timeinerror));
+            format_elapsed_time($formdata->timeouterror - $formdata->timeinerror,
+            $course->id));
     }
     $messagetext .= get_string('br2','block_timetracker');
     $messagetext .= get_string('emessage6','block_timetracker', $formdata->message);
@@ -181,7 +183,8 @@ if ($mform->is_cancelled()){
             userdate($formdata->origtimeout)); 
         $messagehtml .= get_string('br1','block_timetracker');
         $messagehtml .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($formdata->origtimeout - $formdata->origtimein));
+            format_elapsed_time($formdata->origtimeout - $formdata->origtimein,
+            $course->id));
     }
     $messagehtml .= get_string('br2','block_timetracker');
     $messagehtml .= get_string('emessage5','block_timetracker');
@@ -197,7 +200,8 @@ if ($mform->is_cancelled()){
             userdate($formdata->timeouterror));
         $messagehtml .= get_string('br1','block_timetracker');
         $messagehtml .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($formdata->timeouterror - $formdata->timeinerror));
+            format_elapsed_time($formdata->timeouterror - $formdata->timeinerror,
+            $course->id));
     }
     $messagehtml .= get_string('br2','block_timetracker');
     $messagehtml .= get_string('emessage6','block_timetracker', $formdata->message);

@@ -52,8 +52,11 @@ class timetracker_editunit_form extends moodleform {
             print_error('Insufficient permission to edit this workunit');
             return;
         }
-
-        $canmanage = true;
+        
+        $canmanagepayrate = false;
+        if(has_capability('block/timetracker:managepayrate', $this->context)){
+            $canmanagepayrate = true;
+        }
 
         $userinfo = $DB->get_record('block_timetracker_workerinfo',
             array('id'=>$this->userid));
@@ -83,9 +86,6 @@ class timetracker_editunit_form extends moodleform {
             $nextpage = $_SERVER['HTTP_REFERER'];
         } else {
             $nextpage = $index;
-        }
-        if(!$canmanage && $USER->id != $userinfo->mdluserid){
-            redirect($nextpage, 'No permission to add hours', 1);
         }
         
         $mform->addElement('header', 'general', 
@@ -120,7 +120,8 @@ class timetracker_editunit_form extends moodleform {
                 userdate($unit->timeout, get_string('datetimeformat','block_timetracker'))));
             $mform->addElement('html','<br /><b>');
             $mform->addElement('html',get_string('existingduration','block_timetracker',
-                format_elapsed_time($unit->timeout - $unit->timein)));
+                format_elapsed_time($unit->timeout - $unit->timein,
+                $unit->courseid)));
         }
         $mform->addElement('html','</blockquote>');
         /** END EXISTING DATA **/
@@ -144,7 +145,12 @@ class timetracker_editunit_form extends moodleform {
             } else {
                 $mform->setDefault('timeout',$unit->timeout);
             }
-            $mform->addElement('text', 'payrate', 'Payrate $');
+
+            $opstring = 'readonly="readonly"';
+            if($canmanagepayrate){
+                $opstring = '';
+            }
+            $mform->addElement('text', 'payrate', 'Payrate $', $opstring);
             $mform->setDefault('payrate', $unit->payrate);
             $mform->addRule('payrate', 'Numeric values only', 'numeric',
                null, 'server', false, false);

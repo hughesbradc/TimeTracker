@@ -113,8 +113,8 @@ class timetracker_managealerts_form  extends moodleform {
             if($alert->origtimeout > 0){
                 $row.='<br />Out: '.userdate($alert->origtimeout, 
                     get_string('datetimeformat','block_timetracker'));
-                $row.='<br />Elapsed: '.format_elapsed_time($alert->origtimeout -
-                    $alert->origtimein);
+                $row.='<br />Elapsed: '.format_elapsed_time(
+                    $alert->origtimeout - $alert->origtimein, $alert->courseid);
             } else {
                 $row.= '';
             }
@@ -127,8 +127,8 @@ class timetracker_managealerts_form  extends moodleform {
                 $row.='<br />Out: '.userdate($alert->timeout, 
                     get_string('datetimeformat','block_timetracker'));
 
-                $row.='<br />Elapsed: '.format_elapsed_time($alert->timeout -
-                    $alert->timein);
+                $row.='<br />Elapsed: '.format_elapsed_time(
+                    $alert->timeout - $alert->timein, $alert->courseid);
 
                 $row.='</td>';
             } else {

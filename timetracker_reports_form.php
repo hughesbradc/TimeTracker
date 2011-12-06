@@ -92,7 +92,8 @@ class timetracker_reports_form  extends moodleform {
         if($this->userid > 0){
             $mform->addElement('html','<center><a
             href="'.$CFG->wwwroot.'/blocks/timetracker/timesheet.php?id='.
-            $this->courseid.'&userid='.$this->userid.'">Generate Monthly Timesheet</a></center>');
+            $this->courseid.'&userid='.
+            $this->userid.'">Generate Monthly Timesheet</a></center>');
         } else {
             $mform->addElement('html','<center><a
             href="'.$CFG->wwwroot.'/blocks/timetracker/timesheet.php?id='.
@@ -238,7 +239,10 @@ class timetracker_reports_form  extends moodleform {
         //which workers to see?
 
         $workerdesc = 'Completed work units';
-        $endtime = $this->reportend + ((60*60*23)+60*59); //23:59
+        //$endtime = strtotime ('+1 day ', $this->reportend) - 1;
+        //$endtime = $this->reportend + ((60*60*23)+60*59); //23:59
+
+        $endtime = strtotime('+59 seconds', $this->reportend);
         $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE (timeout '.
             'BETWEEN '.$this->reportstart.' AND '.$endtime.' '.
             'OR timein BETWEEN '.$this->reportstart.' AND '.$endtime.') ';
@@ -312,8 +316,25 @@ class timetracker_reports_form  extends moodleform {
 
                 //print them here? print all, w/br?
                 if($unit->timein < $this->reportstart ||
-                    $unit->timeout > $this->reportend){
+                    $unit->timeout > $endtime){
+
+                    /*
+                    error_log("rstart: ".
+                        userdate($this->reportstart, 
+                        '%m/%d/%y %I:%M:%S %p'));
+                    error_log("utin: ".
+                        userdate($unit->timein,
+                        '%m/%d/%y %I:%M:%S %p'));
+                    error_log("rend: ".
+                        userdate($this->reportend,
+                        '%m/%d/%y %I:%M:%S %p'));
+                    error_log("utout: ".
+                        userdate($unit->timeout,
+                        '%m/%d/%y %I:%M:%S %p'));
+                    */
+
                     $singleurl = new moodle_url($baseurl.'/reports.php');
+
                     $singleurl->params(array(
                         'id'=>$this->courseid,
                         'userid'=>$unit->userid,
@@ -325,29 +346,64 @@ class timetracker_reports_form  extends moodleform {
                     foreach($splitunits as $subunit){
                         $straddle = false;
                         if($subunit->timein < $this->reportstart || 
-                            $subunit->timeout > $this->reportend){
+                            $subunit->timeout > $endtime){
                             $straddle = true;
                         }
+
+                        
+
                         /*
                         if($straddle){
-                            $row .='<span style="text-decoration: line-through">';
+                            error_log("rstart: ".
+                                userdate($this->reportstart, 
+                                '%m/%d/%y %I:%M:%S %p'));
+                            error_log('in: '.
+                                userdate($subunit->timein, 
+                                get_string('datetimeformat', 'block_timetracker')));
+                            error_log("rend: ".
+                                userdate($endtime,
+                                '%m/%d/%y %I:%M:%S %p'));
+                            error_log('out: '.
+                                userdate($subunit->timeout, 
+                                get_string('datetimeformat', 'block_timetracker')));
                         }
                         */
+
                         if(!$straddle){
                             $row.= userdate($subunit->timein,
                                 get_string('datetimeformat','block_timetracker'));
                             $row.= ' to '.userdate($subunit->timeout,
                                 get_string('datetimeformat','block_timetracker'));
                             $row .='<br />';
-                        }
+                        } else {
+                            if($subunit->timein > $this->reportstart){
 
-                        /*
-                        if($straddle){
-                            $row .='</span>';
+                                if($subunit->timeout < $endtime)
+                                    $end = $subunit->timeout;
+                                 else 
+                                    $end = $endtime;
+
+                                $row .= userdate($subunit->timein,
+                                    get_string('datetimeformat', 'block_timetracker'));
+                                $row .= ' to '.userdate($end,
+                                    get_string('datetimeformat', 'block_timetracker'));
+                                $row .= '<br />';
+
+                            } else {
+                                if($subunit->timein > $this->reportstart)
+                                    $start = $subunit->timein;
+                                else
+                                    $start = $this->reportstart;
+
+                                $row .= userdate($start,
+                                    get_string('datetimeformat', 'block_timetracker'));
+                                $row .= ' to '.userdate($subunit->timeout,
+                                    get_string('datetimeformat', 'block_timetracker'));
+                                $row .= '<br />';
+                            }
                         }
-                        */
-    
                     }
+
                     $row .= 'Partial unit. ';
                     $row .= $OUTPUT->action_link($singleurl, '[ view complete work unit ]');
                     $row .= '</td>'."\n";
@@ -356,30 +412,44 @@ class timetracker_reports_form  extends moodleform {
                     foreach($splitunits as $subunit){
                         $straddle = false;
                         if($subunit->timein < $this->reportstart || 
-                            $subunit->timeout > $this->reportend){
+                            $subunit->timeout > $endtime){
                             $straddle = true;
                         }
                         
-                        /*
-                        if($straddle){
-                            $row .='<span style="text-decoration: line-through">';
-                        }
-                        */
-
                         if(!$straddle){
                             $currelapsed = $subunit->timeout - $subunit->timein;  
-                            $total += round_time($currelapsed);
+                            $hrs = get_hours($currelapsed, $subunit->courseid);
 
-                            $row .= get_hours($currelapsed).' hour(s)';
+                            $total += $hrs;
+
+                            $row .= $hrs.' hour(s)';
+                            $row .= '<br />';
+                        } else {
+
+                            if($subunit->timein > $this->reportstart){
+                                if($subunit->timeout < $endtime)
+                                    $end = $subunit->timeout;
+                                else
+                                    $end = $endtime;
+
+                                $currelapsed = $end - $subunit->timein;
+
+                            } else {
+                                if($subunit->timein > $this->reportstart)
+                                    $start = $subunit->timein;
+                                else
+                                    $start = $this->reportstart;
+
+                                $currelapsed = $subunit->timeout - $start;
+                            }
+
+                            $hrs = get_hours($currelapsed, $subunit->courseid);
+                            $total += $hrs;
+
+                            $row .= $hrs.' hour(s)';
                             $row .= '<br />';
                         }
     
-                        /*
-                        if($straddle){
-                            $row .= '</span>';
-                        }
-                        */
-
                     }
                     $row .= '</td>'."\n";
                 } else { //unit occurs all in one repstart-repend
@@ -393,8 +463,11 @@ class timetracker_reports_form  extends moodleform {
                     $row .= '<td style="text-align: center">';
 
                     $currelapsed = $unit->timeout - $unit->timein;  
-                    $total += round_time($currelapsed);
-                    $row .= get_hours($currelapsed).' hour(s)</td>';
+                    $hrs = get_hours($currelapsed, $unit->courseid);
+
+                    $total += $hrs;
+
+                    $row .= $hrs.' hour(s)</td>';
     
                 }
 
@@ -482,8 +555,7 @@ class timetracker_reports_form  extends moodleform {
                     <td>&nbsp;</td>
                     <td style="text-align: center; border-top: 1px solid black"><b>Total: 
                     </b>'.
-                //format_elapsed_time($total).'</td>
-                get_hours($total).' hour(s)</td>
+                    round($total, 3).' hour(s)</td>
                     <td>&nbsp;</td></tr></table>';
             $mform->addElement('html',$finalrow);
 
