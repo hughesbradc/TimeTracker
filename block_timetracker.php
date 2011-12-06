@@ -160,7 +160,7 @@
         } else { //worker
 
             //Worker doesn't exist yet, or has missing data
-            if (!$worker || ($worker->address=='0')){
+            if (!$worker){// || ($worker->address=='0')){
                 //print_object($worker);
                 $link =
                     '/blocks/timetracker/updateworkerinfo.php?id='.$COURSE->id.
@@ -352,7 +352,8 @@
 
 						$this->content->text .= '<br />';
                         if($closetomax){
-                            $this->content->text .= '<span style="color: red; font-weight:bold">';
+                            $this->content->text .= 
+                                '<span style="color: red; font-weight:bold">';
                         }
 						$this->content->text .= get_string('totalterm', 'block_timetracker');
                         $this->content->text .= $stats['termhours']; 

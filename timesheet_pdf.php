@@ -277,7 +277,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='')
         $htmldoc = '
         <table border="1" cellpadding="5px">
         <tr>
-            <td style="height: 25px"><font size="13"><b>Base pay rate</b></font>
+            <td style="height: 25px"><font size="13"><b>Base Pay Rate</b></font>
             <br />
                 <font size="12">$'.round($workerrecord->currpayrate, 2).'</font></td>
             <td style="height: 20px"><font size="13"><b>Total Hours/Earnings for '.
