@@ -174,10 +174,12 @@
                 return $this->content;
             } else {
                   
+                /*
                 if($worker->active == 0){
                     $this->content->text = get_string('notactiveerror','block_timetracker');
                     return $this->content;
                 }           
+                */
             
                 // Implement Icons - Timeclock Method
                 if($worker->timetrackermethod == 0){
