@@ -140,7 +140,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             userdate($alertunit->origtimeout));
         $messagetext .= get_string('br1','block_timetracker'); 
         $messagetext .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein,
+                $course->id));
         $messagetext .= get_string('br2','block_timetracker');
         $messagetext .= get_string('approveddata','block_timetracker');
         $messagetext .= get_string('br1','block_timetracker'); 
@@ -155,7 +156,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 userdate($alertunit->timeout));
             $messagetext .= get_string('br1','block_timetracker'); 
             $messagetext .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->timeout - $alertunit->timein));
+            format_elapsed_time($alertunit->timeout - $alertunit->timein, $course->id));
         }
 
         //********** HTML **********//
@@ -173,7 +174,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             userdate($alertunit->origtimeout));
         $messagehtml .= get_string('br1','block_timetracker'); 
         $messagehtml .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein,
+            $course->id));
         $messagehtml .= get_string('br2','block_timetracker');
         $messagehtml .= get_string('approveddata','block_timetracker');
         $messagehtml .= get_string('br1','block_timetracker'); 
@@ -188,7 +190,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 userdate($alertunit->timeout));
             $messagehtml .= get_string('br1','block_timetracker'); 
             $messagehtml .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->timeout - $alertunit->timein));
+            format_elapsed_time($alertunit->timeout - $alertunit->timein, $course->id));
         }
        
         foreach ($alertcom as $alertcomentry){
@@ -264,7 +266,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             userdate($alertunit->origtimeout));
         $messagetext .= get_string('br1','block_timetracker'); 
         $messagetext .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein,
+            $course->id));
         $messagetext .= get_string('br2','block_timetracker');
         $messagetext .= get_string('approveddata','block_timetracker');
         $messagetext .= get_string('br1','block_timetracker'); 
@@ -279,7 +282,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 userdate($alertunit->timeout));
             $messagetext .= get_string('br1','block_timetracker'); 
             $messagetext .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->timeout - $alertunit->timein));
+            format_elapsed_time($alertunit->timeout - $alertunit->timein, $course->id));
         }
 
         //********** HTML **********//
@@ -297,7 +300,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             userdate($alertunit->origtimeout));
         $messagehtml .= get_string('br1','block_timetracker'); 
         $messagehtml .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein,
+            $course->id));
         $messagehtml .= get_string('br2','block_timetracker');
         $messagehtml .= get_string('approveddata','block_timetracker');
         $messagehtml .= get_string('br1','block_timetracker'); 
@@ -312,7 +316,7 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                 userdate($alertunit->timeout));
             $messagehtml .= get_string('br1','block_timetracker'); 
             $messagehtml .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->timeout - $alertunit->timein));
+            format_elapsed_time($alertunit->timeout - $alertunit->timein, $course->id));
         }
         
         foreach ($alertcom as $alertcomentry){
@@ -353,7 +357,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             userdate($alertunit->origtimeout));
         $messagetext .= get_string('br1','block_timetracker'); 
         $messagetext .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein,
+            $course->id));
         $messagetext .= get_string('br2','block_timetracker');
 
         //********** HTML **********//
@@ -369,7 +374,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
             userdate($alertunit->origtimeout));
         $messagehtml .= get_string('br1','block_timetracker'); 
         $messagehtml .= get_string('emessageduration','block_timetracker', 
-            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+            format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein,
+            $course->id));
         $messagehtml .= get_string('br2','block_timetracker');
         
         foreach ($alertcom as $alertcomentry){
@@ -444,7 +450,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                     userdate($alertunit->origtimeout));
                 $messagetext .= get_string('br1','block_timetracker'); 
                 $messagetext .= get_string('emessageduration','block_timetracker', 
-                    format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+                    format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein, 
+                    $course->id));
                 $messagetext .= get_string('br2','block_timetracker');
                 $messagetext .= get_string('approveddata','block_timetracker');
                 $messagetext .= get_string('br1','block_timetracker'); 
@@ -459,7 +466,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                         userdate($alertunit->timeout));
                     $messagetext .= get_string('br1','block_timetracker'); 
                     $messagetext .= get_string('emessageduration','block_timetracker', 
-                    format_elapsed_time($alertunit->timeout - $alertunit->timein));
+                    format_elapsed_time($alertunit->timeout - $alertunit->timein,
+                    $course->id));
                 }
         
                 //********** HTML **********//
@@ -477,7 +485,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                     userdate($alertunit->origtimeout));
                 $messagehtml .= get_string('br1','block_timetracker'); 
                 $messagehtml .= get_string('emessageduration','block_timetracker', 
-                    format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein));
+                    format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein, 
+                    $course->id));
                 $messagehtml .= get_string('br2','block_timetracker');
                 $messagehtml .= get_string('approveddata','block_timetracker');
                 $messagehtml .= get_string('br1','block_timetracker'); 
@@ -492,7 +501,8 @@ if (!$canmanage && $USER->id != $worker->mdluserid){
                         userdate($alertunit->timeout));
                     $messagehtml .= get_string('br1','block_timetracker'); 
                     $messagehtml .= get_string('emessageduration','block_timetracker', 
-                    format_elapsed_time($alertunit->timeout - $alertunit->timein));
+                    format_elapsed_time($alertunit->timeout - $alertunit->timein,
+                    $course->id));
                 }
             
                 foreach ($alertcom as $alertcomentry){

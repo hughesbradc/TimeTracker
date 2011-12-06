@@ -44,53 +44,62 @@ class timetracker_addunit_form  extends moodleform {
 
         //check to make sure that if $this->userid != $USER->id that they have
         //the correct capability TODO
-        $canmanage = false;
-        if(has_capability('block/timetracker:manageworkers',$this->context)){
-            $canmanage = true;
-        }
-        
-        if($canmanage){
-            $userinfo = $DB->get_record('block_timetracker_workerinfo',
-                array('id'=>$this->userid));
-
-            if(!$userinfo){
-                print_error('Worker info does not exist for workerinfo id of '.$this->userid);
-                return;
-            }
-
-            $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
-                array('id'=>$this->courseid,'userid'=>$this->userid));
-
-            $mform->addElement('header', 'general', 
-                get_string('addunittitle','block_timetracker', 
-                $userinfo->firstname.' '.$userinfo->lastname));
-
-            $mform->addElement('hidden','userid', $this->userid);
-            $mform->addElement('hidden','id', $this->courseid);
-    
-            $mform->addElement('hidden','editedby', $USER->id);
-    
-            $workunit = $DB->get_record('block_timetracker_workunit', 
-                array('id'=>$this->userid,'courseid'=>$this->courseid));
-    
-            $mform->addElement('date_time_selector','timein','Time In: ',
-                array('optional'=>false,'step'=>1));
-		    $mform->addHelpButton('timein','timein','block_timetracker');
-            if($this->timein != 0){
-                $mform->setDefault('timein', $this->timein);
-            }
-        
-            $mform->addElement('date_time_selector','timeout','Time Out: ',
-                array('optional'=>false,'step'=>1));
-		    $mform->addHelpButton('timeout','timeout','block_timetracker');
-            if($this->timeout != 0){
-                $mform->setDefault('timeout',$this->timeout);
-            }
-		    
-            $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
-        } else {
+        if(!has_capability('block/timetracker:manageworkers',$this->context)){
             print_error('notpermissible', 'block_timetracker');
         }
+
+        $canmanagepayrate = false;
+        if(has_capability('block/timetracker:managepayrate',$this->context)){
+            $canmanagepayrate = true;
+        }
+
+        $userinfo = $DB->get_record('block_timetracker_workerinfo',
+            array('id'=>$this->userid));
+
+        if(!$userinfo){
+            print_error('Worker info does not exist for workerinfo id of '.$this->userid);
+            return;
+        }
+
+        $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
+            array('id'=>$this->courseid,'userid'=>$this->userid));
+
+        $mform->addElement('header', 'general', 
+            get_string('addunittitle','block_timetracker', 
+            $userinfo->firstname.' '.$userinfo->lastname));
+
+        $mform->addElement('hidden','userid', $this->userid);
+        $mform->addElement('hidden','id', $this->courseid);
+    
+        $mform->addElement('hidden','editedby', $USER->id);
+    
+        $workunit = $DB->get_record('block_timetracker_workunit', 
+            array('id'=>$this->userid,'courseid'=>$this->courseid));
+    
+        $mform->addElement('date_time_selector','timein','Time in: ',
+            array('optional'=>false,'step'=>1));
+		$mform->addHelpButton('timein','timein','block_timetracker');
+        if($this->timein != 0){
+            $mform->setDefault('timein', $this->timein);
+        }
+        
+        $mform->addElement('date_time_selector','timeout','Time out: ',
+            array('optional'=>false,'step'=>1));
+		$mform->addHelpButton('timeout','timeout','block_timetracker');
+        if($this->timeout != 0){
+            $mform->setDefault('timeout',$this->timeout);
+        }
+
+        if($canmanagepayrate){
+            $mform->addElement('text', 'payrate', 'Pay rate $');
+            $mform->setDefault('payrate', $userinfo->currpayrate);
+		    $mform->addHelpButton('payrate','payrate','block_timetracker');
+
+            $mform->addRule('payrate', 'Numeric values only', 'numeric',
+                null, 'server', false, false);
+        }
+		
+        $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
     }
 
     function validation ($data){
@@ -151,8 +160,6 @@ class timetracker_addunit_form  extends moodleform {
                 $errors['timein'] = $errormsg;
             }
         }
-    
         return $errors;
-        
     }
 }

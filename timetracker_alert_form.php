@@ -138,7 +138,7 @@ class timetracker_alert_form  extends moodleform {
         
             $mform->addElement('html', '<br />'); 
             $mform->addElement('html',get_string('existingduration','block_timetracker',
-                format_elapsed_time($unit->timeout - $unit->timein)));
+                format_elapsed_time($unit->timeout - $unit->timein, $unit->courseid)));
         }
 
         $mform->addElement('html', '</blockquote><b>'); 

@@ -21,6 +21,7 @@
 
 $string['datetimeformat']='%m/%d/%y %I:%M %p';
 $string['timeformat']='%I:%M %p';
+$string['dateformat']='%b %e, %Y';
 
 $string['couldnotclockout'] = 'Error adding clock out'; 
 $string['trackermethod'] = 'Which timetracking method would you like to use?';
@@ -28,6 +29,7 @@ $string['pluginname'] = 'TimeTracker';
 $string['timetracker:manageworkers'] = 'Manage workers';
 $string['timetracker:activateworkers'] = 'Activate workers';
 $string['timetracker:manageoldunits'] = 'Manage units from a previous month';
+$string['timetracker:managepayrate'] = 'Manage the pay rate for work units';
 $string['notactiveerror'] = 'This worker is not authorized to work.';
 $string['defaultworkerconfig'] = 'Default Worker Configuration';
 $string['workername'] = 'Worker Name';
@@ -89,12 +91,12 @@ $string['finaid'] = 'Financial Aid Work-Study Coordinator';
 $string['hourlogtitle'] = 'Hourlog for {$a}';
 $string['addentry'] = 'Add work unit';
 $string['date'] = 'Date';
-$string['timein'] = 'Time In';
-$string['timeout'] = 'Time Out'; // For context-sensitive help
+$string['timein'] = 'Time in';
+$string['timeout'] = 'Time out'; // For context-sensitive help
 $string['duration'] = 'Duration: ';
 $string['hours'] = 'hours';
 $string['minutes'] = 'minutes';
-$string['previousentries'] = 'Previous Entries';
+$string['previousentries'] = 'Previous entries';
 $string['noprevious'] = 'You have no previous entries.';
 
 $string['timeclocktitle'] = 'Timeclock';
@@ -108,7 +110,7 @@ $string['pendingtimestamp'] = 'You have a pending timestamp: ';
 
 // Strings for Employee Reports Page
 $string['reportstitle'] = 'Reports';
-$string['timeperiod'] = 'Time Period';
+$string['timeperiod'] = 'Time period';
 $string['cumulative'] = 'Cumulative';
 
 
@@ -264,6 +266,10 @@ $string['maxtermearnings_help'] = 'The maximum hours the worker is allowed to wo
     Enter decimal hours (example: 750.00) or zero (0) for unlimited.';
 $string['currpayrate_help'] = 'The hourly rate of pay the worker will receive. <br /> Enter decimal currency 
     (Example: 7.50).';
+$string['round'] = 'Round to the nearest N seconds (default: 900)';
+$string['round_help'] = 'The number of seconds used for rounding work units. The default
+is to round to the nearest quarter hour (15 minutes), which is 900 seconds. A value of
+\'0\' here means that there will be no rounding.';
 $string['showtotalhours_help'] = 'Shows the worker the overall total number of hours worked. <br />
     Yes = Enabled <br /> No = Disabled';
 $string['showtermhours_help'] = 'Shows the worker the total number of hours worked for the current term. 
@@ -289,6 +295,9 @@ $string['supname_help'] = 'The name(s) of the worker\'s supervisor(s).';
 //Hourlog
 $string['timein_help'] = 'Choose the date and time in which your shift began.';
 $string['timeout_help'] = 'Choose the date and time in which your shift ended.';
+$string['payrate'] = 'Pay rate';
+$string['payrate_help'] = 'Input the hourly wage for this work unit';
+
 //Manage Workers
 $string['manageworkers_help'] = 'This page allows the supervisor or administrator to manage workers.
 <br /><br /> Active allows the supervisor and/or administrator to allow or deny the worker to log
