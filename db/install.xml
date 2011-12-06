@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/timetracker/db" VERSION="2011101401" COMMENT="XMLDB file for Moodle Timetracker block"
+<XMLDB PATH="blocks/timetracker/db" VERSION="2011111801" COMMENT="XMLDB file for Moodle Timetracker block"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -50,7 +50,8 @@
         <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="timein" NEXT="payrate"/>
         <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" PREVIOUS="timeout" NEXT="lastedited"/>
         <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="payrate" NEXT="lasteditedby"/>
-        <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited"/>
+        <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastedited" NEXT="canedit"/>
+        <FIELD NAME="canedit" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="lasteditedby"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -99,11 +100,41 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_timetracker_alert_com" COMMENT="communication info regarding alerted units" PREVIOUS="block_timetracker_alertunits">
+    <TABLE NAME="block_timetracker_alert_com" COMMENT="communication info regarding alerted units" PREVIOUS="block_timetracker_alertunits" NEXT="block_timetracker_timesheet">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="mdluserid"/>
         <FIELD NAME="mdluserid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="alertid"/>
         <FIELD NAME="alertid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="mdluserid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_timetracker_timesheet" COMMENT="stores information on official time sheet submissions" PREVIOUS="block_timetracker_alert_com" NEXT="block_timetracker_tsunits">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="the workerinfo.id of this user" PREVIOUS="id" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The mdl course id of the course" PREVIOUS="userid" NEXT="repstart"/>
+        <FIELD NAME="repstart" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="the unix time stamp of when the reporting period begins for this time sheet." PREVIOUS="courseid" NEXT="repend"/>
+        <FIELD NAME="repend" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="the end time of this report's time sheet." PREVIOUS="repstart" NEXT="submitted"/>
+        <FIELD NAME="submitted" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The unix time stamp of when this time sheet was submitted" PREVIOUS="repend" NEXT="workersignature"/>
+        <FIELD NAME="workersignature" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the unix time when the worker signed this time sheet" PREVIOUS="submitted" NEXT="supervisorsignature"/>
+        <FIELD NAME="supervisorsignature" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the unix time when the supervisor signed the time sheet" PREVIOUS="workersignature" NEXT="supermdlid"/>
+        <FIELD NAME="supermdlid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The supervisor's Moodle id" PREVIOUS="supervisorsignature"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_timetracker_tsunits" COMMENT="the officially submitted units that are on the time sheets listed in the timesheets table." PREVIOUS="block_timetracker_timesheet">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="the timetracker_workerinfo.id of the worker in question" PREVIOUS="id" NEXT="timein"/>
+        <FIELD NAME="timein" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The start time of the work unit" PREVIOUS="userid" NEXT="timeout"/>
+        <FIELD NAME="timeout" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The stop time of the work unit in question" PREVIOUS="timein" NEXT="payrate"/>
+        <FIELD NAME="payrate" TYPE="number" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" COMMENT="The payrate of this work unit" PREVIOUS="timeout" NEXT="lastedited"/>
+        <FIELD NAME="lastedited" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The unix time of the last edit of this work unit" PREVIOUS="payrate" NEXT="lasteditedby"/>
+        <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The Moodle userid of the last person to edit this work unit" PREVIOUS="lastedited"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
