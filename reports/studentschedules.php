@@ -8,6 +8,7 @@ require_login();
 global $CFG, $DB, $USER;
 
 $cat = required_param('catid', PARAM_INT);
+$from = required_param('start', PARAM_INT);
 
 //only get courses in the specified category
 $courses = get_courses($cat, 'fullname ASC', 'c.id, c.shortname');
@@ -36,7 +37,7 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
 //$from=1314849600; //Sept 1
 //$from=1317441600; //Oct 1
 
-$from=1320119998; //Nov 1
+//$from=1320119998; //Nov 1
 $to=time();
 $datetimeformat='%m/%d/%y %I:%M %p';
 
@@ -70,7 +71,7 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
         $endtime = $data[4];
 
         if(strtolower($days_string) == 'tba') continue;
-        if(strtolower($days_string) == 'mtof') $days_string='mtwrf';
+        if(strtolower($days_string) == 'mtof') $days_string='MTWRF';
 
         $workers = $DB->get_records('block_timetracker_workerinfo',
             array('email'=>$email)); 
@@ -121,17 +122,19 @@ if(($handle = fopen("../2011Fall_student_schedules.csv", "r")) !== FALSE){
 
                 $iterator = strtotime("Next $day_names[$day]", $from);
                 if($starttime >= 1200){
+                    $dispstarttime = $starttime;
                     if($starttime >=1300)
-                        $dispstarttime = $starttime - 1200;
-                    $dispstarttime .='pm';
+                        $dispstarttime -= 1200;
+                    $dispstarttime .= 'pm';
                 } else {
                     $dispstarttime = $starttime.'am';
                 }
 
 
                 if($endtime >= 1200){
+                    $dispendtime = $endtime;
                     if($endtime >= 1300)
-                        $dispendtime = $endtime - 1200;
+                        $dispendtime -= 1200;
                     $dispendtime .= 'pm';
                 } else {
                     $dispendtime = $endtime.'am';

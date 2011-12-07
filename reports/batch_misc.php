@@ -9,22 +9,38 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
-$courses = get_courses(4, 'fullname ASC', 'c.id');
-echo sizeof($courses)." courses\n";
+$courses = get_courses(4, 'fullname ASC', 'c.id,c.shortname');
+//echo sizeof($courses)." courses\n";
+
+$round = new stdClass();
+$round->name = 'block_timetracker_round';
+$round->value = '0';
 
 foreach($courses as $course){
     $id = $course->id;
+    $round->courseid = $course->id;
+    echo ("Updating $course->shortname\n");
 
-    $users = $DB->get_records('block_timetracker_workerinfo', array('courseid'=>$id));
+    if($DB->record_exists('block_timetracker_config',
+        array('courseid'=>$id, 'name'=>'block_timetracker_round'))){
 
-    foreach($users as $user){
-        $user->email = strtolower($user->email);
-        $user->idnum = strtolower($user->idnum);
-        $user->idnum = str_replace('s000', '', $user->idnum);
-        //print_object($user);
-        $worked = $DB->update_record('block_timetracker_workerinfo', $user);
-        if(!$worked){
-            echo "Did not update $user->firstname $user->lastname correctly\n";
+        error_log("Entry already exists"); 
+
+        $entry = $DB->get_record('block_timetracker_config',
+            array('courseid'=>$id, 'name'=>'block_timetracker_round'));
+        $entry->value = '0';
+
+        $res = $DB->update_record('block_timetracker_config', $entry);
+        if(!$res){
+            error_log("Failed updating record for $course->shortname");
+        }
+
+    } else {
+
+        $res = $DB->insert_record('block_timetracker_config', $round);
+
+        if(!$res){
+            error_log("Error inserting for $course->shortname");
         }
     }
 }

@@ -9,7 +9,8 @@ require_once('../../../lib/moodlelib.php');
  The purpose of this script is to find earnings/max earnings for this term
 */
 
-function generate_xls(){          //Would like to ask for term to generate report for.  Can we do this?
+function generate_xls(){          
+    //Would like to ask for term to generate report for.  Can we do this?
     global $CFG, $DB, $USER;
 
 
