@@ -9,38 +9,46 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
-$courses = get_courses(4, 'fullname ASC', 'c.id,c.shortname');
-//echo sizeof($courses)." courses\n";
+$courseid = 95; //residential living
+$courseid = 112; //test site
 
-$round = new stdClass();
-$round->name = 'block_timetracker_round';
-$round->value = '0';
+$duration = 1 * 3600; //1 hour
+$date = 1; //put unit on first day of month
 
-foreach($courses as $course){
-    $id = $course->id;
-    $round->courseid = $course->id;
-    echo ("Updating $course->shortname\n");
+$startmonth=12;
+$startyear=2011;
 
-    if($DB->record_exists('block_timetracker_config',
-        array('courseid'=>$id, 'name'=>'block_timetracker_round'))){
+$endmonth=3;
+$endyear=2012;
 
-        error_log("Entry already exists"); 
+$courseworkers = $DB->get_records('block_timetracker_workerinfo',
+    array('courseid'=>$courseid));
 
-        $entry = $DB->get_record('block_timetracker_config',
-            array('courseid'=>$id, 'name'=>'block_timetracker_round'));
-        $entry->value = '0';
+$newunit = new stdClass();
+$newunit->courseid = $courseid;
+$newunit->lasteditedby = 0;
+$newunit->lastedited = time();
 
-        $res = $DB->update_record('block_timetracker_config', $entry);
-        if(!$res){
-            error_log("Failed updating record for $course->shortname");
+$startinfo = get_month_info($startmonth, $startyear);
+$endinfo = get_month_info($endmonth, $endyear);
+
+$starttime = $startinfo['firstdaytimestamp'];
+
+if($startinfo['firstdaytimestamp'] <= $endinfo['firstdaytimestamp']){
+    do {
+        $newunit->timein = $starttime;
+        $newunit->timeout = $starttime + $duration;
+    
+        foreach($courseworkers as $worker){
+            $newunit->payrate = $worker->currpayrate;
+            $newunit->userid = $worker->id;
+            $res = $DB->insert_record('block_timetracker_workunit', $newunit);
+            if(!$res){
+                error_log("failed inserting new work unit for $worker->firstname $worker->lastname");
+                exit;
+            }
         }
-
-    } else {
-
-        $res = $DB->insert_record('block_timetracker_config', $round);
-
-        if(!$res){
-            error_log("Error inserting for $course->shortname");
-        }
-    }
-}
+    
+        $starttime = strtotime('+ 1 month', $starttime);
+    } while ($starttime <= $endinfo['firstdaytimestamp']);
+} 
