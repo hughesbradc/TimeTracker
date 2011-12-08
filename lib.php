@@ -538,7 +538,7 @@ function get_total_earnings($userid, $courseid){
             * $subunit->payrate;
     }
 
-    return number_format(round($earnings, 2), 2);
+    return round($earnings, 2);
 
 }
 
@@ -648,7 +648,7 @@ function get_earnings_this_month($userid, $courseid, $month = -1, $year = -1){
     foreach($units as $unit){
         $earnings += get_hours($unit->timeout - $unit->timein, $round) * $unit->payrate;
     }
-    return number_format(round($earnings, 2), 2);
+    return round($earnings, 2);
 }
 
 /**
@@ -734,7 +734,7 @@ function get_earnings_this_year($userid, $courseid){
     foreach($units as $unit){
         $earnings += get_hours(($unit->timeout - $unit->timein), $round) * $unit->payrate;
     }
-    return number_format(round($earnings, 2), 2);
+    return round($earnings, 2);
 }
 
 /**
@@ -853,7 +853,7 @@ function get_earnings_this_term($userid, $courseid){
     foreach($units as $unit){
         $earnings += get_hours(($unit->timeout - $unit->timein), $courseid) * $unit->payrate;
     }
-    return number_format(round($earnings, 2), 2);
+    return round($earnings, 2);
 }
 
 /**

@@ -361,8 +361,11 @@
                         $this->content->text .= $stats['termhours']; 
                         
 					    $remearnings = $worker->maxtermearnings - $stats['termearnings'];
+
                         $remhours = $remearnings/$worker->currpayrate;
+
                         if($remhours < 0) $remhours = 0;
+
                         $this->content->text .= '<br />';
                         $this->content->text .= get_string('remaining', 'block_timetracker');
                         $this->content->text .= round($remhours, 2);
