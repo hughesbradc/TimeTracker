@@ -26,9 +26,10 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
     print_error('You do not have permission to run this report.');
 }
 
-$categoryinfo = $DB->get_records('course_categories', array('id'=>$catid));
+//$categoryinfo = $DB->get_records('course_categories', array('id'=>$catid));
 
-$filename = date("Y_m_d").'_'.$categoryinfo->name.'_Earnings.csv';
+//$filename = date("Y_m_d").'_'.$categoryinfo->name.'_Earnings.csv';
+$filename = date("Y_m_d").'_Earnings.csv';
 $header = "Department ,Last Name ,First Name ,Earnings ,Max Term Earnings \n";
 header('Content-type: application/ms-excel');
 header('Content-Disposition: attachment; filename='.$filename);
