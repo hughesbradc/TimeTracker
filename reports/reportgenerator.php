@@ -38,7 +38,8 @@ $reportend = optional_param('reportend', 0, PARAM_INTEGER);
 
 $url = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports/reportgenerator.php');
 
-$context = get_context_instance(CONTEXT_SYSTEM); 
+$catid = 2;
+$context = get_context_instance(CONTEXT_COURSECAT), $catid; 
 $PAGE->set_context($context);
 
 $PAGE->set_url($url);

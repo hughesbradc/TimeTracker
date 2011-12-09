@@ -12,7 +12,8 @@ $cat = required_param('catid', PARAM_INT);
 
 global $CFG, $DB, $USER;
 
-$context = get_context_instance(CONTEXT_COURSECAT, $cat);
+$catid = 2;
+$context = get_context_instance(CONTEXT_COURSECAT), $catid; 
 $PAGE->set_context($context);
 
 //$context = $PAGE->context;
