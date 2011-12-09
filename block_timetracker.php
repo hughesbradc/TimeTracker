@@ -506,10 +506,66 @@
      * @return boolean true if all feeds were retrieved succesfully
      */
     function cron() {
-        //global $CFG, $DB, $USER;
 
-        //what would we need to do? Send reminders if last day of month?
+        global $CFG, $DB;
 
+        $days = 7;
+        $limit = time() - (7 * 60 * 60 * 24);
+        
+        $sql = 'SELECT DISTINCT courseid from mdl_block_timetracker_alertunits WHERE alerttime < '.$limit.
+            ' ORDER BY courseid, alerttime ASC';
+        
+        $courses = $DB->get_records_sql($sql);
+        $emails = 0;
+        
+        foreach($courses as $course){
+        
+            $id = $course->courseid;
+            $courseinfo = $DB->get_record('course', array('id'=>$id));
+            $context = get_context_instance(CONTEXT_COURSE, $id);
+            $teachers = get_users_by_capability($context, 'block/timetracker:manageworkers');
+            //print_object($teachers);
+        
+            $coursealerts = $DB->get_records('block_timetracker_alertunits', array(
+                'courseid'=>$id));
+        
+        
+            $num = sizeof($coursealerts);
+            mtrace($num.' alerts for course '.$courseinfo->shortname);
+        
+            if($num == 1){
+                $body = "Hello!\n\nYou have $num work unit alert that requires your attention for $courseinfo->shortname.\n\n";
+                $subj = $num.' Work Unit Alerts for '.$courseinfo->shortname;
+            } else {
+                $body = "Hello!\n\nYou have $num work unit alerts that require your attention for $courseinfo->shortname.\n\n";
+                $subj = $num.' Work Unit Alert(s) for '.$courseinfo->shortname;
+            }
+
+            $body.= "To visit the TimeTracker Alerts page, either click the below link or copy/paste ".
+                "it into your browser window.\n\n".
+                $CFG->wwwroot.'/blocks/timetracker/managealerts.php?id='.$id. 
+                "\n\n".
+                "Thanks for your timely attention to this matter";
+        
+            $body_html = format_text($body);
+            $body = format_text_email($body_html, 'FORMAT_HTML');
+        
+            foreach($coursealerts as $alert){
+            
+                $alertcoms = $DB->get_records('block_timetracker_alert_com', array(
+                    'alertid'=>$alert->id));
+                foreach($alertcoms as $com){
+                    if(array_key_exists($com->mdluserid, $teachers)){
+                        $user = $DB->get_record('user', array('id'=>$com->mdluserid));
+                        email_to_user($user, $user, $subj, $body, $body_html);
+                        //email_to_user($user, $user, $subj, $body);
+                        $emails++;
+                    }
+                }
+        
+            }
+        }
+        mtrace($emails.' reminder emails sent');
     }
 
 
