@@ -38,30 +38,27 @@ $reportend = optional_param('reportend', 0, PARAM_INTEGER);
 
 $url = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports/reportgenerator.php');
 
-//$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-//$PAGE->set_course($course);
 $context = get_context_instance(CONTEXT_SYSTEM); 
 $PAGE->set_context($context);
 
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('base');
-$strtitle = 'TimeTracker : Reports';
+$strtitle = 'TimeTracker : Report Generator';
 
-/*
-$canmanage = false;
-if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
-    $canmanage = true;
+$finaid = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //financial aid
+    $finaid = true;
 }
-*/
+
+if($finaid){
 
 $PAGE->set_title('Report Generator');
-
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php');
 
 $nextpage = $index;
 
 $PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
+$PAGE->navbar->add(get_string('pluginname','block_timetracker'));
 $PAGE->navbar->add($strtitle);
 
 $mform = new timetracker_reportgenerator_form($reportstart, $reportend);
@@ -116,3 +113,9 @@ if ($mform->is_cancelled()){
     $mform->display();
     echo $OUTPUT->footer();
 }
+
+} else {
+    print_error('You do not have permission to access the report generator.');
+}
+
+
