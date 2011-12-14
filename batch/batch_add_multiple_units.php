@@ -9,17 +9,19 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
-$courseid = 95; //residential living
-$courseid = 112; //test site
+//$courseid = 95; //residential living
+//$courseid = 111; //SGA
+$courseid = 105;//Judicial
+//$courseid = 112; //test site
 
 $duration = 1 * 3600; //1 hour
-$date = 1; //put unit on first day of month
+//$date = 1; //put unit on first day of month
 
 $startmonth=12;
 $startyear=2011;
 
-$endmonth=3;
-$endyear=2012;
+$endmonth=12;
+$endyear=2011;
 
 $courseworkers = $DB->get_records('block_timetracker_workerinfo',
     array('courseid'=>$courseid));
@@ -42,9 +44,11 @@ if($startinfo['firstdaytimestamp'] <= $endinfo['firstdaytimestamp']){
         foreach($courseworkers as $worker){
             $newunit->payrate = $worker->currpayrate;
             $newunit->userid = $worker->id;
+            echo "adding a unit for $worker->firstname $worker->lastname\n";
             $res = $DB->insert_record('block_timetracker_workunit', $newunit);
             if(!$res){
-                error_log("failed inserting new work unit for $worker->firstname $worker->lastname");
+                error_log("failed inserting new work unit for ".
+                    "$worker->firstname $worker->lastname");
                 exit;
             }
         }
