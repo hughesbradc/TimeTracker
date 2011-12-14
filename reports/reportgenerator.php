@@ -78,6 +78,9 @@ if ($mform->is_cancelled()){
     $urlparams['end'] = strtotime('+ 1 day ', $formdata->reportend) - 1;
     
     if(isset($formdata->conflicts)){
+        if($catid != 2){
+            print_error("Cannot generate conflicts for this category");
+        }
         $conflictsurl = new moodle_url($CFG->wwwroot.
             '/blocks/timetracker/reports/studentschedules.php',$urlparams);
         redirect($conflictsurl);
