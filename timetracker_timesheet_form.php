@@ -74,12 +74,8 @@ class timetracker_timesheet_form  extends moodleform {
             $mform->addElement('hidden','workerid',$worker->id);    
         }
 
-
-
-        //$mform->addElement('button','selectall','Select All Students','disabled');
-        //$mform->addElement('button','selectall','Select All Students');
-
-
+        $mform->addElement('checkbox', 'entiremonth', 'Entire month?');
+        $mform->setDefault('entiremonth', true);
 
         $months = array(
             1 =>'January',
@@ -97,6 +93,7 @@ class timetracker_timesheet_form  extends moodleform {
 
         $mform->addElement('select', 'month', 
             get_string('month','block_timetracker'), $months);
+        $mform->disabledIf('month', 'entiremonth');
         $mform->setDefault('month', date("m"));
         $mform->addHelpButton('month','month','block_timetracker');
 
@@ -115,10 +112,19 @@ class timetracker_timesheet_form  extends moodleform {
         if(empty($years)) $years[date("Y")] = date("Y");
 
         $mform->addElement('select', 'year', get_string('year','block_timetracker'), $years);
+        $mform->disabledIf('year', 'entiremonth');
         $mform->addHelpButton('year','year','block_timetracker');
         $mform->setDefault('year', date("Y"));
-        
 
+
+
+        $mform->addElement('date_selector', 'startday', 'Start day'); 
+        $mform->disabledIf('startday', 'entiremonth', 'checked');
+
+        $mform->addElement('date_selector', 'endday', 'End day'); 
+        $mform->disabledIf('endday', 'entiremonth', 'checked');
+
+        /*
         if($canmanage){
             // Show File Format Dropdown
             $formats = array(
@@ -128,14 +134,44 @@ class timetracker_timesheet_form  extends moodleform {
                 get_string('fileformat','block_timetracker'), $formats);
             $mform->addHelpButton('fileformat','fileformat','block_timetracker');
         } else {
+            */
             $mform->addElement('hidden','fileformat','pdf');    
+            /*
         }
+        */
 
-        $this->add_action_buttons(true,get_string('generatebutton','block_timetracker'));
+        //$this->add_action_buttons(false, get_string('generatebutton','block_timetracker'));
+        //normally you use add_action_buttons instead of this code
+        $buttonarray=array();
+        $buttonarray[] = &$mform->createElement('submit', 
+            //'unofficial', 'Generate unofficial timesheet');
+            'unofficial', 'Generate paper timesheet');
+
+        //only let workers begin the official timesheet data submission process
+        /*
+        if(!$canmanage){ 
+            $buttonarray[] = &$mform->createElement('submit', 'official', 
+                'Submit official timesheet');
+        } 
+        */
+        //$buttonarray[] = &$mform->createElement('cancel');
+
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->closeHeaderBefore('buttonar');
     }
 
     function validation($data){
         $errors = array();
+
+        if(!isset($data['entiremonth'])){
+            $monthinfo = get_month_info($data['month'], $data['year']); 
+            
+            if($data['endday'] < $data['startday']){
+                $errors['startday'] = 'Start day cannot be after end day';
+            }
+
+        }
+
 
         return $errors;
     }

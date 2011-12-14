@@ -1,69 +1,54 @@
 <?php
 
-$FILE1='october_earnings.csv';
-$FILE2='september_earnings.csv';
 
 define('CLI_SCRIPT', true);
 require_once('../../../config.php');
 require_once('../lib.php');
 
+global $CFG, $DB, $USER;
+
+$files = array();
+
+$files[]='12_2_sept_earnings.csv';
+$files[]='12_2_oct_earnings.csv';
+$files[]='12_2_nov_earnings.csv';
+
 /**
  The purpose of this script is to find earnings/max earnings for this term
 */
-global $CFG, $DB, $USER;
 
 $workers = array();
 
-//iterate through first file
-if(($handle = fopen($FILE1, "r")) !== FALSE){
-    while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
+foreach ($files as $file){
+    //echo "opening file $file \n";
+    //iterate through second file
+    if(($handle = fopen($file, "r")) !== FALSE){
 
-        $id = strtolower($data[0]); 
-        $hours = $data[1];
+        while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
-        $this_worker = new  stdClass();
-        $this_worker->studentid = $id;
-        $this_worker->hours = $hours;
-        $this_worker->firstname = $data[3];
-        $this_worker->lastname = $data[2];
-        $this_worker->department = $data[4];
+            $id = strtolower($data[0]); 
+            $hours = $data[1];
 
-        $workers[$id] = $this_worker;
-        //error_log("Adding $id to array");
-    }
-} else {
-    error_log("Cannot open $FILE1");
-}
-
-//error_log("Done with file1...on to file2");
-
-//iterate through second file
-if(($handle = fopen($FILE2, "r")) !== FALSE){
-    //error_log("about to process file2");
-    while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
-
-        $id = strtolower($data[0]); 
-        $hours = $data[1];
-
-        if(array_key_exists($id, $workers)){
-        //if(isset($workers[$id])){
-            //error_log("Duplicate record found: $id");
-            error_log($id.' '.$hours .' '.$workers[$id]->hours);
-            $workers[$id]->hours += $hours;
-            error_log($id.' '.$workers[$id]->hours);
-        } else {
-            $this_worker = new  stdClass();
-            $this_worker->studentid = $id;
-            $this_worker->hours = $hours;
-            $this_worker->firstname = $data[3];
-            $this_worker->lastname = $data[2];
-            $this_worker->department = $data[4];
-
-            $workers[$id] = $this_worker;
+            if(array_key_exists($id, $workers)){
+                //if(isset($workers[$id])){
+                //error_log("Duplicate record found: $id");
+                error_log($id.' '.$hours .' '.$workers[$id]->hours);
+                $workers[$id]->hours += $hours;
+                error_log($id.' '.$workers[$id]->hours);
+            } else {
+                $this_worker = new  stdClass();
+                $this_worker->studentid = $id;
+                $this_worker->hours = $hours;
+                $this_worker->firstname = $data[3];
+                $this_worker->lastname = $data[2];
+                $this_worker->department = $data[4];
+    
+                $workers[$id] = $this_worker;
+            }
         }
+    } else {
+        error_log("Cannot open $file");
     }
-} else {
-    error_log("Cannot open $FILE2");
 }
 
 //print out the consolidated numbers
@@ -72,7 +57,6 @@ foreach ($workers as $worker){
     echo '"'.$worker->studentid.'","'.$worker->hours.'","'.
         $worker->lastname.'","'.$worker->firstname.'","'.
         $worker->department.'"'. "\n";
-
 
 }
 

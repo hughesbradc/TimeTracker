@@ -136,7 +136,7 @@ if ($canmanage) { //supervisor
                 $currelapsed = $unit->timeout - $unit->timein;  
                 $row.='<td>'.
                     //format_elapsed_time($currelapsed).'</td>';
-                    get_hours($currelapsed).' hour(s)</td>';
+                    get_hours($currelapsed, $courseid).' hour(s)</td>';
 
                 $baseurl = $CFG->wwwroot.'/blocks/timetracker'; 
 
@@ -209,10 +209,10 @@ if ($canmanage) { //supervisor
             $html .= '<td>'.$worker->lastname.', '.$worker->firstname.'</td>';
             $html .= '<td>'.$worker->lastunit.'</td>';
             $html .= '<td style="text-align: center">$'.
-                number_format($worker->currpayrate, 2).'</td>';
+                round($worker->currpayrate, 2).'</td>';
             $html .= '<td style="text-align: center">'.
                 $worker->monthhours.' / $'.
-                number_format($worker->monthearnings, 2)
+                $worker->monthearnings
                 .'</td>';
 
             if($worker->maxtermearnings > 0 && 
@@ -222,22 +222,22 @@ if ($canmanage) { //supervisor
 
                 $html .= '<td style="text-align:center"><span style="color: red">'.
                     $worker->termhours.' / $'.
-                    number_format($worker->termearnings, 2)
+                    $worker->termearnings
                     .'</span></td>';
             } else {
                 $html .= '<td style="text-align: center">'.
                     $worker->termhours.' / $'.
-                    number_format($worker->termearnings, 2)
+                    $worker->termearnings
                     .'</td>';
             }
 
             $html .= '<td style="text-align: center">'.
                 $worker->yearhours.' / $'.
-                number_format($worker->yearearnings, 2)
+                $worker->yearearnings
                 .'</td>';
             $html .= '<td style="text-align: center">'.
                 $worker->totalhours.' / $'.
-                number_format($worker->totalearnings, 2)
+                $worker->totalearnings
                 .'</td>';
 
             $html .= '</tr>';
@@ -261,35 +261,37 @@ if ($canmanage) { //supervisor
 
 
     //add clockin/clockout box
+    /*
     if($worker->active == 0){
         echo get_string('notactiveerror','block_timetracker').'<br /><br />';
     } else {
-        if(!$userPending && $worker->timetrackermethod==0){ //timeclock
-            $clockinicon = new pix_icon('clock_play','Clock in', 'block_timetracker');
-            $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',
-                $urlparams);
-            $clockinurl->params(array('clockin'=>1));
-            $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
-            echo $OUTPUT->box_start('generalbox boxaligncenter');
-            echo '<h2>';
-            echo $clockinaction;
-            echo ' Clock in?</h2>';
-            echo "You are not currently clocked in. Click the icon to clock in now.<br />";
-            echo $OUTPUT->box_end();
-        } else if(!$userPending && $worker->timetrackermethod==1){ //hourlog
-            $clockinicon = new pix_icon('clock_add','Add work unit', 'block_timetracker');
-            $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',
-                $urlparams);
-            $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
-            echo $OUTPUT->box_start('generalbox boxaligncenter');
-            echo '<h2>';
-            echo $clockinaction;
-            echo ' Add Hours?</h2>';
-            echo 'Would you like to add some hours now? Click the icon to '.
-                'add work units.<br />';
-            echo $OUTPUT->box_end();
-        }
+    */
+    if(!$userPending && $worker->timetrackermethod==0){ //timeclock
+        $clockinicon = new pix_icon('clock_play','Clock in', 'block_timetracker');
+        $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timeclock.php',
+            $urlparams);
+        $clockinurl->params(array('clockin'=>1));
+        $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
+        echo $OUTPUT->box_start('generalbox boxaligncenter');
+        echo '<h2>';
+        echo $clockinaction;
+        echo ' Clock in?</h2>';
+        echo "You are not currently clocked in. Click the icon to clock in now.<br />";
+        echo $OUTPUT->box_end();
+    } else if(!$userPending && $worker->timetrackermethod==1){ //hourlog
+        $clockinicon = new pix_icon('clock_add','Add work unit', 'block_timetracker');
+        $clockinurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/hourlog.php',
+            $urlparams);
+        $clockinaction = $OUTPUT->action_icon($clockinurl, $clockinicon);
+        echo $OUTPUT->box_start('generalbox boxaligncenter');
+        echo '<h2>';
+        echo $clockinaction;
+        echo ' Add Hours?</h2>';
+        echo 'Would you like to add some hours now? Click the icon to '.
+            'add work units.<br />';
+        echo $OUTPUT->box_end();
     }
+    //}
 
 
     //summary data
@@ -315,19 +317,19 @@ if ($canmanage) { //supervisor
 
     $statstable->add_data(array(
         'This month',$stats['monthhours'],
-        '$'.number_format($stats['monthearnings'], 2)
+        '$'.$stats['monthearnings']
         ));
     $statstable->add_data(array(
         'This term',$stats['termhours'],
-        '$'.number_format($stats['termearnings'], 2)
+        '$'.$stats['termearnings']
         ));
     $statstable->add_data(array(
         'This year',$stats['yearhours'],
-        '$'.number_format($stats['yearearnings'], 2)
+        '$'.$stats['yearearnings']
         ));
     $statstable->add_data(array(
         'Total hours',$stats['totalhours'],
-        '$'.number_format($stats['totalearnings'], 2)
+        '$'.$stats['totalearnings']
         ));
 
     $statstable->print_html();
@@ -434,7 +436,7 @@ if ($canmanage) { //supervisor
             $table->add_data(array(
                 userdate($unit->timein, get_string('datetimeformat','block_timetracker')),
                 userdate($unit->timeout, get_string('datetimeformat','block_timetracker')),
-                get_hours($unit->timeout - $unit->timein).' hour(s)',
+                get_hours($unit->timeout - $unit->timein, $courseid).' hour(s)',
                 $alertaction));
 
         }

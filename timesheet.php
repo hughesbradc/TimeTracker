@@ -62,13 +62,6 @@ $timetrackerurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$
 $indexparams['id'] = $courseid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $indexparams);
 
-/*
-if(isset($_SERVER['HTTP_REFERER'])){
-    $nextpage = $_SERVER['HTTP_REFERER'];
-} else {
-    $nextpage = $reportsurl;
-}
-*/
 $nextpage = $index;
 
 $PAGE->navbar->add(get_string('blocks'));
@@ -84,8 +77,23 @@ if($mform->is_cancelled()){
     redirect($reportsurl);
 } else if($formdata=$mform->get_data()){
 
+    $official  = false;
+    if(isset($formdata->official)){
+        $official = true;
+    } 
+
     $cid = $formdata->id;
     $format = $formdata->fileformat;
+    if(isset($formdata->entiremonth)){
+        $monthinfo = get_month_info($formdata->month, $formdata->year);
+        $start = make_timestamp($formdata->year, $formdata->month, 1, 0, 0, 0);
+        $end =  make_timestamp($formdata->year, $formdata->month,
+            $monthinfo['lastday'], 23, 59, 59);
+    } else {
+        $start = $formdata->startday;
+        $end = strtotime('+ 1 day ', $formdata->endday) - 1;
+    }
+
     if(!is_array($formdata->workerid) || count($formdata->workerid)==1){ // a single id?
 
         if(is_array($formdata->workerid)){
@@ -93,17 +101,14 @@ if($mform->is_cancelled()){
         } else {
 	        $uid = $formdata->workerid;
         }
-        //error_log($formdata->workerid);
-        //error_log('Worker id is: '.$uid);
         if($format == 'pdf'){
-            generate_pdf($formdata->month, $formdata->year, $uid, $cid);
+            generate_pdf($start, $end, $uid, $cid);
         } else {
-            //redirect($CFG->wwwroot.'/blocks/timetracker/timesheet_xls.php?id='.$cid.
-                //'&userid='.$uid.'&month='.$formdata->month.'&year='.$formdata->year);
             generate_xls($formdata->month, $formdata->year, $uid, $cid);
                 
         }
     } else { //have multiple selected
+
         //create all the timesheets
         $files = array();
         $basepath = $CFG->dataroot.'/temp/timetracker/'.$cid.'_'.$USER->id.'_'.sesskey();
@@ -116,8 +121,13 @@ if($mform->is_cancelled()){
 
         if($format == 'pdf'){
             foreach($formdata->workerid as $id){
-                $fn = generate_pdf($formdata->month, $formdata->year, $id, $cid, 
-                    'F', $basepath);
+                /*
+                $monthinfo = get_month_info($formdata->month, $formdata->year);
+                $start = make_timestamp($formdata->year, $formdata->month, 1, 0, 0, 0);
+                $end =  make_timestamp($formdata->year, $formdata->month,
+                    $monthinfo['lastday'], 23, 59, 59);
+                */
+                $fn = generate_pdf($start, $end, $id, $cid, 'F', $basepath);
                 $files[$fn] = $basepath.'/'.$fn;
             }
         } else if ($format == 'xls') {
@@ -144,13 +154,10 @@ if($mform->is_cancelled()){
     echo $OUTPUT->header();
 
     $tabs = get_tabs($urlparams, $canmanage, $courseid);
-    $tabs[] = new tabobject('timesheet',
-        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php#', $urlparams),
-        'Generate Timesheet');
     $tabs = array($tabs);
 
 
-    print_tabs($tabs, 'timesheet');
+    print_tabs($tabs, 'timesheets');
 
     $mform->display();
     echo $OUTPUT->footer();

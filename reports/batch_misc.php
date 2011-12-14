@@ -9,40 +9,38 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
-//find all workers
-//$workers = $DB->get_records('block_timetracker_workerinfo', array(), 'lastname');
+$courses = get_courses(4, 'fullname ASC', 'c.id,c.shortname');
+//echo sizeof($courses)." courses\n";
 
-//foreach($workers as $worker){
-if(($handle = fopen("2011_11_08FINAL_SUBMISSION.csv", "r")) !== FALSE){
-    while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
-    
-        $id = $data[0];
-        $hours = $data[1];
-        $userid = $data[2];
-        $last = $data[3];
-        $first = $data[4];
-        $dept = $data[5];
-    
-        $email = $userid.'@mhc.edu';
-    
-        $sql = "SELECT * FROM ".$CFG->prefix."block_timetracker_workerinfo WHERE ".
-            'email=\''.$email.'\' AND courseid NOT IN (73, 74, 75, 76)';
-        //error_log($sql);
-        $worker = $DB->get_record_sql($sql);
-        if($worker){
-            echo '"'.$id.'","'.$hours.'","'.
-                $worker->currpayrate.
-                '","'.
-                $last.
-                '","'.
-                $first.
-                '","'.
-                $dept.'"'."\n";
-        } else {
-            echo "NOT FOUND!! $email\n";
+$round = new stdClass();
+$round->name = 'block_timetracker_round';
+$round->value = '0';
+
+foreach($courses as $course){
+    $id = $course->id;
+    $round->courseid = $course->id;
+    echo ("Updating $course->shortname\n");
+
+    if($DB->record_exists('block_timetracker_config',
+        array('courseid'=>$id, 'name'=>'block_timetracker_round'))){
+
+        error_log("Entry already exists"); 
+
+        $entry = $DB->get_record('block_timetracker_config',
+            array('courseid'=>$id, 'name'=>'block_timetracker_round'));
+        $entry->value = '0';
+
+        $res = $DB->update_record('block_timetracker_config', $entry);
+        if(!$res){
+            error_log("Failed updating record for $course->shortname");
+        }
+
+    } else {
+
+        $res = $DB->insert_record('block_timetracker_config', $round);
+
+        if(!$res){
+            error_log("Error inserting for $course->shortname");
         }
     }
-    
-} else {
-    echo("Error opening file\n");
 }

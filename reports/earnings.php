@@ -4,14 +4,17 @@ require_once('../../../config.php');
 require_once('../lib.php');
 require_login();
 
+$cat = required_param('catid', PARAM_INT);
+
 /**
  The purpose of this script is to find earnings/max earnings for this term
 */
 
 global $CFG, $DB, $USER;
 
-$context = get_context_instance(CONTEXT_SYSTEM);
+$context = get_context_instance(CONTEXT_COURSECAT, $cat);
 $PAGE->set_context($context);
+
 //$context = $PAGE->context;
 
 //Print results in a table

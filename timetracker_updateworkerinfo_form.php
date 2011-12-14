@@ -51,6 +51,11 @@ class timetracker_updateworkerinfo_form extends moodleform {
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
             $canmanage = true;
         }
+
+        $canmanagepayrate = false;
+        if (has_capability('block/timetracker:managepayrate', $this->context)) {
+            $canmanagepayrate = true;
+        }
          
         $worker = $DB->get_record('block_timetracker_workerinfo',
             array('courseid'=>$this->courseid,'mdluserid'=>$this->mdluserid));
@@ -96,6 +101,11 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $opstring = '';
         }
 
+        $opstring2='readonly="readonly"';
+        if($canmanagepayrate){
+            $opstring2='';
+        }
+
         $mform->addElement('text','firstname',
             get_string('firstname','block_timetracker'), $opstring);
         $mform->setDefault('firstname',$worker->firstname);
@@ -116,12 +126,12 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $mform->addHelpButton('idnum','idnum','block_timetracker');
         
         $mform->addElement('text','address',get_string('address','block_timetracker'));
-        $mform->addRule('address', null, 'required', null, 'client', 'false');
+        //$mform->addRule('address', null, 'required', null, 'client', 'false');
 		$mform->addHelpButton('address','address','block_timetracker');
 
-        if($worker->address != '0'){
+        //if($worker->address != '0'){
             $mform->setDefault('address', $worker->address);
-        }
+        //}
 
         $mform->addElement('text','phonenumber',get_string('phone','block_timetracker'));
 		$mform->addHelpButton('phonenumber','phone','block_timetracker');
@@ -133,7 +143,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $mform->addHelpButton('maxtermearnings','maxtermearnings','block_timetracker');
 
         $mform->addElement('text','currpayrate',
-            get_string('currpayrate','block_timetracker'), $opstring);
+            get_string('currpayrate','block_timetracker'), $opstring2);
         $mform->setDefault('currpayrate',$payrate);
 		$mform->addHelpButton('currpayrate','currpayrate','block_timetracker');
 

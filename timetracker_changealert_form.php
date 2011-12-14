@@ -65,8 +65,8 @@ class timetracker_changealert_form extends moodleform {
             $mform->addElement('hidden', 'lasteditedby', $USER->id);
             $mform->addElement('hidden', 'alertid', $alertunit->id);
             $mform->addElement('hidden', 'action', $alertunit->id);
-            $mform->addElement('header', 'general',  get_string('changealert','block_timetracker',
-                $userinfo->firstname.' '.$userinfo->lastname));
+            $mform->addElement('header', 'general',  get_string('changealert',
+                'block_timetracker', $userinfo->firstname.' '.$userinfo->lastname));
             $mform->addElement('html', get_string('emessage2','block_timetracker'));
             $mform->addElement('html', get_string('br1','block_timetracker'));
             $mform->addElement('html', get_string('emessage3','block_timetracker', 
@@ -76,7 +76,8 @@ class timetracker_changealert_form extends moodleform {
                 userdate($alertunit->origtimeout)));
             $mform->addElement('html', get_string('br1','block_timetracker'));
             $mform->addElement('html', get_string('emessageduration','block_timetracker',
-                format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein)));
+                format_elapsed_time($alertunit->origtimeout - $alertunit->origtimein,
+                $alertunit->courseid)));
             $mform->addElement('html', get_string('br2','block_timetracker'));
             $mform->addElement('html', get_string('emessage5','block_timetracker'));
             $mform->addElement('html', get_string('br1','block_timetracker'));
@@ -87,7 +88,8 @@ class timetracker_changealert_form extends moodleform {
                 userdate($alertunit->timeout)));
             $mform->addElement('html', get_string('br1','block_timetracker'));
             $mform->addElement('html', get_string('emessageduration','block_timetracker',
-                format_elapsed_time($alertunit->timeout - $alertunit->timein)));
+                format_elapsed_time($alertunit->timeout - $alertunit->timein,
+                $alertunit->courseid)));
             $mform->addElement('html', get_string('br1','block_timetracker'));
             $mform->addElement('html', get_string('emessage6','block_timetracker',
                 $alertunit->message));
