@@ -29,11 +29,12 @@ require_once ('../lib.php');
 
 class timetracker_reportgenerator_form extends moodleform {
 
-    function timetracker_reportgenerator_form($reportstart=0, $reportend=0){
+    function timetracker_reportgenerator_form($reportstart=0, $reportend=0, $catid){
         
         //$this->context = $context;
         $this->reportstart = $reportstart;
         $this->reportend = $reportend;
+        $this->catid = $catid;
         parent::__construct();
     }
 
@@ -66,8 +67,12 @@ class timetracker_reportgenerator_form extends moodleform {
             redirect($nextpage,'You do not have permission to generate this report.',1);
         }
         */
-
-        $mform->addElement('header', 'general','Report Generator');
+        $categoryinfo = $DB->get_record('course_categories', array('id'=>$this->catid));
+        if(!$categoryinfo)
+            $mform->addElement('header', 'general','Report Generator');
+        else 
+            $mform->addElement('header', 'general','Report Generator for '.
+                $categoryinfo->name);
         
         $now = time();
         if($this->reportstart == 0 || $this->reportend == 0){
@@ -84,20 +89,23 @@ class timetracker_reportgenerator_form extends moodleform {
 
     $buttonarray=array();
     $buttonarray[] = &$mform->createElement('submit', 'conflicts', 'Conflicts');
-    $buttonarray[] = &$mform->createElement('submit', 'earningsactive', 'Earnings - active students only');
+    $buttonarray[] = &$mform->createElement('submit', 'earningsactive', 
+        'Earnings - active workers only');
 
-    $buttonarray[] = &$mform->createElement('submit', 'earningsall', 'Earnings - all students');
+    $buttonarray[] = &$mform->createElement('submit', 'earningsall', 
+        'Earnings - all workers');
 
-            $mform->addElement('html','Please provide a date and time range for the report(s) you
+            $mform->addElement('html',
+                'Please provide a date and time range for the report(s) you
                 wish to generate.');
-            $mform->addElement('date_selector','reportstart','Start Date: ',array('optional'=>false,
-                'step'=>1));    
+            $mform->addElement('date_selector','reportstart','Start Date: ',
+                array('optional'=>false, 'step'=>1));    
             $mform->setDefault('reportstart',$this->reportstart);
-            $mform->addElement('date_selector','reportend','End Date: ',array('optional'=>false,
-                'step'=>1));    
+            $mform->addElement('date_selector','reportend','End Date: ',
+                array('optional'=>false, 'step'=>1));    
             $mform->setDefault('reportend',$this->reportend);
 
-            //$mform->addElement('hidden','id', $this->courseid);
+            $mform->addElement('hidden','catid', $this->catid);
             //$mform->addElement('hidden','userid', $this->userid);
 
             $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
@@ -106,14 +114,10 @@ class timetracker_reportgenerator_form extends moodleform {
 
     function validation ($data){
         $errors = array();
-        if($data['reportstart'] > time()){
-            $errors['reportstart'] = 'Time cannot be set in the future.';
-        } else if($data['reportend'] > time()){
-            $errors['reportend'] = 'Time cannot be set in the future.';      
-        } else if($data['reportstart'] > $data['reportend']){
-            $errors['reportstart'] = 'Your begin date cannot be after your end date.';
+        if($data['reportstart'] > $data['reportend']){
+            $errors['reportstart'] = 'The begin date cannot be after the end date.';
         } else if ($data['reportend'] < $data['reportstart']){
-            $errors['reportend'] = 'Your end date cannot be before your begin date.';
+            $errors['reportend'] = 'The end date cannot be before the begin date.';
         }
         return $errors;
     }
