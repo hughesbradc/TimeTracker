@@ -67,17 +67,16 @@ if(!$courses){
             echo '<td>'.$course->days .'</td>';
             echo '<td>'.$course->begin_time .' to ' .$course->end_time .'</td>';
 
-            
-            
             //SQL statements to edit or delete a class from a student's schedule
-            $editsql = ''; //TODO
-            $deletesql = 'DELETE FROM mdl_block_timetracker_schedules WHERE id='.$course->id; 
+            $modifyurl = new moodle_url($baseurl.'/modifyschedule.php', $urlparams); 
 
             //Icons and actions
-            $editaction = $OUTPUT->action_icon($editsql, new pix_icon('clock_edit',
+            $addicon = $OUTPUT->action_icon($modifyurl, new pix_icon
+                ('clock_add',get_string('addentry','block_timetracker'), 'block_timetracker'));
+            $editaction = $OUTPUT->action_icon($modifyurl, new pix_icon('clock_edit',
                 get_string('edit'),'block_timetracker'));
             $deleteicon = new pix_icon('clock_delete', get_string('delete'),'block_timetracker');
-            $deleteaction = $OUTPUT->action_icon($deletesql, $deleteicon, new confirm_action('Are you sure you
+            $deleteaction = $OUTPUT->action_icon($modifyurl, $deleteicon, new confirm_action('Are you sure you
                 want to delete this course from '.$course->firstname .' '.$course->lastname .'\'s schedule?'));
            
             //Add action icons to the last column in the table
@@ -88,12 +87,4 @@ if(!$courses){
     }
     echo '</table>'; 
 }
-
-
-
-
-
-
-
-
 ?>
