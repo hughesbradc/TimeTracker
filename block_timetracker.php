@@ -510,12 +510,19 @@
         global $CFG, $DB;
 
         $days = 7;
-        $limit = time() - (7 * 60 * 60 * 24);
+        $now = time();
+        $limit = $now - (7 * 60 * 60 * 24);
+        $thistime = usergetdate($now);
+        $monthinfo = get_month_info ($thistime['month'], $thistime['year']);
         
-        $sql = 'SELECT DISTINCT courseid from mdl_block_timetracker_alertunits WHERE alerttime < '.$limit.
-            ' ORDER BY courseid, alerttime ASC';
+        $sql = 'SELECT DISTINCT courseid from mdl_block_timetracker_alertunits '.
+            'WHERE alerttime < '.$limit.
+            ' AND alerttime between '.$monthinfo['firstdaytimestamp'] .' AND '.
+            $now.'  ORDER BY courseid, alerttime ASC';
         
         $courses = $DB->get_records_sql($sql);
+
+
         $emails = 0;
         
         foreach($courses as $course){
@@ -534,15 +541,17 @@
             mtrace($num.' alerts for course '.$courseinfo->shortname);
         
             if($num == 1){
-                $body = "Hello!\n\nYou have $num work unit alert that requires your attention for $courseinfo->shortname.\n\n";
+                $body = "Hello!\n\nYou have $num work unit alert ".
+                    "that requires your attention for $courseinfo->shortname.\n\n";
                 $subj = $num.' Work Unit Alerts for '.$courseinfo->shortname;
             } else {
-                $body = "Hello!\n\nYou have $num work unit alerts that require your attention for $courseinfo->shortname.\n\n";
+                $body = "Hello!\n\nYou have $num work unit alerts ".
+                    "that require your attention for $courseinfo->shortname.\n\n";
                 $subj = $num.' Work Unit Alert(s) for '.$courseinfo->shortname;
             }
 
-            $body.= "To visit the TimeTracker Alerts page, either click the below link or copy/paste ".
-                "it into your browser window.\n\n".
+            $body.= "To visit the TimeTracker Alerts page, either click the below ".
+                "link or copy/paste it into your browser window.\n\n".
                 $CFG->wwwroot.'/blocks/timetracker/managealerts.php?id='.$id. 
                 "\n\n".
                 "Thanks for your timely attention to this matter";
