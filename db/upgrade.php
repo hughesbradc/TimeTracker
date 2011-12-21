@@ -97,6 +97,16 @@ function xmldb_block_timetracker_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        // Define field id to be added to block_timetracker_workunit
+        $table = new xmldb_table('block_timetracker_workunit');
+        $field = new xmldb_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+
+        // Conditionally launch add field id
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
           // Define table block_timetracker_transactn to be created
         $table = new xmldb_table('block_timetracker_transactn');
 
@@ -119,6 +129,7 @@ function xmldb_block_timetracker_upgrade($oldversion) {
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
+
 
         upgrade_block_savepoint(true, 2011121901, 'timetracker');
 
