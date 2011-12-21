@@ -14,6 +14,7 @@ global $CFG, $DB, $USER;
 
 $context = get_context_instance(CONTEXT_COURSECAT, $cat);
 $PAGE->set_context($context);
+
 //$context = $PAGE->context;
 
 //Print results in a table

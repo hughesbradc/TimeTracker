@@ -93,6 +93,7 @@ if($mform->is_cancelled()){
         $start = $formdata->startday;
         $end = strtotime('+ 1 day ', $formdata->endday) - 1;
     }
+
     if(!is_array($formdata->workerid) || count($formdata->workerid)==1){ // a single id?
 
         if(is_array($formdata->workerid)){
@@ -120,12 +121,13 @@ if($mform->is_cancelled()){
 
         if($format == 'pdf'){
             foreach($formdata->workerid as $id){
+                /*
                 $monthinfo = get_month_info($formdata->month, $formdata->year);
                 $start = make_timestamp($formdata->year, $formdata->month, 1, 0, 0, 0);
                 $end =  make_timestamp($formdata->year, $formdata->month,
                     $monthinfo['lastday'], 23, 59, 59);
-                $fn = generate_pdf($start, $end, $id, $cid, 
-                    'F', $basepath);
+                */
+                $fn = generate_pdf($start, $end, $id, $cid, 'F', $basepath);
                 $files[$fn] = $basepath.'/'.$fn;
             }
         } else if ($format == 'xls') {

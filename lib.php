@@ -426,8 +426,8 @@ function add_enrolled_users($context){
     $config = get_timetracker_config($COURSE->id);
     $students = get_users_by_capability($context, 'mod/assignment:submit');
     foreach ($students as $student){
-        if(!$DB->record_exists('block_timetracker_workerinfo',array('mdluserid'=>$student->id,
-            'courseid'=>$COURSE->id))){
+        if(!$DB->record_exists('block_timetracker_workerinfo',
+            array('mdluserid'=>$student->id, 'courseid'=>$COURSE->id))){
             $student->mdluserid = $student->id;
             unset($student->id);
             $student->courseid = $COURSE->id;
@@ -443,7 +443,8 @@ function add_enrolled_users($context){
             $student->maxtermearnings = $config['default_max_earnings'];
             $res = $DB->insert_record('block_timetracker_workerinfo', $student);
             if(!$res){
-                print_error("Error adding $student->firstname $student->lastname to TimeTracker");
+                print_error("Error adding $student->firstname $student->lastname ".
+                    "to TimeTracker");
             }
         }
     }
@@ -468,8 +469,6 @@ function round_time($totalsecs=0, $round=900){
     }
 
     return $totalsecs;
-
-    
 }
 
 /*
@@ -477,18 +476,7 @@ function round_time($totalsecs=0, $round=900){
 */
 function get_hours($totalsecs=0, $courseid=-1){
 
-    if($courseid == -1){
-        $round = 900;
-    } else {
-        $config = get_timetracker_config($courseid);
-        //print_object($config);
-        if(array_key_exists('round', $config)){
-            $round = $config['round'];
-        } else {
-            $round = 900;
-        }
-    }
-
+    $round = get_rounding_config($courseid);
     $totalsecs = round_time($totalsecs, $round);
     $hrs = round($totalsecs/3600, 3);
     return ($hrs);
@@ -503,22 +491,26 @@ function format_elapsed_time($totalsecs=0, $courseid=-1){
         return '0 hours 0 minutes';
     }
 
-    if($courseid == -1){
-        $round = 900;
-    } else {
-        $config = get_timetracker_config($courseid);
-        if(array_key_exists('round', $config)){
-            $round = $config['round'];;
-        } else {
-            $round = 900;
-        }
-    }
-
+    $round = get_rounding_config($courseid);
     $totalsecs = round_time($totalsecs, $round);
     $hours = floor($totalsecs/3600);
     $minutes = ($totalsecs % 3600)/60;
     
     return $hours.' hour(s) and '.$minutes. ' minute(s)'; 
+}
+
+function get_rounding_config($courseid = -1){
+    if($courseid == -1){
+        $round = 900;
+    } else {
+        $config = get_timetracker_config($courseid);
+        if(array_key_exists('round', $config)){
+            $round = $config['round'];
+        } else {
+            $round = 900;
+        }
+    }
+    return $round;
 }
 
 /**
@@ -531,14 +523,16 @@ function get_total_earnings($userid, $courseid){
     $workerunits = get_split_units(0, time(), $userid, $courseid);
 
     if(!$workerunits) return 0;
+    $round = get_rounding_config($courseid);
 
     $earnings = 0;
     foreach($workerunits as $subunit){
-        $earnings += get_hours($subunit->timeout - $subunit->timein, $courseid)
-            * $subunit->payrate;
+        $hours = round_time($subunit->timeout - $subunit->timein, $round);
+        $hours = round($hours/3600, 3);
+        $earnings += $hours * $subunit->payrate;
     }
 
-    return number_format(round($earnings, 2), 2);
+    return round($earnings, 2);
 
 }
 
@@ -605,13 +599,7 @@ function get_total_hours($userid, $courseid){
 
     if(!$workerunits) return 0;
 
-    $config = get_timetracker_config($courseid);
-    if(array_key_exists('round', $config)){
-        $round = $config['round'];
-    } else {
-        $round = 900;
-    }
-
+    $round = get_rounding_config($courseid);
     $total = 0;
     foreach($workerunits as $subunit){
         $total += round_time($subunit->timeout - $subunit->timein, $round);
@@ -619,6 +607,27 @@ function get_total_hours($userid, $courseid){
 
     return get_hours($total, $courseid);
 
+}
+
+/**
+* @return earnings (in dollars) for this time period
+*
+*/
+function get_earnings($userid, $courseid, $start, $end){
+
+    $units = get_split_units($start, $end, $userid, $courseid);
+
+    if(!$units) return 0;
+    $round = get_rounding_config($courseid);
+
+    $earnings = 0;
+    foreach($units as $unit){
+        $hours = round_time($unit->timeout - $unit->timein, $round);
+        $hours = round($hours/3600, 3);
+        $earnings += $hours * $unit->payrate;
+    }
+
+    return round($earnings, 2);
 }
 
 /**
@@ -636,19 +645,15 @@ function get_earnings_this_month($userid, $courseid, $month = -1, $year = -1){
             $month, $year);
     }
 
-    $config = get_timetracker_config($courseid);
-    if(array_key_exists('round', $config)){
-        $round = $config['round'];
-    } else {
-        $round = 900;
-    }
-
     if(!$units) return 0;
+    $round = get_rounding_config($courseid);
     $earnings = 0;
     foreach($units as $unit){
-        $earnings += get_hours($unit->timeout - $unit->timein, $round) * $unit->payrate;
+        $hours = round_time($unit->timeout - $unit->timein, $round);
+        $hours = round($hours/3600, 3);
+        $earnings += $hours * $unit->payrate;
     }
-    return number_format(round($earnings, 2), 2);
+    return round($earnings, 2);
 }
 
 /**
@@ -678,6 +683,27 @@ function get_month_info($month, $year){
     return $monthinfo;
 }
 
+/**
+* @return hours (in decimal) for this defined period
+*
+*/
+function get_hours_this_period($userid, $courseid, $start, $end){
+
+    $units = get_split_units($start, $end, $userid, $courseid);
+
+    $config = get_timetracker_config($courseid);
+
+
+    if(!$units) return 0;
+    $round = get_rounding_config($courseid);
+    $total = 0;
+    foreach($units as $unit){
+        $total += round_time($unit->timeout - $unit->timein, $round);
+    }
+
+    return get_hours($total, $courseid);
+}
+
 
 /**
 * @return hours (in decimal) for this month
@@ -693,15 +719,8 @@ function get_hours_this_month($userid, $courseid, $month = -1, $year = -1){
             $month, $year);
     }
 
-    $config = get_timetracker_config($courseid);
-
-    if(array_key_exists('round', $config)){
-        $round = $config['round'];
-    } else {
-        $round = 900;
-    }
-
     if(!$units) return 0;
+    $round = get_rounding_config($courseid);
     $total = 0;
     foreach($units as $unit){
         $total += round_time($unit->timeout - $unit->timein, $round);
@@ -721,20 +740,17 @@ function get_earnings_this_year($userid, $courseid){
 
     $units = get_split_units($firstofyear, $endofyear, $userid, $courseid);
 
-    $config = get_timetracker_config($courseid);
-    if(array_key_exists('round', $config)){
-        $round = $config['round'];
-    } else {
-        $round = 900;
-    }
-
 
     if(!$units) return 0;
+    $round = get_rounding_config($courseid);
     $earnings = 0;
     foreach($units as $unit){
-        $earnings += get_hours(($unit->timeout - $unit->timein), $round) * $unit->payrate;
+        $hours = round_time($unit->timeout - $unit->timein, $round);
+        $hours = round($hours/3600, 3);
+        $earnings += $hours * $unit->payrate;
     }
-    return number_format(round($earnings, 2), 2);
+
+    return round($earnings, 2);
 }
 
 /**
@@ -749,18 +765,9 @@ function get_hours_this_year($userid, $courseid){
 
     $units = get_split_units($firstofyear, $endofyear, $userid, $courseid);
 
-    if($courseid == -1){
-        $round = 900;
-    } else {
-        $config = get_timetracker_config($courseid);
-        if(array_key_exists('round', $config)){
-            $round = $config['round'];
-        } else {
-            $round = 900;
-        }
-    }
-    
+     
     if(!$units) return 0;
+    $round = get_rounding_config($courseid);
     $total = 0;
     foreach($units as $unit){
         $total += round_time($unit->timeout - $unit->timein, $round);
@@ -822,18 +829,8 @@ function get_hours_this_term($userid, $courseid=-1){
     $units = get_split_units($boundaries['termstart'], $boundaries['termend'],
         $userid, $courseid);
 
-    if($courseid == -1){
-        $round = 900;
-    } else {
-        $config = get_timetracker_config($courseid);
-        if(array_key_exists('round', $config)){
-            $round = $config['round'];
-        } else {
-            $round = 900;
-        }
-    }
-
     if(!$units) return 0;
+    $round = get_rounding_config($courseid);
     $total = 0;
     foreach($units as $unit){
         $total += round_time($unit->timeout - $unit->timein, $round);
@@ -849,11 +846,14 @@ function get_earnings_this_term($userid, $courseid){
         $userid, $courseid);
 
     if(!$units) return 0;
+    $round = get_rounding_config($courseid);
     $earnings = 0;
     foreach($units as $unit){
-        $earnings += get_hours(($unit->timeout - $unit->timein), $courseid) * $unit->payrate;
+        $hours = round_time($unit->timeout - $unit->timein);
+        $hours = round($hours/3600, 3);
+        $earnings += $hours * $unit->payrate;
     }
-    return number_format(round($earnings, 2), 2);
+    return round($earnings, 2);
 }
 
 /**
@@ -920,8 +920,9 @@ function get_workers_stats($courseid){
 
     $workers = $DB->get_records('block_timetracker_workerinfo',
         array('courseid'=>$courseid),'lastname ASC, firstname ASC');
-
+    
     if(!$workers) return null;
+    $round = get_rounding_config($courseid);
     $workerstats = array();
     foreach($workers as $worker){
         
@@ -935,12 +936,14 @@ function get_workers_stats($courseid){
             array('userid'=>$worker->id, 'courseid'=>$courseid), 'timeout DESC LIMIT 1');
         $lu = '';
         foreach($lastunit as $u){
+            $hours = round_time($u->timeout - $u->timein, $round);
+            $hours = round($hours/3600, 3);
             $lu = 
                 userdate($u->timein,get_string('datetimeformat','block_timetracker')).
                 '<br />'.
                 userdate($u->timeout,get_string('datetimeformat','block_timetracker')).
                 '<br />'.
-                number_format(get_hours($u->timeout - $u->timein, $courseid), 2).' hours';
+                number_format($hours, 2).' hours';
         }
 
         $worker->lastunit = $lu;

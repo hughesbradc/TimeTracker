@@ -78,6 +78,7 @@ if($workerrecord->active == 0){
             } else {
                 print_error('You tried to clock-in, but something went wrong.  
                     We have logged the error.  Please contact your supervisor.');
+
                 add_to_log($COURSE->id, '', 'error adding clock-in', ''.$COURSE->id, 
                     'ERROR:  TimeTracker clock-in failed.');
 
