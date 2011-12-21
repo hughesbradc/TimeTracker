@@ -130,6 +130,30 @@ function xmldb_block_timetracker_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
+         // Define table block_timetracker_txdetail to be created
+        $table = new xmldb_table('block_timetracker_txdetail');
+
+        // Adding fields to table block_timetracker_txdetail
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL,
+            XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            XMLDB_NOTNULL, null, null);
+        $table->add_field('hours', XMLDB_TYPE_NUMBER, '10, 2', XMLDB_UNSIGNED, null, null,
+            null);
+        $table->add_field('pay', XMLDB_TYPE_NUMBER, '10, 2', XMLDB_UNSIGNED, null, null,
+            null);
+        $table->add_field('paycode', XMLDB_TYPE_CHAR, '50', null, null, null, 'Reg');
+        $table->add_field('transactionid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table block_timetracker_txdetail
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for block_timetracker_txdetail
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
 
         upgrade_block_savepoint(true, 2011121901, 'timetracker');
 

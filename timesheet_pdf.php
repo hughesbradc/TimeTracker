@@ -27,7 +27,7 @@ require_once(dirname(__FILE__) . '/../../config.php');
 require_once('lib.php');
 require_once('../../lib/tcpdf/tcpdf.php');
 
-function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base=''){
+function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='', $timesheetid='-1'){
 
     global $CFG,$DB;
 
@@ -138,13 +138,13 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='')
     
         <table border="1" cellpadding="2px">
             <tr bgcolor="#C0C0C0">
-                <td align="center"><font size="8"><b>Sunday</b></font></td>
                 <td align="center"><font size="8"><b>Monday</b></font></td>
                 <td align="center"><font size="8"><b>Tuesday</b></font></td>
                 <td align="center"><font size="8"><b>Wednesday</b></font></td>
                 <td align="center"><font size="8"><b>Thursday</b></font></td>
                 <td align="center"><font size="8"><b>Friday</b></font></td>
                 <td align="center"><font size="8"><b>Saturday</b></font></td>
+                <td align="center"><font size="8"><b>Sunday</b></font></td>
                 <td align="center"><font size="8"><b>Total Hours</b></font></td>
             </tr>
         ';
@@ -152,9 +152,10 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='')
         // ********** START THE TABLE AND DATA ********** //
         
         for($row=0; $row < 6; $row++){
+
             $dayofweek = $dayofweek % 7;
         
-            $counter = 0;
+            $counter = 1;
             //write blank cells to catch up to the first day of the month
             while($counter != $dayofweek){
                 $counter++; 
@@ -188,14 +189,38 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='')
                                 $hours = get_hours($unit->timeout - $unit->timein,
                                     $unit->courseid);
 
-                                $weeksum += $hours;
+                                //overtime or regular?
+                                if(($hours + $weeksum) > 40){
 
-                                $amt = $hours * $unit->payrate;
+                                    $ovthours = $reghours = 0;
+
+                                    if($weeksum > 40){ //already over 40
+
+                                        //no reghours, just ovthours
+                                        $ovthours = $hours;
+
+                                    } else { //not already over 40
+
+                                        $reghours = 40 - $weeksum;
+                                        $ovthours = $hours - $reghours;
+
+                                    }
+                                   
+                                    $amt = $reghours * $unit->payrate;
+                                    $ovtamt = $ovthours * ($workerrecord->currpayrate * 1.5);
+
+                                    error_log("ovt: $ovthours at $ovtamt");
+                                    error_log("reg: $reghours at $amt");
+
+                                    $amt += $ovtamt;
+
+                                } else {
+                                    $amt = $hours * $unit->payrate;
+                                }
 
                                 $monthdollarsum += $amt;
-
                                 $overalldollarsum += $amt;
-
+                                $weeksum += $hours;
                                 $overallhoursum += $hours;
 
                             }
@@ -208,7 +233,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='')
                 
                 //if day of week = 7, copy value over and reset weekly sum to 0.        
                 // Calculate total hours
-                if($dayofweek == 6){
+                if($dayofweek == 7){
                     //Add week sum to monthly sum
                     //Print value in weekly totals column 
                     //clear weekly sum
@@ -222,7 +247,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='')
                 } else if ($date == $monthinfo['lastday']){
                     //what about when we reach the end of the month? 
                     //Still need to put totals!!!
-                    while($dayofweek != 6){ //pad to the rightmost column
+                    while($dayofweek != 7){ //pad to the rightmost column
                         $days[] = '<td style="height: 10px">&nbsp;</td>';
                         $vals[] = '<td style="height: 70px">&nbsp;</td>';
                         $dayofweek++;
@@ -242,7 +267,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='')
                 
                 $dayofweek ++; $date++;
                 $curr = strtotime('+1 day', $curr);
-            } while ($date <= $monthinfo['lastday'] && $dayofweek % 7 != 0);
+            } while ($date <= $monthinfo['lastday'] && $dayofweek != 8);
             if($date >= $monthinfo['lastday']) break; 
         }
         
