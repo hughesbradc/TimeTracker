@@ -43,7 +43,7 @@ class timetracker_timesheet_form  extends moodleform {
             $canmanage = true;
         }
 
-        $mform->addElement('header','general','Generate Monthly Timesheet');
+        $mform->addElement('header','general','Generate Timesheet');
 
         // Collect all of the workers under the supervisor
 
@@ -157,7 +157,13 @@ class timetracker_timesheet_form  extends moodleform {
         //$buttonarray[] = &$mform->createElement('cancel');
 
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
-        $mform->closeHeaderBefore('buttonar');
+        //$mform->closeHeaderBefore('buttonar');
+        $mform->closeHeaderBefore('signOfficial');
+
+        $mform->addElement('header','signOfficial','Official Timesheets');
+       
+        //If student, show below
+        $mform->addElement('html','Previously signed timesheets will appear here');
     }
 
     function validation($data){

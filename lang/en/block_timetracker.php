@@ -346,3 +346,4 @@ $string['timesheet'] = 'Timesheet';
 $string['signbutton'] = 'Sign timesheet';
 $string['signature'] = 'Signature';
 
+$string['viewofficial'] = 'View Official Timesheets';
