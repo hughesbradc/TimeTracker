@@ -93,7 +93,10 @@ foreach ($timesheets as $timesheet){
         $amountpd += $payment->pay; 
     }
     
-    $viewtsurl = new moodle_url($baseurl.'/timesheet_pdf.php');
+    $viewparams['id'] = $courseid;
+    $viewparams['userid'] = $userid;
+    $viewparams['timesheetid'] = $timesheet->id;
+    $viewtsurl = new moodle_url($baseurl.'/timesheet_fromid.php',$viewparams);
     
     echo '<tr>';
     if($timesheet->supervisorsignature == 0){
