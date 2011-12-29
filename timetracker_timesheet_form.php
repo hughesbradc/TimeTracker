@@ -144,8 +144,9 @@ class timetracker_timesheet_form  extends moodleform {
         //normally you use add_action_buttons instead of this code
         $buttonarray=array();
         $buttonarray[] = &$mform->createElement('submit', 
-            //'unofficial', 'Generate unofficial timesheet');
             'unofficial', 'Generate paper timesheet');
+        $buttonarray[] = &$mform->createElement('submit',
+            'official', 'Sign official timesheet');
 
         //only let workers begin the official timesheet data submission process
         /*
@@ -158,12 +159,6 @@ class timetracker_timesheet_form  extends moodleform {
 
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         //$mform->closeHeaderBefore('buttonar');
-        $mform->closeHeaderBefore('signOfficial');
-
-        $mform->addElement('header','signOfficial','Official Timesheets');
-       
-        //If student, show below
-        $mform->addElement('html','Previously signed timesheets will appear here');
     }
 
     function validation($data){
