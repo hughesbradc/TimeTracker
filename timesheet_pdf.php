@@ -183,6 +183,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
                                 get_string('timeformat','block_timetracker'));
                             $out = userdate($unit->timeout,
                                 get_string('timeformat','block_timetracker'));
+
                             if(($unit->timeout - $unit->timein) > 449){ //WHAT IF NOT ROUNDED?
                                 $wustr .= "In: $in<br />Out: $out<br />";
 
@@ -193,25 +194,16 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
                                 if(($hours + $weeksum) > 40){
 
                                     $ovthours = $reghours = 0;
-
                                     if($weeksum > 40){ //already over 40
-
                                         //no reghours, just ovthours
                                         $ovthours = $hours;
-
                                     } else { //not already over 40
-
                                         $reghours = 40 - $weeksum;
                                         $ovthours = $hours - $reghours;
-
                                     }
                                    
                                     $amt = $reghours * $unit->payrate;
                                     $ovtamt = $ovthours * ($workerrecord->currpayrate * 1.5);
-
-                                    error_log("ovt: $ovthours at $ovtamt");
-                                    error_log("reg: $reghours at $amt");
-
                                     $amt += $ovtamt;
 
                                 } else {
@@ -224,7 +216,6 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
                                 $overallhoursum += $hours;
 
                             }
-
                         }
                     }
                 }

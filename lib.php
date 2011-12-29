@@ -84,7 +84,6 @@ function get_split_units($start, $end, $userid=0, $courseid=0, $sort='ASC'){
     $units = $DB->get_records_sql($sql);
 
     if(!$units) {
-        //error_log("no units from db");    
         return;
     }
 
@@ -107,7 +106,6 @@ function get_split_units($start, $end, $userid=0, $courseid=0, $sort='ASC'){
 * @return an array of workunits split up into days
 */
 function split_unit($unit){
-    //error_log("in split_unit()");
     $splitunits = array();
 
     if(!is_object($unit)) return $splitunits;
@@ -130,6 +128,9 @@ function split_unit($unit){
         $newunit->userid = $unit->userid;
         $newunit->courseid = $unit->courseid;
         $newunit->partial = 0;
+        $newunit->timesheetid = $unit->timesheetid;
+        $newunit->canedit = $unit->canedit;
+        $newunit->submitted = $unit->submitted;
     
         $splitunits[] = $newunit;
     } else { //spans multiple days
@@ -160,6 +161,9 @@ function split_unit($unit){
             $newunit->userid = $unit->userid;
             $newunit->courseid = $unit->courseid;
             $newunit->partial = true;
+            $newunit->timesheetid = $unit->timesheetid;
+            $newunit->canedit = $unit->canedit;
+            $newunit->submitted = $unit->submitted;
     
             $splitunits[] = $newunit;
     
@@ -548,7 +552,6 @@ function has_course_alerts($courseid){
         $CFG->prefix.'block_timetracker_alertunits'.
         ' WHERE courseid='.$courseid.
             ' ORDER BY alerttime';
-    //error_log($sql);
     $numalerts = $DB->count_records_sql($sql);
     return $numalerts;
 
@@ -610,24 +613,111 @@ function get_total_hours($userid, $courseid){
 }
 
 /**
+* Also calculates overtime (Weeks > 40 hours Mon-Sun)
 * @return earnings (in dollars) for this time period
 *
 */
-function get_earnings($userid, $courseid, $start, $end){
+function get_earnings($userid, $courseid, $start, $end, $processovt=1){
+
+    global $DB;
 
     $units = get_split_units($start, $end, $userid, $courseid);
-
     if(!$units) return 0;
-    $round = get_rounding_config($courseid);
 
-    $earnings = 0;
-    foreach($units as $unit){
-        $hours = round_time($unit->timeout - $unit->timein, $round);
-        $hours = round($hours/3600, 3);
-        $earnings += $hours * $unit->payrate;
+    $info = break_down_earnings($units, $processovt);
+    return $info['earnings'];
+}
+
+/**
+* Break down earnings into reghours, regearnings, ovthours, ovtearnings,hours,earnings
+* All $unit in $units should be from the same userid/courseid
+* @return array
+*/
+function break_down_earnings($units, $processovt = 1){
+    global $DB;
+    $info = array();
+    $info['reghours'] = 0;
+    $info['regearnings'] = 0;
+    $info['ovthours'] = 0;
+    $info['ovtearnings'] = 0;
+    $info['hours'] = 0;
+    $info['earnings'] = 0;
+
+    if(!$units) return $info;
+    $exampleunit = reset($units);
+
+    $round = get_rounding_config($exampleunit->courseid);
+
+    $worker = $DB->get_record('block_timetracker_workerinfo',
+        array('id'=>$exampleunit->userid));
+
+    if(!$worker) return $info;
+    if(!$processovt){
+
+        $earnings = 0;
+        foreach($units as $unit){
+            $hours = round_time($unit->timeout - $unit->timein, $round);
+            $hours = round($hours/3600, 3);
+            $info['hours'] += $hours;
+            $info['reghours'] += $hours;
+            $earnings += $hours * $unit->payrate;
+        }
+    
+        $info['earnings'] = $info['regearnings'] = round($earnings, 2);
+    } else {
+
+        $earnings =  $weekhours = $prevweekday = $prevdate = 0;
+    
+        foreach($units as $unit){
+            //weekday will be from 1 (Monday) to 7 (Sunday)
+            //if weekday is < prevweekday, we're on a new week.
+
+    
+            $weekday = userdate($unit->timein, "%u");
+            $date = userdate($unit->timein, "%Y%m%d");
+            if($weekday < $prevweekday ||
+                ($weekday == $prevweekday && $date != $prevdate)){
+                $weekhours = 0;
+            }
+            $prevweekday = $weekday; 
+            $prevdate = $date;
+    
+            $hours = round_time($unit->timeout - $unit->timein, $round);
+            $hours = round($hours/3600, 3);
+    
+            if( ($hours + $weekhours) > 40){
+                $ovthours = $reghours = 0; 
+                if($weekhours > 40){
+                    $ovthours = $hours;
+                } else {
+                    $reghours = 40 - $weekhours; 
+                    $ovthours = $hours - $reghours;
+                }
+    
+                $info['reghours'] += $reghours;
+                $info['ovthours'] += $ovthours;
+    
+                $amt = $reghours * $unit->payrate;
+                $info['regearnings'] += $amt;
+                
+                $ovtamt = $ovthours * ($worker->currpayrate * 1.5);
+                $info['ovtearnings'] += $ovtamt;
+    
+            } else {
+                $amt = $hours * $unit->payrate;
+                $info['reghours'] += $hours;
+                $info['regearnings'] += $amt;
+            }
+            $weekhours += $hours;
+        }
+    
+        $info['regearnings'] = round($info['regearnings'], 2);
+        $info['ovtearnings'] = round($info['ovtearnings'], 2);
+        $info['earnings'] = round($info['regearnings']+$info['ovtearnings'], 2);
+        $info['hours'] = $info['reghours'] + $info['ovthours'];
+
     }
-
-    return round($earnings, 2);
+    return $info;
 }
 
 /**

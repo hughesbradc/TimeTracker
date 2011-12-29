@@ -38,7 +38,7 @@ header('Content-Disposition: attachment; filename='.$filename);
 
 //$headers = "Department,Last Name,First Name,Email,Earnings,Max Term Earnings,Remaining \n";
 $headers = 
-    "Department,Last Name,First Name,ID,Budget,Hours,Earnings,Max Term Earnings,Remaining \n";
+    "DET,DETCode,ID,Hours,Amount,Budget,Department,Last Name,First Name,Max Term Earnings,Remaining \n";
 
 echo $headers;
 
@@ -57,23 +57,32 @@ foreach($courses as $course){
     
     
     foreach($workers as $worker){
-        //demo courses, et. al.
-        if($worker->courseid >= 73 && $worker->courseid <= 76){
-            continue;
-        }
-    
-        $earnings = get_earnings($worker->id, $course->id, $start, $end);
-        $hours = get_hours_this_period($worker->id, $course->id, $start, $end);
 
-        $remaining = $worker->maxtermearnings - $earnings; 
+        $units = get_split_units($start, $end, $worker->id, $course->id);
+
+        $info = break_down_earnings($units);
+
+        $remaining = $worker->maxtermearnings - $info['earnings']; 
         if($remaining < 0) $remaining = 0;
 
-        $contents =
-        "$course->shortname,$worker->lastname,$worker->firstname,$worker->idnum,"
-            ."$worker->budget,$hours,$earnings,$worker->maxtermearnings,$remaining \n";
-    
-        //Export Data to Simple XLS file
-        echo $contents;
+        //print_object($info); 
+        
+        if ($info['regearnings'] > 0){
+            $contents =
+                "E,Reg,$worker->idnum,".$info['reghours'].','.$info['regearnings'].','.
+                "$worker->budget,$course->shortname,$worker->lastname,$worker->firstname,".
+                "$worker->maxtermearnings,$remaining\n";
+            echo $contents;
+        }
+
+        if($info['ovtearnings'] > 0){
+            $contents =
+                "E,OT,$worker->idnum,".$info['ovthours'].','.$info['ovtearnings'].','.
+                "$worker->budget,$course->shortname,$worker->lastname,$worker->firstname,".
+                "$worker->maxtermearnings,$remaining\n";
+            echo $contents;
+        } 
+
     }
 
 }
