@@ -257,7 +257,7 @@ $string['notpermissible'] = 'You do not have permissions to perform this action'
 $string['errordeleting'] = 'Invalid session key or user id';
 $string['usernotexist'] = 'User does not exist';
 $string['alreadyapproved'] = 'This work unit has already been approved by {$a}';
-
+$string['invalidtimesheetid'] = 'Timesheet ID does not exist for this user';
 $string['timesheettitle'] = 'Timesheet Report';
 
 //Context-Sensitive Help

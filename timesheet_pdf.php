@@ -27,15 +27,47 @@ require_once(dirname(__FILE__) . '/../../config.php');
 require_once('lib.php');
 require_once('../../lib/tcpdf/tcpdf.php');
 
-function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='', $timesheetid='-1'){
+
+function generate_pdf_from_timesheetid($timesheetid, $userid, $courseid, $method = 'I', $base=''){
+    global $DB, $CFG;
+    $units = $DB->get_records('block_timetracker_workunit', array('userid'=>$userid,
+        'timesheetid'=>$timesheetid), 'timein ASC');
+
+    if($units){
+
+        $start = reset($units);
+        $startinfo = get_month_info(userdate($start->timein, "%m"),
+            userdate($start->timein, "%Y"));
+        $end = end($units);
+        $endinfo = get_month_info(userdate($end->timeout, "%m"),
+            userdate($end->timeout, "%Y"));
+
+        //error_log($start->timein);
+        //error_log($end->timeout);
+
+        return generate_pdf($startinfo['firstdaytimestamp'], $endinfo['lastdaytimestamp'], 
+            $userid, $courseid, $method, $base, $timesheetid);
+
+    } else {
+        print_error('invalidtimesheetid', 'block_timetracker', 
+            $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
+    }
+}
+
+function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='', $timesheetid=-1){
 
     global $CFG,$DB;
 
     $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
         array('id'=>$userid,'courseid'=>$courseid));
 
-    $samemonth = (userdate($start, "%m%Y")==userdate($end, "%m%Y"));
-    //error_log($samemonth);
+    $startstring = userdate($start, "%m%Y");
+    $endstring = userdate($end, "%m%Y");
+    $samemonth = ($startstring == $endstring);
+
+    //error_log('Samemonth: '.$samemonth);
+    //error_log('startstring:'.$startstring);
+    //error_log('endstring:'.$endstring);
     
     if(!$workerrecord){
         print_error('usernotexist', 'block_timetracker',
@@ -69,6 +101,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
 
     $overallhoursum = 0;
     $overalldollarsum = 0;
+
     while ($curr <= $end) {
         $month = userdate($curr, "%m");
         $year = userdate($curr, "%Y");
@@ -80,7 +113,8 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
         $monthhoursum = 0;
         $monthdollarsum = 0;
 
-        $units = get_split_month_work_units($workerrecord->id, $courseid, $month, $year);
+        $units = get_split_month_work_units($workerrecord->id, $courseid, $month, $year,
+            $timesheetid);
     
         // Add Page
         $pdf->AddPage();
@@ -258,6 +292,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
                 
                 $dayofweek ++; $date++;
                 $curr = strtotime('+1 day', $curr);
+                //error_log('curr: '.userdate($curr, '%m/%d/%y'));
             } while ($date <= $monthinfo['lastday'] && $dayofweek != 8);
             if($date >= $monthinfo['lastday']) break; 
         }
@@ -305,39 +340,81 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
     }
 
     // ********** OVERALL TOTALS AND SIGNATURES********** //
+    if($timesheetid != -1){
+        $ts = $DB->get_record('block_timetracker_timesheet', 
+            array('id'=>$timesheetid));
+    }
+
     $htmldoc = '
-    <table border="1" cellpadding="5px">';
+        <table border="1" cellpadding="5px">';
     if(!$samemonth){
+        if($timesheetid == -1){
+            $desc = 
+	            userdate($start, get_string('dateformat', 'block_timetracker')).
+                ' to '.
+	            userdate($end, get_string('dateformat', 'block_timetracker'));
+        } else {
+            $desc =
+                'Time Sheet Submitted '.userdate($ts->submitted,
+                get_string('datetimeformat', 'block_timetracker'));
+        }
+
         $htmldoc .='
         <tr>
         <td colspan="2" style="height: 35px"><font size="13"><b>Total Hours/Earnings for '.
-	        userdate($start, get_string('dateformat', 'block_timetracker')).
-            ' to '.
-	        userdate($end, get_string('dateformat', 'block_timetracker')).
+            $desc.
             '</b></font><br /><font size="12">'.
             round($overallhoursum, 3).' / $'.
-	        round((round($overallhoursum, 3) * $workerrecord->currpayrate), 2) .'</font></td>
+	        round($overalldollarsum, 2) .'</font></td>
         </tr>';
     }
-    $htmldoc .='
-    <tr>
-        <td style="height: 45px"><font size="13"><b>Worker Signature/Date</b></font></td>
-        <td style="height: 45px"><font size="13"><b>Supervisor Signature/Date</b></font></td>
-    </tr>
-    </table>';
+
+    if($timesheetid != -1){
+        $datestr = get_string('datetimeformat', 'block_timetracker');
+        $htmldoc .='
+        <tr>
+            <td style="height: 45px"><font size="13"><b>Worker Signature/Date</b></font><br />'.
+            '<font size="9">Signed by '.$workerrecord->firstname.' '.$workerrecord->lastname.'<br />'.
+            userdate($ts->workersignature, $datestr).
+            '</font></td>'.
+            '<td style="height: 45px"><font size="13"><b>Supervisor Signature/Date</b></font><br />'.
+            '<font size="9">';
+        if($ts->supervisorsignature != 0){
+            $super = $DB->get_record('user', array('id'=>$ts->supermdlid));
+            if(!$super) print_error('Supervisor does not exist');
+            $htmldoc .= 'Signed by '.$super->firstname.' '.$super->lastname.'<br />'.
+                userdate($ts->supervisorsignature, $datestr);
+        } else {
+            $htmldoc .= 'Awaiting supervisor signature';
+        }
+
+        $htmldoc .='
+            </font></td>
+        </tr>
+        </table>';
+
+    } else {
+        $htmldoc .='
+        <tr>
+            <td style="height: 45px"><font size="13"><b>Worker Signature/Date</b></font></td>
+            <td style="height: 45px"><font size="13"><b>Supervisor Signature/Date</b></font></td>
+        </tr>
+        </table>';
+    }
 
     $pdf->writeHTML($htmldoc, true, false, false, false, '');
     
     
     
-    //Close and Output PDF document
-    //change the $method from 'I' to $method -- allow more than just a single file
-    //to be created
+    //create the filename
     $fn = $year.'_'.($month<10?'0'.$month:$month).'Timesheet_'.
         substr($workerrecord->firstname,0,1).
         $workerrecord->lastname. '_'.$workerrecord->mdluserid.'.pdf';
 
-    //create the file
+
+    //Close and Output PDF document
+    //change the $method from 'I' to $method -- allow more than just a single file
+    //to be created
     $pdf->Output($base.'/'.$fn, $method);
     return $fn;    
 }

@@ -63,7 +63,7 @@ function expired($timein, $now = -1){
 *
 * @return an array of objects, each having all the properties of a workunit
 */
-function get_split_units($start, $end, $userid=0, $courseid=0, $sort='ASC'){
+function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, $sort='ASC'){
     global $CFG, $DB;
 
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
@@ -77,6 +77,10 @@ function get_split_units($start, $end, $userid=0, $courseid=0, $sort='ASC'){
     
     if($courseid > 0){
         $sql .= ' AND courseid='.$courseid;
+    }
+
+    if($timesheetid > -1){
+        $sql .= ' AND timesheetid='.$timesheetid;
     }
 
     $sql .= ' ORDER BY timein '.$sort;
@@ -196,11 +200,11 @@ function split_unit($unit){
 * @return array of unit objects
 *
 */
-function get_split_month_work_units($userid, $courseid, $month, $year){
+function get_split_month_work_units($userid, $courseid, $month, $year, $timesheetid=-1){
     $info = get_month_info($month, $year);
 
     return get_split_units($info['firstdaytimestamp'], $info['lastdaytimestamp'],
-        $userid, $courseid);
+        $userid, $courseid, $timesheetid);
 }
 
 
