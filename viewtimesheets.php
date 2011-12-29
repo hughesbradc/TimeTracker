@@ -24,6 +24,7 @@
  */
 
 require_once('../../config.php');
+require_once('lib.php');
 
 global $CFG, $COURSE, $USER, $DB;
 
@@ -60,6 +61,13 @@ $PAGE->set_heading($strtitle);
 $indexparams['id'] = $courseid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
 
+$canmanage = false;
+if(has_capability('block/timetracker:manageworkers', $context)){
+    $canmanage = true;
+}
+
+$maintabs = get_tabs($indexparams, $canmanage, $courseid);
+
 $nextpage = $index;
 
 $PAGE->navbar->add(get_string('blocks'));
@@ -67,6 +75,8 @@ $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $url);
 $PAGE->navbar->add($strtitle);
 
 echo $OUTPUT->header();
+$tabs = array($maintabs);
+print_tabs($tabs, 'manage');
 $totalcount = $DB->count_records('block_timetracker_timesheet',array('userid'=>$userid));
 $timesheets = $DB->get_records('block_timetracker_timesheet',array('userid'=>$userid),'','*',
     $page * $perpage,$perpage);

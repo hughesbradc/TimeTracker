@@ -58,8 +58,14 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
+if($canmanage){
+    print_error('supsignerror','block_timetracker');
+}
 if(!$worker){
     echo 'This worker does not exist in the database.';
+} else if($worker->mdluserid != $USER->id){
+    print_error('notpermissible','block_timetracker',
+        $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
 } else {
     $mform = new timetracker_workersig_form($courseid, $userid);
 
