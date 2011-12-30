@@ -39,8 +39,11 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
+
 $urlparams['id'] = $courseid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
+
+$maintabs = get_tabs($urlparams, $canmanage, $courseid);
 
 $workers = $DB->get_records('block_timetracker_workerinfo', array('courseid'=>$courseid));
 
@@ -48,7 +51,7 @@ $PAGE->set_url(new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/supervisorsig.php',$urlparams));
 $PAGE->set_pagelayout('base');
 
-$strtitle = get_string('timesheet','block_timetracker'); 
+$strtitle = get_string('signheader','block_timetracker'); 
 $PAGE->set_title($strtitle);
 $PAGE->set_pagelayout('base');
 
@@ -79,6 +82,8 @@ if(!$workers){
     } else {
         //form is shown for the first time
         echo $OUTPUT->header();
+        $tabs=array($maintabs);
+        print_tabs($tabs, 'timesheets');
         $mform->display();
         echo $OUTPUT->footer();
     }

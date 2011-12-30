@@ -38,7 +38,7 @@ class timetracker_supervisorsig_form extends moodleform {
         $mform =& $this->_form;
 
         $mform->addElement('header','general',
-            get_string('timesheet','block_timetracker'));
+            get_string('signheader','block_timetracker'));
 
         $mform->addElement('html','<table align="center" border="1" cellspacing="10px"
             cellpadding="5px width="75%">');
@@ -81,11 +81,26 @@ class timetracker_supervisorsig_form extends moodleform {
             $viewparams['timesheetid'] = $timesheet->id;
             $viewurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet_fromid.php',
                 $viewparams);
-            $viewaction = $OUTPUT->action_icon($viewurl, new pix_icon('i/calendar', 
-                'view Timesheet'));
-            $editurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/updateworkerinfo.php');
-            $editaction = $OUTPUT->action_icon($editurl, new pix_icon('user_edit', 
-                get_string('edit'),'block_timetracker'));
+            $viewaction = $OUTPUT->action_icon($viewurl, new pix_icon('date','View Timesheet',
+                'block_timetracker'));
+            
+            $editsql =$DB->get_records('block_timetracker_workunit',
+                array('timesheetid'=>$timesheet->id),'timein ASC');
+
+            $first = reset($editsql);
+            if(sizeof($editsql) > 1){
+                $last = end($editsql);
+            } else {
+                $last = $first;
+            }
+            $editparams['id'] = $this->courseid;
+            $editparams['userid'] = $worker->id;
+            $editparams['repstart'] = $first->timein;
+            $editparams['repend'] = $last->timeout;
+            $editurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $editparams);
+            $editicon = new pix_icon('date_edit', get_string('edit'),'block_timetracker');
+            $editaction = $OUTPUT->action_icon($editurl, $editicon,
+                new confirm_action(get_string('editwarning','block_timetracker')));
             $mform->addElement('html',$viewaction);
             $mform->addElement('html',' ');
             $mform->addElement('html',$editaction);

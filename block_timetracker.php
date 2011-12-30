@@ -114,7 +114,7 @@
 
             $timesheeturl = new moodle_url($baseurl.'/timesheet.php', $indexparams);
             $timesheetaction=$OUTPUT->action_icon($timesheeturl, 
-                new pix_icon('i/calendar', 'Timesheets')); 
+                new pix_icon('date', 'Timesheets','block_timetracker')); 
 
             $this->content->text .= $timesheetaction.' '.
                 $OUTPUT->action_link($timesheeturl, 'Timesheet').'<br />';
@@ -249,7 +249,7 @@
                         $indexparams);
                     $timesheeturl->params(array('userid'=>$worker->id));
                     $timesheetaction=$OUTPUT->action_icon($reportsurl, 
-                        new pix_icon('i/calendar', 'Timesheets')); 
+                        new pix_icon('date', 'Timesheets','block_timetracker')); 
             
                     $this->content->text .= '<div style="text-align: left">';
                     $this->content->text .= 
@@ -310,7 +310,7 @@
                         $indexparams);
                     $timesheeturl->params(array('userid'=>$worker->id));
                     $timesheetaction=$OUTPUT->action_icon($reportsurl, 
-                        new pix_icon('i/calendar', 'Timesheets')); 
+                        new pix_icon('date', 'Timesheets', 'block_timetracker')); 
 
                     $this->content->text .= '<div style="text-align: left">';
                     $this->content->text .= 

@@ -346,7 +346,8 @@ $string['timesheet'] = 'Timesheet';
 $string['signbutton'] = 'Sign timesheet';
 $string['signbuttonsup'] = 'Sign selected timesheet(s)';
 $string['signature'] = 'Signature';
-
+$string['signheader'] = 'Sign Timesheets';
+$string['editwarning'] = 'Are you sure you wish to edit this timesheet?  Doing so will remove the student\'s signature and require him or her to re-sign before the timesheet can be approved.';
 $string['viewofficial'] = 'View Official Timesheets';
 $string['workerstatement'] = 'I certify that the hours reported on this timesheet are true, correct, and are within the student\'s allotted maximum earnings.  I understand that if my timesheet is not signed by the due date, I will not be paid for these hours until the next pay period.';
 $string['supervisorstatement'] = 'I certify that the hours reported on the selected timesheets are true, correct, and are within each student\'s allotted maximum earnings. I understand that if the timesheets are not signed by the due date, the students will not be paid for these hours until the next pay period.';

@@ -97,10 +97,8 @@ echo '
 foreach ($timesheets as $timesheet){
 
     $amountpd = 0;
-    foreach ($payments as $payment){
-        $amountpd += $timesheets->regpay; 
-        $amountpd += $timesheets->otpay;
-    }
+    $amountpd += $timesheet->regpay; 
+    $amountpd += $timesheet->otpay;
     
     $viewparams['id'] = $courseid;
     $viewparams['userid'] = $userid;
@@ -112,17 +110,17 @@ foreach ($timesheets as $timesheet){
         echo '<td>Pending supervisor signature</td>';
         echo '<td align="center">$'.number_format(round($amountpd,2),2).'</td>';
         echo '<td align="center">'. $OUTPUT->action_icon($viewtsurl, 
-            new pix_icon('i/calendar', 'View Timesheet')) .'</td>';
+            new pix_icon('date', 'View Timesheet','block_timetracker')) .'</td>';
     } else if ($timesheet->submitted == 0){
         echo '<td>Processing</td>';
         echo '<td align="center">$'.number_format(round($amountpd,2),2).'</td>';
         echo '<td align="center">'. $OUTPUT->action_icon($viewtsurl, 
-            new pix_icon('i/calendar', 'View Timesheet')) .'</td>';
+            new pix_icon('date', 'View Timesheet','block_timetracker')) .'</td>';
     } else {
         echo '<td>Complete</td>';
         echo '<td align="center">$'.number_format(round($amountpd,2),2).'</td>';
         echo '<td align="center">'. $OUTPUT->action_icon($viewtsurl, 
-            new pix_icon('i/calendar', 'View Timesheet')) .'</td>';
+            new pix_icon('date', 'View Timesheet','block_timetracker')) .'</td>';
     }
     echo '</tr>';
 }
