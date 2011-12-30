@@ -58,27 +58,20 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
 
     global $CFG,$DB;
 
+    $htmlpages = generate_html($start, $end, $userid, $courseid, $method, $base,$timesheetid);
+    // Collect Data
+    $conf = get_timetracker_config($courseid);
+
+    $month = userdate($start, "%m");
+    $year = userdate($start, "%Y");
+
     $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
-        array('id'=>$userid,'courseid'=>$courseid));
+        array('id'=>$userid));
 
-    $startstring = userdate($start, "%m%Y");
-    $endstring = userdate($end, "%m%Y");
-    $samemonth = ($startstring == $endstring);
-
-    //error_log('Samemonth: '.$samemonth);
-    //error_log('startstring:'.$startstring);
-    //error_log('endstring:'.$endstring);
-    
     if(!$workerrecord){
         print_error('usernotexist', 'block_timetracker',
             $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
     }
-
-    //error_log(userdate($end, '%m/%d/%y %I:%M:%S %p'));
-    
-    // Collect Data
-    $mdluser= $DB->get_record('user', array('id'=>$workerrecord->mdluserid));
-    $conf = get_timetracker_config($courseid);
 
     // ********** BEGIN PDF ********** //
     // Create new PDF
@@ -97,6 +90,47 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
     $pdf->setPrintHeader(false);
     $pdf->setPrintFooter(false);
     
+    foreach($htmlpages as $page){
+        $pdf->AddPage();
+        $pdf->writeHTML($page, true, false, false, false, '');
+    }
+    
+    //create the filename
+    $fn = $year.'_'.($month<10?'0'.$month:$month).'Timesheet_'.
+        substr($workerrecord->firstname,0,1).
+        $workerrecord->lastname. '_'.$workerrecord->mdluserid.'.pdf';
+
+
+    //Close and Output PDF document
+    //change the $method from 'I' to $method -- allow more than just a single file
+    //to be created
+    $pdf->Output($base.'/'.$fn, $method);
+    return $fn;    
+}
+
+/**
+    @return an array of HTML pages used for printing - one page per array item
+*/
+function generate_html($start, $end, $userid, $courseid, $method = 'I', $base='', $timesheetid=-1){
+    global $CFG,$DB;
+
+    $pages = array();
+
+    $startstring = userdate($start, "%m%Y");
+    $endstring = userdate($end, "%m%Y");
+    $samemonth = ($startstring == $endstring);
+
+    $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
+        array('id'=>$userid,'courseid'=>$courseid));
+
+    if(!$workerrecord){
+        print_error('usernotexist', 'block_timetracker',
+            $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
+    }
+
+    // Collect Data
+    $conf = get_timetracker_config($courseid);
+
     $curr = $start;
 
     $overallhoursum = 0;
@@ -117,7 +151,9 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
             $timesheetid);
     
         // Add Page
-        $pdf->AddPage();
+
+        /**DING DING DING**/
+        //$pdf->AddPage();
     
         // ********** HEADER ********** //
         $htmldoc = '
@@ -134,10 +170,10 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
         </table>
         <hr style="height: 1px" />';
     
-        $pdf->writeHTML($htmldoc, true, false, false, false, '');
+        //$pdf->writeHTML($htmldoc, true, false, false, false, '');
     
         // ********** WORKER AND SUPERVISOR DATA ********** //
-        $htmldoc = '
+        $htmldoc .= '
         <table cellspacing="0" cellpadding="0">
             <tr>
                 <td><font size="8"><b>WORKER: '.strtoupper($workerrecord->lastname).', '
@@ -153,7 +189,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
             </tr>
         </table>';
     
-        $pdf->writeHTML($htmldoc, true, false, false, false, '');
+        //$pdf->writeHTML($htmldoc, true, false, false, false, '');
     
         // ********** CALENDAR DAYS HEADER (Sun - Sat) ********** //
         // ********** CALENDAR DATES AND DATA ********** //
@@ -168,7 +204,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
         $weeksum = 0;
         $monthhoursum = 0;
 
-        $htmldoc = '
+        $htmldoc .= '
     
         <table border="1" cellpadding="2px">
             <tr bgcolor="#C0C0C0">
@@ -321,11 +357,11 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
     
         $htmldoc .= '</table>';
     
-        $pdf->writeHTML($htmldoc, true, false, false, false, '');
+        //$pdf->writeHTML($htmldoc, true, false, false, false, '');
     
     
         // ********** FOOTER TOTALS ********** //
-        $htmldoc = '
+        $htmldoc .= '
         <table border="1" cellpadding="5px">
         <tr>
             <td style="height: 25px"><font size="13"><b>Base Pay Rate</b></font>
@@ -336,8 +372,13 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
                 round($monthhoursum, 3).' / $'.
 		        round($monthdollarsum, 2) .'</font></td>
         </tr></table>';
-        $pdf->writeHTML($htmldoc, true, false, false, false, '');
+        //$pdf->writeHTML($htmldoc, true, false, false, false, '');
+
+        //here is a new page!!!
+        $pages[] = $htmldoc;
     }
+
+    $htmldoc = end($pages);
 
     // ********** OVERALL TOTALS AND SIGNATURES********** //
     if($timesheetid != -1){
@@ -345,7 +386,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
             array('id'=>$timesheetid));
     }
 
-    $htmldoc = '
+    $htmldoc .= '
         <table border="1" cellpadding="5px">';
     if(!$samemonth){
         if($timesheetid == -1){
@@ -402,20 +443,8 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
         </table>';
     }
 
-    $pdf->writeHTML($htmldoc, true, false, false, false, '');
-    
-    
-    
-    //create the filename
-    $fn = $year.'_'.($month<10?'0'.$month:$month).'Timesheet_'.
-        substr($workerrecord->firstname,0,1).
-        $workerrecord->lastname. '_'.$workerrecord->mdluserid.'.pdf';
-
-
-    //Close and Output PDF document
-    //change the $method from 'I' to $method -- allow more than just a single file
-    //to be created
-    $pdf->Output($base.'/'.$fn, $method);
-    return $fn;    
+    return $pages;
 }
+
+
 ?>
