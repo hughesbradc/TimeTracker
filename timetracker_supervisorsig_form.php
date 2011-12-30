@@ -40,72 +40,75 @@ class timetracker_supervisorsig_form extends moodleform {
         $mform->addElement('header','general',
             get_string('signheader','block_timetracker'));
 
-        $mform->addElement('html','<table align="center" border="1" cellspacing="10px"
-            cellpadding="5px width="75%">');
-        $mform->addElement('html','<tr>
-                <td style="font-weight: bold; text-align:center">Select</td>
-                <td style="font-weight: bold; text-align:center">Worker Name</td>
-                <td style="font-weight: bold; text-align:center">Total Hours</td>
-                <td style="font-weight: bold; text-align:center">Total Pay</td>
-                <td style="font-weight: bold; text-align:center">Actions</td>
-            </tr>');
-
         $timesheets = $DB->get_records('block_timetracker_timesheet',
-            array('courseid'=>$this->courseid));
+            array('courseid'=>$this->courseid, 'supervisorsignature'=>0));
         
-        foreach ($timesheets as $timesheet){
-            $mform->addElement('html','<tr><td style="text-align: center">');
-            $mform->addElement('advcheckbox', 'timesheetid['.$timesheet->id.']','',
-                null, array('','group'=>1));
-            $mform->addElement('html','</td><td>');
-            
-            $worker = $DB->get_record('block_timetracker_workerinfo',
-                array('id'=>$timesheet->userid));
-            $mform->addElement('html',$worker->firstname .' '.$worker->lastname);
-            $mform->addElement('html','</td><td>');
+        if(!$timesheets){
+            $mform->addElement('html',get_string('notstosign','block_timetracker'));
+        } else {
+            $mform->addElement('html','<table align="center" border="1" cellspacing="10px"
+                cellpadding="5px width="75%">');
+            $mform->addElement('html','<tr>
+                    <td style="font-weight: bold; text-align:center">Select</td>
+                    <td style="font-weight: bold; text-align:center">Worker Name</td>
+                    <td style="font-weight: bold; text-align:center">Total Hours</td>
+                    <td style="font-weight: bold; text-align:center">Total Pay</td>
+                    <td style="font-weight: bold; text-align:center">Actions</td>
+                </tr>');
 
-            $hours = 0;
-            $pay = 0;
-            $hours += $timesheet->reghours;
-            $hours += $timesheet->othours;
-            $pay += $timesheet->regpay;
-            $pay += $timesheet->otpay;
-
-            $mform->addElement('html',number_format(round($hours,2),2));
-            $mform->addElement('html','</td><td>');
-            $mform->addElement('html',number_format(round($pay,2),2));
-            $mform->addElement('html','</td><td style="text-align: center">');
-            
-            $viewparams['id'] = $this->courseid;
-            $viewparams['userid'] = $worker->id;
-            $viewparams['timesheetid'] = $timesheet->id;
-            $viewurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet_fromid.php',
-                $viewparams);
-            $viewaction = $OUTPUT->action_icon($viewurl, new pix_icon('date','View Timesheet',
-                'block_timetracker'));
-            
-            $editsql =$DB->get_records('block_timetracker_workunit',
-                array('timesheetid'=>$timesheet->id),'timein ASC');
-
-            $first = reset($editsql);
-            if(sizeof($editsql) > 1){
-                $last = end($editsql);
-            } else {
-                $last = $first;
+            foreach ($timesheets as $timesheet){
+                $mform->addElement('html','<tr><td style="text-align: center">');
+                $mform->addElement('advcheckbox', 'timesheetid['.$timesheet->id.']','',
+                    null, array('','group'=>1));
+                $mform->addElement('html','</td><td>');
+                
+                $worker = $DB->get_record('block_timetracker_workerinfo',
+                    array('id'=>$timesheet->userid));
+                $mform->addElement('html',$worker->firstname .' '.$worker->lastname);
+                $mform->addElement('html','</td><td>');
+    
+                $hours = 0;
+                $pay = 0;
+                $hours += $timesheet->reghours;
+                $hours += $timesheet->othours;
+                $pay += $timesheet->regpay;
+                $pay += $timesheet->otpay;
+    
+                $mform->addElement('html',number_format(round($hours,2),2));
+                $mform->addElement('html','</td><td>');
+                $mform->addElement('html',number_format(round($pay,2),2));
+                $mform->addElement('html','</td><td style="text-align: center">');
+                
+                $viewparams['id'] = $this->courseid;
+                $viewparams['userid'] = $worker->id;
+                $viewparams['timesheetid'] = $timesheet->id;
+                $viewurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet_fromid.php',
+                    $viewparams);
+                $viewaction = $OUTPUT->action_icon($viewurl, new pix_icon('date','View Timesheet',
+                    'block_timetracker'));
+                
+                $editsql =$DB->get_records('block_timetracker_workunit',
+                    array('timesheetid'=>$timesheet->id),'timein ASC');
+                
+                $first = reset($editsql);
+                if(sizeof($editsql) > 1){
+                    $last = end($editsql);
+                } else {
+                    $last = $first;
+                }
+                $editparams['id'] = $this->courseid;
+                $editparams['userid'] = $worker->id;
+                $editparams['repstart'] = $first->timein;
+                $editparams['repend'] = $last->timeout;
+                $editurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $editparams);
+                $editicon = new pix_icon('date_edit', get_string('edit'),'block_timetracker');
+                $editaction = $OUTPUT->action_icon($editurl, $editicon,
+                    new confirm_action(get_string('editwarning','block_timetracker')));
+                $mform->addElement('html',$viewaction);
+                $mform->addElement('html',' ');
+                $mform->addElement('html',$editaction);
+                $mform->addElement('html','</tr>');
             }
-            $editparams['id'] = $this->courseid;
-            $editparams['userid'] = $worker->id;
-            $editparams['repstart'] = $first->timein;
-            $editparams['repend'] = $last->timeout;
-            $editurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $editparams);
-            $editicon = new pix_icon('date_edit', get_string('edit'),'block_timetracker');
-            $editaction = $OUTPUT->action_icon($editurl, $editicon,
-                new confirm_action(get_string('editwarning','block_timetracker')));
-            $mform->addElement('html',$viewaction);
-            $mform->addElement('html',' ');
-            $mform->addElement('html',$editaction);
-            $mform->addElement('html','</tr>');
-        }
 
         $mform->addElement('html','</table>');
         $mform->addElement('html', get_string('supervisorstatement','block_timetracker'));
@@ -116,6 +119,8 @@ class timetracker_supervisorsig_form extends moodleform {
         $mform->addGroup($buttonarray, 'buttonar','',array(' '), false);
         
         $mform->disabledIf('buttonar','supervisorsig');
+    
+        }
         
     }
 
