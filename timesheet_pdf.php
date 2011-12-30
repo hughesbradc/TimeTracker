@@ -92,7 +92,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
     
     foreach($htmlpages as $page){
         $pdf->AddPage();
-        $pdf->writeHTML($page, true, false, false, false, '');
+        $pdf->writeHTML($page);
     }
     
     //create the filename
@@ -121,7 +121,7 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
     $samemonth = ($startstring == $endstring);
 
     $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
-        array('id'=>$userid,'courseid'=>$courseid));
+        array('id'=>$userid));
 
     if(!$workerrecord){
         print_error('usernotexist', 'block_timetracker',
@@ -157,7 +157,7 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
     
         // ********** HEADER ********** //
         $htmldoc = '
-        <table cellspacing="0" cellpadding="0">
+        <table style="margin-left: auto; margin-right: auto" cellspacing="0" cellpadding="0" width="540px">
             <tr>
                 <td align="center"><font size="10"><b>'.$conf['institution'].'</b></font></td>
             </tr>
@@ -174,7 +174,7 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
     
         // ********** WORKER AND SUPERVISOR DATA ********** //
         $htmldoc .= '
-        <table cellspacing="0" cellpadding="0">
+        <table style="margin-left: auto: margin-right: auto" cellspacing="0" cellpadding="0" width="540px">
             <tr>
                 <td><font size="8"><b>WORKER: '.strtoupper($workerrecord->lastname).', '
                     .strtoupper($workerrecord->firstname).'<br />'
@@ -187,7 +187,8 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
                 .'POSITION: '.$conf['position'].'<br />'
                 .'BUDGET: '.$conf['budget'].'</b></font></td>
             </tr>
-        </table>';
+        </table>
+        <br />';
     
         //$pdf->writeHTML($htmldoc, true, false, false, false, '');
     
@@ -206,16 +207,16 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
 
         $htmldoc .= '
     
-        <table border="1" cellpadding="2px">
+        <table border="1" cellpadding="2px" width="540px" style="margin-right: auto; margin-left: auto">
             <tr bgcolor="#C0C0C0">
-                <td align="center"><font size="8"><b>Monday</b></font></td>
-                <td align="center"><font size="8"><b>Tuesday</b></font></td>
-                <td align="center"><font size="8"><b>Wednesday</b></font></td>
-                <td align="center"><font size="8"><b>Thursday</b></font></td>
-                <td align="center"><font size="8"><b>Friday</b></font></td>
-                <td align="center"><font size="8"><b>Saturday</b></font></td>
-                <td align="center"><font size="8"><b>Sunday</b></font></td>
-                <td align="center"><font size="8"><b>Total Hours</b></font></td>
+                <td class="calendar" align="center"><font size="8"><b>Monday</b></font></td>
+                <td class="calendar" align="center"><font size="8"><b>Tuesday</b></font></td>
+                <td class="calendar" align="center"><font size="8"><b>Wednesday</b></font></td>
+                <td class="calendar" align="center"><font size="8"><b>Thursday</b></font></td>
+                <td class="calendar" align="center"><font size="8"><b>Friday</b></font></td>
+                <td class="calendar" align="center"><font size="8"><b>Saturday</b></font></td>
+                <td class="calendar" align="center"><font size="8"><b>Sunday</b></font></td>
+                <td class="calendar" align="center"><font size="8"><b>Total Hours</b></font></td>
             </tr>
         ';
         
@@ -229,18 +230,17 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
             //write blank cells to catch up to the first day of the month
             while($counter != $dayofweek){
                 $counter++; 
-                $days[] = '<td style="height: 10px">&nbsp;</td>';
-                $vals[] = '<td style="height: 70px">&nbsp;</td>';
+                $days[] = '<td class="calendar" style="height: 10px">&nbsp;</td>';
+                $vals[] = '<td class="calendar" style="height: 70px">&nbsp;</td>';
             }
         
             do {
-                $days[] = '<td style="height: 10px" align="center"><b>'.$date.'</b></td>';
+                $days[] = '<td class="calendar" style="height: 10px" align="center"><b>'.$date.'</b></td>';
 
                 //begin of print work units
                 
                 // Print the data in the correct date blocks
                 $wustr = "";
-               
 
                 if($units){
                     foreach($units as $unit) {
@@ -254,6 +254,7 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
                             $out = userdate($unit->timeout,
                                 get_string('timeformat','block_timetracker'));
 
+                            //FIXMEFIXME!
                             if(($unit->timeout - $unit->timein) > 449){ //WHAT IF NOT ROUNDED?
                                 $wustr .= "In: $in<br />Out: $out<br />";
 
@@ -290,7 +291,7 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
                     }
                 }
                 
-                $vals[] = '<td style="height: 70px"><font size="7">'.$wustr.'</font></td>';
+                $vals[] = '<td class="calendar"  style="height: 70px"><font size="7">'.$wustr.'</font></td>';
                 
                 //if day of week = 7, copy value over and reset weekly sum to 0.        
                 // Calculate total hours
@@ -299,25 +300,27 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
                     //Print value in weekly totals column 
                     //clear weekly sum
                     $monthhoursum += $weeksum;
-                    $days[] = '<td style="height: 10px">&nbsp;</td>';
+                    $days[] = '<td class="calendar" style="height: 10px">&nbsp;</td>';
                     if($weeksum == 0) $weeksum = '&nbsp;';
                     $vals[] = 
-                    '<td style="height: 70px" align="center"><font size="11"><b><br /><br />'.
+                        '<td class="calendar" style="height: 70px" align="center">'.
+                        '<font size="10"><b><br /><br />'.
                         $weeksum.'</b><br /></font></td>';
                     $weeksum = 0;
                 } else if ($date == $monthinfo['lastday']){
                     //what about when we reach the end of the month? 
                     //Still need to put totals!!!
                     while($dayofweek != 7){ //pad to the rightmost column
-                        $days[] = '<td style="height: 10px">&nbsp;</td>';
-                        $vals[] = '<td style="height: 70px">&nbsp;</td>';
+                        $days[] = '<td class="calendar" style="height: 10px">&nbsp;</td>';
+                        $vals[] = '<td class="calendar" style="height: 70px">&nbsp;</td>';
                         $dayofweek++;
                     }
                     $monthhoursum += $weeksum;
-                    $days[] = '<td style="height: 10px">&nbsp;</td>';
+                    $days[] = '<td class="calendar" style="height: 10px">&nbsp;</td>';
                     if($weeksum == 0) $weeksum = '&nbsp;';
                     $vals[] = 
-                    '<td style="height: 70px" align="center"><font size="11"><b><br /><br />'.
+                        '<td class="calendar" style="height: 70px" align="center">'.
+                        '<font size="10"><b><br /><br />'.
                         $weeksum.'</b><br /></font></td>';
                     $weeksum = 0;
     
@@ -340,7 +343,7 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
                 if(isset($days[$spot]))
                     $htmldoc .= "\t".$days[$spot]."\n";    
                 else
-                    $htmldoc .= "\t".'<td style="height: 10px">&nbsp;</td>'."\n";
+                    $htmldoc .= "\t".'<td class="calendar" style="height: 10px">&nbsp;</td>'."\n";
             }
             $htmldoc.="\n</tr>\n";
         
@@ -350,35 +353,37 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
                 if(isset($vals[$spot]))
                     $htmldoc .= "\t".$vals[$spot]."\n";    
                 else
-                    $htmldoc .="\t".'<td style="height: 70px">&nbsp;</td>'."\n";
+                    $htmldoc .="\t".'<td class="calendar" style="height: 70px">&nbsp;</td>'."\n";
             }
             $htmldoc.="\n</tr>\n";
         }
     
-        $htmldoc .= '</table>';
+        $htmldoc .= '</table><br />';
     
         //$pdf->writeHTML($htmldoc, true, false, false, false, '');
     
     
         // ********** FOOTER TOTALS ********** //
         $htmldoc .= '
-        <table border="1" cellpadding="5px">
+        <table border="1" cellpadding="5px" width="540px" style="margin-left: auto; margin-right: auto">
         <tr>
             <td style="height: 25px"><font size="13"><b>Base Pay Rate</b></font>
             <br />
-                <font size="12">$'.round($workerrecord->currpayrate, 2).'</font></td>
+                <font size="10">$'.round($workerrecord->currpayrate, 2).'</font></td>
             <td style="height: 20px"><font size="13"><b>Total Hours/Earnings for '.
-	 	        $monthinfo['monthname'].', '.$year.'</b></font><br /><font size="12">'.
+	 	        $monthinfo['monthname'].', '.$year.'</b></font><br /><font size="10">'.
                 round($monthhoursum, 3).' / $'.
 		        round($monthdollarsum, 2) .'</font></td>
-        </tr></table>';
+        </tr></table><br />';
         //$pdf->writeHTML($htmldoc, true, false, false, false, '');
 
         //here is a new page!!!
         $pages[] = $htmldoc;
     }
 
-    $htmldoc = end($pages);
+    end($pages);
+    $key = key($pages);
+    $htmldoc = $pages[$key];
 
     // ********** OVERALL TOTALS AND SIGNATURES********** //
     if($timesheetid != -1){
@@ -387,7 +392,7 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
     }
 
     $htmldoc .= '
-        <table border="1" cellpadding="5px">';
+        <table border="1" cellpadding="5px" width="540px" style="margin-left: auto; margin-right: auto">';
     if(!$samemonth){
         if($timesheetid == -1){
             $desc = 
@@ -404,7 +409,7 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
         <tr>
         <td colspan="2" style="height: 35px"><font size="13"><b>Total Hours/Earnings for '.
             $desc.
-            '</b></font><br /><font size="12">'.
+            '</b></font><br /><font size="10">'.
             round($overallhoursum, 3).' / $'.
 	        round($overalldollarsum, 2) .'</font></td>
         </tr>';
@@ -415,11 +420,11 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
         $htmldoc .='
         <tr>
             <td style="height: 45px"><font size="13"><b>Worker Signature/Date</b></font><br />'.
-            '<font size="9">Signed by '.$workerrecord->firstname.' '.$workerrecord->lastname.'<br />'.
+            '<font size="8">Signed by '.$workerrecord->firstname.' '.$workerrecord->lastname.'<br />'.
             userdate($ts->workersignature, $datestr).
             '</font></td>'.
             '<td style="height: 45px"><font size="13"><b>Supervisor Signature/Date</b></font><br />'.
-            '<font size="9">';
+            '<font size="8">';
         if($ts->supervisorsignature != 0){
             $super = $DB->get_record('user', array('id'=>$ts->supermdlid));
             if(!$super) print_error('Supervisor does not exist');
@@ -432,7 +437,7 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
         $htmldoc .='
             </font></td>
         </tr>
-        </table>';
+        </table><br />';
 
     } else {
         $htmldoc .='
@@ -440,8 +445,10 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
             <td style="height: 45px"><font size="13"><b>Worker Signature/Date</b></font></td>
             <td style="height: 45px"><font size="13"><b>Supervisor Signature/Date</b></font></td>
         </tr>
-        </table>';
+        </table><br />';
     }
+
+    $pages[$key] = $htmldoc;
 
     return $pages;
 }
