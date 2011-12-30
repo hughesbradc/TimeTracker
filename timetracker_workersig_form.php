@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* This block will display a summary of hours and earnings for the worker.
+* This form will allow the worker to sign a timesheet electronically. 
 *
 * @package    Block
 * @subpackage TimeTracker
@@ -26,11 +26,10 @@
 require_once("$CFG->libdir/formslib.php");
 require_once('lib.php');
 
-class timetracker_testsig_form extends moodleform {
-   function timetracker_testsig_form($context,$courseid,$mdluserid){
-       $this->context = $context;
+class timetracker_workersig_form extends moodleform {
+   function timetracker_workersig_form($courseid,$userid){
        $this->courseid = $courseid;
-       $this->mdluserid = $mdluserid;
+       $this->userid = $userid;
        parent::__construct();
    }
 
@@ -42,23 +41,19 @@ class timetracker_testsig_form extends moodleform {
         $mform->addElement('header','general',
             get_string('timesheet','block_timetracker'));
 
-        $worker = $DB->get_record('block_timetracker_workerinfo',
-            array('courseid'=>$this->courseid,'mdluserid'=>$this->mdluserid));
-
-        $signature = $mform->addElement('html','You must sign your timesheet exactly as your name appears:
-        '.$worker->firstname .' '.$worker->lastname);
-        $mform->addElement('text','signature',get_string('signature','block_timetracker'));
+        $mform->addElement('html', get_string('workerstatement','block_timetracker'));
+        $mform->addElement('checkbox','workersig',get_string('clicktosign','block_timetracker'));
+       
+        $buttonarray=array();
+        $buttonarray[] = &$mform->createElement('submit',
+            'signbutton',get_string('signbutton','block_timetracker'));
+        $mform->addGroup($buttonarray, 'buttonar','',array(' '), false);
         
-        $this->add_action_buttons(true,get_string('signbutton','block_timetracker'));
+        $mform->disabledIf('buttonar','workersig');
+        
     }
 
     function validation($data){
-        /*
-        $name = $worker->firstname .' '.$worker->lastname;
-        if($name != $signature){
-            echo 'Your signature does not exactly match your name as displayed.';
-        }
-        */
     }
- }
+}
 ?>

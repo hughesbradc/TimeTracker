@@ -28,7 +28,6 @@ if (!has_capability('block/timetracker:manageworkers', $context)) {
     print_error('You do not have permission to run this report.');
 }
 
-
 $categoryinfo = $DB->get_record('course_categories', array('id'=>$catid));
 $catname = str_replace(' ','', $categoryinfo->name);
 

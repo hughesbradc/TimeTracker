@@ -114,13 +114,6 @@ class timetracker_reportgenerator_form extends moodleform {
 
     function validation ($data){
         $errors = array();
-        /*
-        if($data['reportstart'] > time()){
-            $errors['reportstart'] = 'Time cannot be set in the future.';
-        } else if($data['reportend'] > time()){
-            $errors['reportend'] = 'Time cannot be set in the future.';      
-        */
-        //} else if($data['reportstart'] > $data['reportend']){
         if($data['reportstart'] > $data['reportend']){
             $errors['reportstart'] = 'The begin date cannot be after the end date.';
         } else if ($data['reportend'] < $data['reportstart']){

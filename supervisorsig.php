@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This block will display a summary of hours and earnings for the worker.
+ * This form will allow the supervisor to batch sign timesheets electronically.
  *
  * @package    Block
  * @subpackage TimeTracker
@@ -24,12 +24,11 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require('timetracker_testsig_form.php');
+require('timetracker_supervisorsig_form.php');
 
 require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
-$userid = optional_param('userid', -1, PARAM_INTEGER);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
@@ -40,34 +39,19 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
+
 $urlparams['id'] = $courseid;
-$urlparams['userid'] = $userid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
-/*
-if(get_referer(false)){
-    $nextpage = get_referer(false);
-} else {
-    $nextpage = $index;
-}
+$maintabs = get_tabs($urlparams, $canmanage, $courseid);
 
-//if we posted to ourself from ourself
-if(strpos($nextpage, qualified_me()) !== false){
-    $nextpage = $SESSION->lastpage;
-} else {
-    $SESSION->lastpage = $nextpage;
-}
-//$nextpage = $index;
-
-*/
-
-$worker = $DB->get_record('block_timetracker_workerinfo', array('id'=>$userid));
+$workers = $DB->get_records('block_timetracker_workerinfo', array('courseid'=>$courseid));
 
 $PAGE->set_url(new moodle_url($CFG->wwwroot.
-    '/blocks/timetracker/testsig.php',$urlparams));
+    '/blocks/timetracker/supervisorsig.php',$urlparams));
 $PAGE->set_pagelayout('base');
 
-$strtitle = get_string('timesheet','block_timetracker'); 
+$strtitle = get_string('signheader','block_timetracker'); 
 $PAGE->set_title($strtitle);
 $PAGE->set_pagelayout('base');
 
@@ -75,30 +59,32 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
-$mform = new timetracker_testsig_form($context, $courseid, $worker->mdluserid);
+if(!$canmanage){
+    print_error('notpermissible','block_timetracker');
+}
 
-if ($mform->is_cancelled()){ //user clicked cancel
-    //redirect($nextpage);
-    redirect($index, $urlparams);
-
-} else if ($formdata=$mform->get_data()){
-    $name = $worker->firstname .' '.$worker->lastname;
-
-    if($formdata->signature == $name){
-        echo 'Timesheet is signed.';
-    } else {
-        echo 'Your signature does not exactly match your name as displayed.';
-    }
-
-    $indexparams['userid'] = $ttuserid;
-    $indexparams['id'] = $courseid;
-    $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
-
-    //redirect($nextpage);
-
+if(!$workers){
+    echo 'No users are enrolled in your course.';
 } else {
-    //form is shown for the first time
-    echo $OUTPUT->header();
-    $mform->display();
-    echo $OUTPUT->footer();
+    $mform = new timetracker_supervisorsig_form($courseid);
+
+    if ($mform->is_cancelled()){ //user clicked cancel
+        //redirect($nextpage);
+        redirect($index, $urlparams);
+
+    } else if ($formdata=$mform->get_data()){
+    
+        $indexparams['id'] = $courseid;
+        $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
+    
+        //redirect($nextpage);
+    
+    } else {
+        //form is shown for the first time
+        echo $OUTPUT->header();
+        $tabs=array($maintabs);
+        print_tabs($tabs, 'timesheets');
+        $mform->display();
+        echo $OUTPUT->footer();
+    }
 }
