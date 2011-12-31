@@ -597,6 +597,15 @@ function get_course_alert_links($courseid){
 
 
 
+
+/**
+* Generate the alert links for a course
+* @param $courseid id of the course
+* @param $alerticon create the alert icon (using new pix_icon)
+* @param $alertaction create the action of the alert (usually $OUTPUT->action_icon($alertsurl,$alertaction) 
+* @return hyperlink with number of existing alerts
+* Example: Manage Alerts (3)
+*/
 function get_alerts_link($courseid, $alerticon, $alertaction){
     global $CFG, $DB;
     //getnumalerts from $courseid

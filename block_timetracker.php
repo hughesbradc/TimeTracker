@@ -94,8 +94,6 @@
                 $alertsurl = new moodle_url($baseurl.'/managealerts.php', $indexparams);
                 $alerticon= new pix_icon('alert','Manage Alerts', 'block_timetracker');
                 $alertaction= $OUTPUT->action_icon($alertsurl, $alerticon);
-                //$this->content->text .= $alertaction.' <a href="'.$alertsurl.
-                //    '" style="color: red">Manage worker alerts</a><br /><br />';
                 $this->content->text .= get_alerts_link($COURSE->id, $alerticon, $alertaction);
             }
 
