@@ -145,16 +145,12 @@ class timetracker_timesheet_form  extends moodleform {
         $buttonarray=array();
         $buttonarray[] = &$mform->createElement('submit', 
             'unofficial', 'Generate paper timesheet');
-        $buttonarray[] = &$mform->createElement('submit',
-            'official', 'Sign official timesheet');
 
         //only let workers begin the official timesheet data submission process
-        /*
         if(!$canmanage){ 
             $buttonarray[] = &$mform->createElement('submit', 'official', 
                 'Submit official timesheet');
         } 
-        */
         //$buttonarray[] = &$mform->createElement('cancel');
 
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);

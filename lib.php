@@ -651,8 +651,8 @@ function get_timesheet_link($courseid, $timesheetsicon, $timesheetsaction){
     $urlparams['id'] = $courseid;
     $baseurl = $CFG->wwwroot.'/blocks/timetracker';
     $url = new moodle_url($baseurl.'/supervisorsig.php', $urlparams);
-    $text = $timesheetsaction.' <a href="'.$url. 'style="color: red">View
-        Timesheets '.$numts.'</a><br /><br />';
+    $text = $timesheetsaction.' <a href="'.$url. 'style="color: red">
+        Sign Timesheets '.$numts.'</a><br /><br />';
 
     return $text;
 }

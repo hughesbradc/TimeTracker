@@ -56,6 +56,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 
 echo $OUTPUT->header();
 
+//start here, using $mform->addElement... 
 echo '
 <style type="text/css">
 
@@ -122,7 +123,7 @@ foreach($pages as $page){
     echo $page;
     echo "\n\n\n";
 }
-
+//stop here
 //echo '</div>';
 
 

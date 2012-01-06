@@ -355,3 +355,4 @@ $string['clicktosign'] = 'Click here to sign:';
 $string['supsignerror'] = '<B>ERROR: A supervisor cannot sign a student\'s timesheet.</B>';
 $string['notstosign'] = '<b><center>There are no timesheets requiring your signature
     at this time.</center></b>';
+$string['signtsheading'] = 'Sign Timesheet';
