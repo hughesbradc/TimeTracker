@@ -104,6 +104,97 @@ function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, 
 }
 
 /**
+* If any units straddle the $start or $end boundary, split them into multiple units
+* Only consider units that have NOT been submitted (submitted==0)
+*/
+function split_boundary_units($start, $end, $userid, $courseid){
+    global $DB, $CFG;
+
+    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        'userid = '.$userid.' AND courseid = '.$courseid.' AND submitted=0'.
+        'timein < '.$start.' AND timeout > '.$start;
+
+    $startunits = $DB->get_records_sql($sql);
+
+    if($startunits){
+        //if there are some (only should be 1, right?)
+        //split them up to timein->$start and $start->timeout
+        foreach($startunits as $unit){
+            $origid = $unit->id;
+            $timeout = $unit->timeout; 
+            $timein = $unit->timein;
+
+            unset($unit->id); 
+            $unit->timeout = $start;
+
+            $result = $DB->insert_record('block_timetracker_workunit', $unit);
+
+            if(!$result) {
+                print_error("Error splitting boundary work unit");
+                return;
+            }
+            
+            unset($unit->id);
+            $unit->timein = $start;
+            $unit->timeout = $timeout;
+            
+            $result = $DB->insert_record('block_timetracker_workunit', $unit);
+
+            if(!$result) {
+                print_error("Error splitting boundary work unit");
+                return;
+            }
+
+            //delete the original
+            $DB->delete_record('block_timetracker_workunit', array('id'=>$origid));
+            //TODO update workunit history here?
+        }
+    }
+
+    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
+        'userid = '.$userid.' AND courseid = '.$courseid.' AND submitted=0'.
+        'timein >= '.$start.' AND timeout > '.$end;
+
+    $endunits = $DB->get_records_sql($sql);
+
+    if($endunits){
+        //if there are some (only should be 1, right?)
+        //split them up to timein->$end and $end->timeout
+        foreach($endunits as $unit){
+            $origid = $unit->id;
+            $timeout = $unit->timeout; 
+            $timein = $unit->timein;
+
+            unset($unit->id); 
+            $unit->timeout = $start;
+
+            $result = $DB->insert_record('block_timetracker_workunit', $unit);
+
+            if(!$result) {
+                print_error("Error splitting boundary work unit");
+                return;
+            }
+            
+            unset($unit->id);
+            $unit->timein = $start;
+            $unit->timeout = $timeout;
+            
+            $result = $DB->insert_record('block_timetracker_workunit', $unit);
+
+            if(!$result) {
+                print_error("Error splitting boundary work unit");
+                return;
+            }
+
+            //delete the original
+            $DB->delete_record('block_timetracker_workunit', array('id'=>$origid));
+            //TODO update workunit history here?
+        }
+    }
+
+}
+
+/**
 * Given a $unit (full of workunit table data), return an array of $unit objects
 * That are split across the day boundary
 * TO NOTE: Units that are split up have a 'partial' property that is set to True.
@@ -631,6 +722,7 @@ function get_earnings($userid, $courseid, $start, $end, $processovt=1){
     $info = break_down_earnings($units, $processovt);
     return $info['earnings'];
 }
+
 
 /**
 * Break down earnings into reghours, regearnings, ovthours, ovtearnings,hours,earnings
