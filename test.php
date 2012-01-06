@@ -111,7 +111,7 @@ span.seven{
 </style>
 ';
 
-$pages = generate_html(1320120000, time(), 4, 112, 'I','',1);
+$pages = generate_html(1320120000, time(), 4, 112,1);
 
 foreach($pages as $page){
     $page = str_replace('<font size="13">', '<span class="thirteen">',$page);
