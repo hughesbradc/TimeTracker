@@ -52,13 +52,14 @@ function generate_pdf_from_timesheetid($timesheetid, $userid, $courseid, $method
         print_error('invalidtimesheetid', 'block_timetracker', 
             $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
     }
+
 }
 
 function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='', $timesheetid=-1){
 
     global $CFG,$DB;
 
-    $htmlpages = generate_html($start, $end, $userid, $courseid, $method, $base,$timesheetid);
+    $htmlpages = generate_html($start, $end, $userid, $courseid, $timesheetid);
     // Collect Data
     $conf = get_timetracker_config($courseid);
 
@@ -76,12 +77,16 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
     // ********** BEGIN PDF ********** //
     // Create new PDF
     $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+    $fn = $year.'_'.($month<10?'0'.$month:$month).'Timesheet_'.
+        substr($workerrecord->firstname,0,1).
+        $workerrecord->lastname. '_'.$workerrecord->mdluserid;
     
     // Set Document Data
     $pdf->setCreator(PDF_CREATOR);
     $pdf->SetFont('helvetica', '', 8);
     $pdf->SetCellPadding(0);
-    //$pdf->SetTitle('Timesheet_'.$monthinfo['monthname'].'_'.$year);
+    $pdf->SetTitle($fn);
     $pdf->SetAuthor('TimeTracker');
     $pdf->SetSubject(' ');
     $pdf->SetKeywords(' ');
@@ -96,9 +101,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
     }
     
     //create the filename
-    $fn = $year.'_'.($month<10?'0'.$month:$month).'Timesheet_'.
-        substr($workerrecord->firstname,0,1).
-        $workerrecord->lastname. '_'.$workerrecord->mdluserid.'.pdf';
+    $fn .= '.pdf';
 
 
     //Close and Output PDF document
@@ -111,7 +114,7 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I', $base='',
 /**
     @return an array of HTML pages used for printing - one page per array item
 */
-function generate_html($start, $end, $userid, $courseid, $method = 'I', $base='', $timesheetid=-1){
+function generate_html($start, $end, $userid, $courseid, $timesheetid=-1){
     global $CFG,$DB;
 
     $pages = array();
@@ -235,7 +238,8 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
             }
         
             do {
-                $days[] = '<td class="calendar" style="height: 10px" align="center"><b>'.$date.'</b></td>';
+                $days[] = '<td class="calendar" style="height: 10px" align="center"><b>'.
+                    $date.'</b></td>';
 
                 //begin of print work units
                 
@@ -255,7 +259,13 @@ function generate_html($start, $end, $userid, $courseid, $method = 'I', $base=''
                                 get_string('timeformat','block_timetracker'));
 
                             //FIXMEFIXME!
-                            if(($unit->timeout - $unit->timein) > 449){ //WHAT IF NOT ROUNDED?
+                            if(array_key_exists('round', $conf) && $conf['round'] > 0)
+                                $factor = ($conf['round']/2)-1;
+                            else
+                                $factor = 0;
+
+                            if(($unit->timeout - $unit->timein) > $factor){ 
+                                //WHAT IF NOT ROUNDED?
                                 $wustr .= "In: $in<br />Out: $out<br />";
 
                                 $hours = get_hours($unit->timeout - $unit->timein,
