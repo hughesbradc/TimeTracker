@@ -686,6 +686,70 @@ function get_course_alert_links($courseid){
     return $alertlinks;
 }
 
+
+
+
+/**
+* Generate the alert links for a course
+* @param $courseid id of the course
+* @param $alerticon create the alert icon (using new pix_icon)
+* @param $alertaction create the action of the alert (usually $OUTPUT->action_icon($alertsurl,$alertaction) 
+* @return hyperlink with number of existing alerts
+* Example: Manage Alerts (3)
+*/
+function get_alerts_link($courseid, $alerticon, $alertaction){
+    global $CFG, $DB;
+    //getnumalerts from $courseid
+    $numalerts = '';
+    $n = has_course_alerts($courseid);
+    if($n > 0){
+        $numalerts = '('.$n.')';
+    }
+    
+    $urlparams['id'] = $courseid;
+    $baseurl = $CFG->wwwroot.'/blocks/timetracker';
+    $url = new moodle_url($baseurl.'/managealerts.php', $urlparams);
+    $text = $alertaction.' <a href="'.$url. 'style="color: red">Manage Alerts '.$numalerts.'</a><br />';
+
+    return $text;
+}
+
+/**
+* Determine if the course has alerts waiting
+* @param $courseid id of the course
+* @return 0 if no alerts are pending, # of alerts if they exist.
+*/
+function has_unsigned_timesheets($courseid){
+    global $CFG, $DB;
+    //check the timesheet table to see if there are any unsigned timesheets:
+    $sql = 'SELECT COUNT(*) FROM '.
+        $CFG->prefix.'block_timetracker_timesheet'.
+        ' WHERE courseid='.$courseid.' & supervisorsignature=0 ORDER BY submitted';
+    $numtimesheets = $DB->count_records_sql($sql);
+    return $numtimesheets;
+
+}
+
+function get_timesheet_link($courseid, $timesheetsicon, $timesheetsaction){
+    global $CFG, $DB;
+    //getnumalerts from $courseid
+    $numts = '';
+    $n = has_unsigned_timesheets($courseid);
+    if($n > 0){
+        $numts = '('.$n.')';
+    }
+    
+    $urlparams['id'] = $courseid;
+    $baseurl = $CFG->wwwroot.'/blocks/timetracker';
+    $url = new moodle_url($baseurl.'/supervisorsig.php', $urlparams);
+    $text = $timesheetsaction.' <a href="'.$url. 'style="color: red">View
+        Timesheets '.$numts.'</a><br /><br />';
+
+    return $text;
+}
+
+
+
 /**
 * Calculate Total Hours
 * @param $workerunits is an array, each $subunit has $subunit->timein and $subunit->timeout
