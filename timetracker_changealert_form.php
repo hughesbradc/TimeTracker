@@ -118,10 +118,6 @@ class timetracker_changealert_form extends moodleform {
             $errors['timeout'] = 'Time cannot be set in the future.';
         } else if($data['timein'] > $data['timeout']){
             $errors['timein'] = 'Time out cannot be set before time in.';
-        } else if(!has_capability('block/timetracker:manageoldunits', $this->context) && 
-            expired($data['timein'])){
-            $errors['timein'] = 'You are not authorized to add work units this far in the
-            past. See an administrator for assistance';
         } else {
 
             $conflicts = find_conflicts($data['timein'],$data['timeout'],$data['userid']);
