@@ -45,11 +45,6 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $urlparams['userid']=0;
 }
 
-$canmanageold = false;
-if (has_capability('block/timetracker:manageoldunits', $context)){
-    $canmanageold = true;
-}
-
 $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id, 
     'courseid'=>$course->id));
 
@@ -89,6 +84,7 @@ print_tabs($tabs, 'home');
 
 
 if ($canmanage) { //supervisor
+    /*
     echo $OUTPUT->box_start('generalbox boxaligncenter');
     echo '<h2>Welcome, ' .$USER->firstname .'!</h2>'; 
     echo '<br />Below you will find the last 10 work units by your employees 
@@ -146,7 +142,7 @@ if ($canmanage) { //supervisor
                 $urlparams['unitid'] = $unit->id;
                 
                 $unitdateinfo = usergetdate($unit->timein);
-                if(!$canmanageold && expired($unit->timein, $now)){
+                if(!$unit->canedit){
 
                     //show greyed out icons and no URL
                     
@@ -181,6 +177,7 @@ if ($canmanage) { //supervisor
     }
     echo '</table>';
     echo $OUTPUT->box_end();
+    */
 
 
     //now print out roster
@@ -394,57 +391,6 @@ if ($canmanage) { //supervisor
     } else {
         //show clock in?
 
-    }
-
-    if($userUnits){
-
-        echo $OUTPUT->box_start('generalbox boxaligncenter');
-        echo '<h2>Last 10 Work Units</h2>';
-        $table = new flexible_table('timetracker-display-worker-index');
-    
-        $table->define_columns(array('timein', 'timeout', 'elapsed', 'action'));
-        $table->define_headers(array('Time in', 'Time out', 'Elapsed', 'Action'));
-        $table->define_baseurl($CFG->wwwroot.'/blocks/timetracker/index.php');
-        
-        $table->set_attribute('cellspacing', '0');
-        //$table->set_attribute('width', '95%');
-        $table->set_attribute('class', 'generaltable generalbox');
-
-        $table->setup();
-
-        //TODO Look at this for spanning?
-        foreach ($userUnits as $unit){
-            
-            $unitdateinfo = usergetdate($unit->timein);
-            if(!$canmanageold && expired($unit->timein, $now)){
-                
-                //show greyed out icons and no URL
-                $alertaction = 
-                    html_writer::empty_tag('img', 
-                    array('src' => 
-                    $CFG->wwwroot.'/blocks/timetracker/pix/alert_bw.gif', 
-                    'class' => 'icon'));
-            }else {
-                $urlparams['unitid'] = $unit->id;
-                $alertlink= new moodle_url($CFG->wwwroot.'/blocks/timetracker/alert.php', 
-                    $urlparams);
-                $alerticon= new pix_icon('alert',
-                    'Alert Supervisor of Error','block_timetracker');
-                $alertaction= $OUTPUT->action_icon($alertlink, $alerticon);        
-            }
-
-            $table->add_data(array(
-                userdate($unit->timein, get_string('datetimeformat','block_timetracker')),
-                userdate($unit->timeout, get_string('datetimeformat','block_timetracker')),
-                get_hours($unit->timeout - $unit->timein, $courseid).' hour(s)',
-                $alertaction));
-
-        }
-        unset($urlparams['unitid']);
-
-        $table->print_html();
-
-        echo $OUTPUT->box_end();
     }
 }
 
