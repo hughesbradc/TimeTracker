@@ -22,12 +22,25 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once($CFG->libdir . '/tablelib.php');
-require_once('lib.php');
-require_once('timesheet_pdf.php');
+//require_once($CFG->libdir . '/tablelib.php');
+//require_once('lib.php');
+//require_once('timesheet_pdf.php');
 
-require_login();
+//require_login();
 
+
+$courses = get_courses(4, 'fullname ASC', 'c.id,c.shortname');
+
+if($courses){
+
+    $sql = 'SELECT * from mdl_block_timetracker_timesheet where courseid in (';
+    $list = implode(",", array_keys($courses));    
+    $sql .= $list.')';
+    echo $sql;
+}
+
+
+/*
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = optional_param('userid',$USER->id, PARAM_INTEGER);
 
@@ -124,6 +137,7 @@ foreach($pages as $page){
 }
 
 //echo '</div>';
+*/
 
 
-echo $OUTPUT->footer();
+//echo $OUTPUT->footer();
