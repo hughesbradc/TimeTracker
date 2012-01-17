@@ -31,6 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 * Question about this is whethere we should look at timein
 * or timeout, now that we're not splitting up work units
 * before adding them to the db TODO
+* @deprecated as of v2011123100
 */
 function expired($timein, $now = -1){
     if($now == -1) $now = time();
@@ -491,6 +492,7 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet.php',
         $urlparams), 'Timesheets');
 
+    
     $numalerts = '';
     if($canmanage){
         $manageurl = 
@@ -722,10 +724,9 @@ function get_alerts_link($courseid, $alerticon, $alertaction){
 function has_unsigned_timesheets($courseid){
     global $CFG, $DB;
     //check the timesheet table to see if there are any unsigned timesheets:
-    $sql = 'SELECT COUNT(*) FROM '.
-        $CFG->prefix.'block_timetracker_timesheet'.
-        ' WHERE courseid='.$courseid.' & supervisorsignature=0 ORDER BY submitted';
-    $numtimesheets = $DB->count_records_sql($sql);
+    $numtimesheets = $DB->count_records('block_timetracker_timesheet',
+        array('courseid'=>$courseid,
+        'supervisorsignature'=>0));
     return $numtimesheets;
 
 }
@@ -738,7 +739,7 @@ function get_timesheet_link($courseid, $timesheetsicon, $timesheetsaction){
     if($n > 0){
         $numts = '('.$n.')';
     }
-    
+
     $urlparams['id'] = $courseid;
     $baseurl = $CFG->wwwroot.'/blocks/timetracker';
     $url = new moodle_url($baseurl.'/supervisorsig.php', $urlparams);
