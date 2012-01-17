@@ -55,8 +55,8 @@ function xmldb_block_timetracker_upgrade($oldversion) {
             XMLDB_NOTNULL, null, '0');
         $table->add_field('supervisorsignature', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
             XMLDB_NOTNULL, null, '0');
-        $table->add_field('supermdlid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null,
-            null, null);
+        $table->add_field('supermdlid', XMLDB_TYPE_INTEGER, '10', null, null,
+            null, -1, 'supervisorsignature');
         $table->add_field('transactionid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
             XMLDB_NOTNULL, null, '0');
         $table->add_field('reghours', XMLDB_TYPE_NUMBER, '10, 2', XMLDB_UNSIGNED,
