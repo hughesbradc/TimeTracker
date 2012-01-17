@@ -156,6 +156,11 @@ if($mform->is_cancelled()){
     $tabs = get_tabs($urlparams, $canmanage, $courseid);
     $tabs = array($tabs);
 
+    $timesheetsub = array();
+    $timesheetsub[] = new tabobject('submittedts', "#", 'Submitted Timesheets');
+    $timesheetsub[] = new tabobject('pending', "#", 'Pending Timesheets');
+    $tabs[] = $timesheetsub;
+
 
     print_tabs($tabs, 'timesheets');
 
