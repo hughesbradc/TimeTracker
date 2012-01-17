@@ -30,6 +30,8 @@ require_login();
 
 $courseid = required_param('id', PARAM_INTEGER);
 $userid = required_param('userid', PARAM_INTEGER);
+$start = required_param('start', PARAM_INT);
+$end = required_param('end', PARAM_INT);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
@@ -50,8 +52,9 @@ $PAGE->set_url(new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/workersig.php',$urlparams));
 $PAGE->set_pagelayout('base');
 
-$strtitle = get_string('timesheet','block_timetracker'); 
+$strtitle = get_string('signtsheading','block_timetracker'); 
 $PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
 $PAGE->set_pagelayout('base');
 
 $PAGE->navbar->add(get_string('blocks'));
@@ -67,19 +70,48 @@ if(!$worker){
     print_error('notpermissible','block_timetracker',
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$courseid);
 } else {
-    $mform = new timetracker_workersig_form($courseid, $userid);
+    $mform = new timetracker_workersig_form($courseid, $userid, $start, $end);
 
     if ($mform->is_cancelled()){ //user clicked cancel
         //redirect($nextpage);
         redirect($index, $urlparams);
 
     } else if ($formdata=$mform->get_data()){
-    
-        $indexparams['userid'] = $ttuserid;
-        $indexparams['id'] = $courseid;
-        $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
-    
-        //redirect($nextpage);
+       /*
+        Look for units that straddle the pay period boundary
+        TODO Check for course conflicts against submitted work units
+        Create timesheet entry
+        Assign all of the work units the timesheet id
+        Set all of the work units canedit=0
+       */
+        
+        split_boundary_units($start, $end, $userid, $courseid);
+       
+        $units = $DB->get_records_select('block_timetracker_workunit','timein BETWEEN '.$start.' AND '.
+            $end.' AND timeout BETWEEN '.$start .' AND '.$end, 
+            array('userid'=>$userid, 'courseid'=>$courseid,'submitted'=>0));
+
+        $earnings = break_down_earnings($units);
+
+        //Create entry in timesheet table
+        $newtimesheet = new stdClass();
+        $newtimesheet->userid = $userid;
+        $newtimesheet->courseid = $courseid;
+        $newtimesheet->submitted = time();
+        $newtimesheet->workersignature = time();
+        $newtimesheet->reghours = $earnings['reghours'];
+        $newtimesheet->regpay = $earnings['regpay'];
+        $newtimesheet->othours = $earnings['othours'];
+        $newtimesheet->otpay = $earnings['otpay'];
+       
+        $timesheetid = $DB->insert_record('block_timetracker_timesheet', $newtimesheet);
+            
+        foreach ($units as $unit){
+            $unit->timesheetid = $timesheetid; 
+            $unit->canedit = 0;
+            $DB->update_record('block_timetracker_workunit', $unit);    
+        }
+        
     
     } else {
         //form is shown for the first time

@@ -101,6 +101,15 @@ if($mform->is_cancelled()){
         } else {
 	        $uid = $formdata->workerid;
         }
+        if($official){
+            $urlparams['id'] = $formdata->id;
+            $urlparams['userid'] = $formdata->workerid;
+            $urlparams['start'] = $start;
+            $urlparams['end'] = $end;
+            $workersigpage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/workersig.php',$urlparams);
+            redirect($workersigpage);
+        }
+        
         if($format == 'pdf'){
             generate_pdf($start, $end, $uid, $cid);
         } else {

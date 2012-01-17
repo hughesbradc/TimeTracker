@@ -53,6 +53,7 @@ $PAGE->set_pagelayout('base');
 
 $strtitle = get_string('signheader','block_timetracker'); 
 $PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
 $PAGE->set_pagelayout('base');
 
 $PAGE->navbar->add(get_string('blocks'));

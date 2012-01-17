@@ -69,6 +69,7 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
 
 echo $OUTPUT->header();
 
+//start here, using $mform->addElement... 
 echo '
 <style type="text/css">
 
@@ -123,7 +124,7 @@ span.seven{
 </style>
 ';
 
-$pages = generate_html(1320120000, time(), 4, 112, 'I','',1);
+$pages = generate_html(1320120000, time(), 4, 112,1);
 
 foreach($pages as $page){
     $page = str_replace('<font size="13">', '<span class="thirteen">',$page);
@@ -135,7 +136,7 @@ foreach($pages as $page){
     echo $page;
     echo "\n\n\n";
 }
-
+//stop here
 //echo '</div>';
 */
 
