@@ -193,12 +193,6 @@ class timetracker_alert_form  extends moodleform {
                 break;
             }
         }
-        $expired = false;
-        if(!has_capability('block/timetracker:manageoldunits', $this->context) && 
-            expired($data['timeinerror'])){
-            $expired = true;            
-        }
-
 
         //if it gets here, we had no teachers selected. Use the first teacherid value to
         //place the error
@@ -212,12 +206,7 @@ class timetracker_alert_form  extends moodleform {
             return $errors;  
         }
 
-        if(!has_capability('block/timetracker:manageoldunits', $this->context) && 
-            $expired){
-            //error_log(expired($data['timein']));
-            $errors['timeinerror'] = 'You are not authorized to add work units this far in the
-            past. See an administrator for assistance';
-        } else if($data['timeinerror'] > time()){
+        if($data['timeinerror'] > time()){
             $errors['timeinerror'] = 'Time cannot be set in the future.';
         } else if($data['timeinerror'] > $data['timeouterror']){
             $errors['timeinerror'] = 'Your time out cannot be before your time in.';
