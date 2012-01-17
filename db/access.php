@@ -41,7 +41,7 @@ $capabilities = array(
         )
     ),
 
-    'block/timetracker:manageoldunits' => array(
+    'block/timetracker:manageid' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
