@@ -45,7 +45,9 @@ class timetracker_workersig_form extends moodleform {
             get_string('timesheet','block_timetracker'));
 
         $mform->addElement('hidden','userid',$this->userid);
-        $mform->addElement('hidden','courseid',$this->courseid);
+        $mform->addElement('hidden','id',$this->courseid);
+        $mform->addElement('hidden','start',$this->start);
+        $mform->addElement('hidden','end',$this->end);
 
         $mform->addElement('html', get_string('workerstatement','block_timetracker'));
         $mform->addElement('checkbox','workersig',get_string('clicktosign','block_timetracker'));

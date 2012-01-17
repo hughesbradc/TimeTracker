@@ -79,7 +79,22 @@ if(!$workers){
         $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
     
         //redirect($nextpage);
-    
+
+        /*
+         * Set supervisorsignature in timesheet table 
+         * Set supermdlid in timesheet table
+         */
+        
+        $timesheets = $DB->get_records('block_timetracker_timesheet',
+            array('courseid'=>$COURSE->id, 'supervisorsignature'=>0));
+
+        foreach($timesheets as $timesheet){
+            $timesheet->supervisorsignature = time();
+            $timesheet->supermdlid = $USER->id;
+            $DB->update_record('block_timetracker_timesheet',$timesheet);
+        }
+        
+
     } else {
         //form is shown for the first time
         echo $OUTPUT->header();

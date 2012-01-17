@@ -111,7 +111,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
     global $DB, $CFG;
 
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        'userid = '.$userid.' AND courseid = '.$courseid.' AND submitted=0'.
+        'userid = '.$userid.' AND courseid = '.$courseid.' AND submitted=0 AND '.
         'timein < '.$start.' AND timeout > '.$start;
 
     $startunits = $DB->get_records_sql($sql);
@@ -152,7 +152,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
     }
 
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        'userid = '.$userid.' AND courseid = '.$courseid.' AND submitted=0'.
+        'userid = '.$userid.' AND courseid = '.$courseid.' AND submitted=0 AND '.
         'timein >= '.$start.' AND timeout > '.$end;
 
     $endunits = $DB->get_records_sql($sql);

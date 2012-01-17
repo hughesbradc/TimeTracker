@@ -87,31 +87,37 @@ if(!$worker){
         
         split_boundary_units($start, $end, $userid, $courseid);
        
-        $units = $DB->get_records_select('block_timetracker_workunit','timein BETWEEN '.$start.' AND '.
-            $end.' AND timeout BETWEEN '.$start .' AND '.$end, 
-            array('userid'=>$userid, 'courseid'=>$courseid,'submitted'=>0));
-
-        $earnings = break_down_earnings($units);
-
-        //Create entry in timesheet table
-        $newtimesheet = new stdClass();
-        $newtimesheet->userid = $userid;
-        $newtimesheet->courseid = $courseid;
-        $newtimesheet->submitted = time();
-        $newtimesheet->workersignature = time();
-        $newtimesheet->reghours = $earnings['reghours'];
-        $newtimesheet->regpay = $earnings['regpay'];
-        $newtimesheet->othours = $earnings['othours'];
-        $newtimesheet->otpay = $earnings['otpay'];
-       
-        $timesheetid = $DB->insert_record('block_timetracker_timesheet', $newtimesheet);
-            
-        foreach ($units as $unit){
-            $unit->timesheetid = $timesheetid; 
-            $unit->canedit = 0;
-            $DB->update_record('block_timetracker_workunit', $unit);    
-        }
+        $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE timein BETWEEN '.
+            $start.' AND '.$end.' AND timeout BETWEEN '.$start.' AND '.$end.' AND userid='.
+            $userid.' AND courseid='.$courseid.' AND submitted=0';
         
+        $units = $DB->get_records_sql($sql);
+        
+        if($units){
+
+            $earnings = break_down_earnings($units);
+            
+            //Create entry in timesheet table
+            $newtimesheet = new stdClass();
+            $newtimesheet->userid = $userid;
+            $newtimesheet->courseid = $courseid;
+            $newtimesheet->workersignature = time();
+            $newtimesheet->reghours = $earnings['reghours'];
+            $newtimesheet->regpay = $earnings['regearnings'];
+            $newtimesheet->othours = $earnings['ovthours'];
+            $newtimesheet->otpay = $earnings['ovtearnings'];
+        
+            $timesheetid = $DB->insert_record('block_timetracker_timesheet', $newtimesheet);
+                
+            foreach ($units as $unit){
+                $unit->timesheetid = $timesheetid; 
+                $unit->canedit = 0;
+                $unit->submitted = 1;
+                $DB->update_record('block_timetracker_workunit', $unit);    
+            }
+        } else {
+
+        }
     
     } else {
         //form is shown for the first time
