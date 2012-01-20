@@ -9,6 +9,9 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
+$MONTH = 12;
+$YEAR = 2011;
+
 $courses = get_courses(2, 'fullname ASC', 'c.id, c.shortname');
 //find all workers
 
@@ -25,7 +28,7 @@ foreach($courses as $course){
         $course = $courses[$worker->courseid];
         if(!$course) continue;
     
-        $earnings = get_hours_this_month($worker->id, $worker->courseid, 9, 2011);
+        $earnings = get_hours_this_month($worker->id, $worker->courseid, $MONTH, $YEAR);
         //$earnings = get_earnings_this_term($worker->id, $worker->courseid);
         
         //$course = $DB->get_record('course', array('id'=>$worker->courseid));
