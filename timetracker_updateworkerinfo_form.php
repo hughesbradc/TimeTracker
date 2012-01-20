@@ -109,20 +109,28 @@ class timetracker_updateworkerinfo_form extends moodleform {
         $mform->addElement('text','firstname',
             get_string('firstname','block_timetracker'), $opstring);
         $mform->setDefault('firstname',$worker->firstname);
+        $mform->addRule('firstname', 'First name is a required field', 
+            'required', null, 'server', 'false');
 		$mform->addHelpButton('firstname','firstname','block_timetracker');
 
         $mform->addElement('text','lastname',
             get_string('lastname','block_timetracker'), $opstring);
         $mform->setDefault('lastname',$worker->lastname);
+        $mform->addRule('lastname', 'Last name is a required field', 
+            'required', null, 'server', 'false');
 		$mform->addHelpButton('lastname','lastname','block_timetracker');
         
         $mform->addElement('text','email',get_string('email','block_timetracker'), $opstring);
         $mform->setDefault('email',$worker->email);
+        $mform->addRule('email', 'Email is a required field', 
+            'required', null, 'server', 'false');
 		$mform->addHelpButton('email','email','block_timetracker');
 
         $mform->addElement('text','idnum',get_string('idnum','block_timetracker'),
             $opstring);
         $mform->setDefault('idnum',$idnum);
+        $mform->addRule('idnum', 'ID is a required field', 
+            'required', null, 'server', 'false');
         $mform->addHelpButton('idnum','idnum','block_timetracker');
         
         $mform->addElement('text','address',get_string('address','block_timetracker'));
@@ -144,6 +152,10 @@ class timetracker_updateworkerinfo_form extends moodleform {
 
         $mform->addElement('text','currpayrate',
             get_string('currpayrate','block_timetracker'), $opstring2);
+        $mform->addRule('currpayrate', 'Pay rate is a required field', 
+            'required', null, 'server', 'false');
+        $mform->addRule('currpayrate', 'Pay rate is a required field', 
+            'numeric', null, 'server', 'false');
         $mform->setDefault('currpayrate',$payrate);
 		$mform->addHelpButton('currpayrate','currpayrate','block_timetracker');
 
