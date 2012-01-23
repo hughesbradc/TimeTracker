@@ -94,7 +94,11 @@ if(!$workers){
             $DB->update_record('block_timetracker_timesheet',$timesheet);
         }
         
-
+        $redirectparams['id'] = $courseid;
+        $redirecturl = new moodle_url('/blocks/timetracker/index.php?', $redirectparams);
+        $status = 'You have successfully signed the selected timesheet(s).';
+        redirect($redirecturl, $status, 2);
+    
     } else {
         //form is shown for the first time
         echo $OUTPUT->header();

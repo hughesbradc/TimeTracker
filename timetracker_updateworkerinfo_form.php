@@ -75,7 +75,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $budget= $config['budget'];
             $institution= $config['institution'];
             $supname= $config['supname'];
-            $3dnum = $USER->username;
+            $idnum = $USER->username;
 
         } else {
             $idnum = $worker->idnum;

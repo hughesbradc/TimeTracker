@@ -101,6 +101,7 @@ if(!$worker){
             $newtimesheet = new stdClass();
             $newtimesheet->userid = $userid;
             $newtimesheet->courseid = $courseid;
+            $newtimesheet->submitted = 0;
             $newtimesheet->workersignature = time();
             $newtimesheet->reghours = $earnings['reghours'];
             $newtimesheet->regpay = $earnings['regearnings'];
@@ -116,9 +117,12 @@ if(!$worker){
                 $DB->update_record('block_timetracker_workunit', $unit);    
             }
         } else {
-
+            print_error('nounits','block_timetracker');
         }
-    
+        $redirectparams['id'] = $courseid;
+        $redirecturl = new moodle_url('/blocks/timetracker/index.php?', $redirectparams);
+        $status = 'You have successfully signed the official timesheet.';
+        redirect($redirecturl, $status, 2);
     } else {
         //form is shown for the first time
         echo $OUTPUT->header();
