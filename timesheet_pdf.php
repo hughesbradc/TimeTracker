@@ -247,7 +247,7 @@ function generate_html($start, $end, $userid, $courseid, $timesheetid=-1){
 
         
             do {
-                error_log($dayofweek.' '.$date);
+                //error_log($dayofweek.' '.$date);
                 $days[] = '<td class="calendar" style="height: 10px" align="center"><b>'.
                     $date.'</b></td>';
 
