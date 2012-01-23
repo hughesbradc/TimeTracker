@@ -79,7 +79,7 @@ $tabs = array($maintabs);
 print_tabs($tabs, 'manage');
 
 if(!$canmanage && $USER->id != $userinfo->mdluserid){
-
+    print_error('notpermissible','block_timetracker');
 } else {
 
     $totalcount = $DB->count_records('block_timetracker_timesheet',array('userid'=>$userid));
