@@ -64,7 +64,7 @@ function expired($timein, $now = -1){
 *
 * @return an array of objects, each having all the properties of a workunit
 */
-function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, $sort='ASC', $submitted){
+function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, $sort='ASC', $submitted=-1){
     global $CFG, $DB;
 
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
