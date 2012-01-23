@@ -159,10 +159,8 @@ class timetracker_timesheet_form  extends moodleform {
 
     function validation($data){
         $errors = array();
-
+        
         if(!isset($data['entiremonth'])){
-            $monthinfo = get_month_info($data['month'], $data['year']); 
-            
             if($data['endday'] < $data['startday']){
                 $errors['startday'] = 'Start day cannot be after end day';
             }
