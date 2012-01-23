@@ -356,3 +356,12 @@ $string['supsignerror'] = '<B>ERROR: A supervisor cannot sign a student\'s times
 $string['notstosign'] = '<b><center>There are no timesheets requiring your signature
     at this time.</center></b>';
 $string['signtsheading'] = 'Sign Timesheet';
+$string['rejectts'] = 'Reject Timesheet';
+$string['nocourseserror'] = 'There are no courses in this category.';
+$string['noworkerserror'] = 'There are no workers enrolled in this course.';
+$string['nounits'] = 'ERROR: There are no units to be signed.'; 
+
+
+//Deny Official Timesheet Strings
+$string['rejecttstitle'] = 'Reject Official Timesheet';
+$string['tssubject'] = 'TimetTracker Official Timesheet Denied for {$a}';

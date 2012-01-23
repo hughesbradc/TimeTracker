@@ -45,7 +45,9 @@ class timetracker_workersig_form extends moodleform {
             get_string('timesheet','block_timetracker'));
 
         $mform->addElement('hidden','userid',$this->userid);
-        $mform->addElement('hidden','courseid',$this->courseid);
+        $mform->addElement('hidden','id',$this->courseid);
+        $mform->addElement('hidden','start',$this->start);
+        $mform->addElement('hidden','end',$this->end);
 
         $mform->addElement('html', get_string('workerstatement','block_timetracker'));
         $mform->addElement('checkbox','workersig',get_string('clicktosign','block_timetracker'));
@@ -53,7 +55,8 @@ class timetracker_workersig_form extends moodleform {
         $buttonarray=array();
         $buttonarray[] = &$mform->createElement('submit',
             'signbutton',get_string('signbutton','block_timetracker'),
-            array('onclick'=>'return confirm("Message")'));
+            array('onclick'=>'return confirm("Are you sure you wish to submit the work units during
+                this range?  Doing so may split units in a way that cannot be undone.")'));
         $mform->addGroup($buttonarray, 'buttonar','',array(' '), false);
         
         $mform->disabledIf('buttonar','workersig');
