@@ -104,17 +104,15 @@ class timetracker_transaction_form extends moodleform {
                 } else {
                     $last = $first;
                 }
-                $editparams['id'] = $timesheet->courseid;
-                $editparams['userid'] = $worker->id;
-                //$editparams['repstart'] = $first->timein;
-                //$editparams['repend'] = $last->timeout;
-                $editurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $editparams);
-                $editicon = new pix_icon('date_edit', get_string('edit'),'block_timetracker');
-                $editaction = $OUTPUT->action_icon($editurl, $editicon,
+                $rejectparams['id'] = $timesheet->courseid;
+                $rejectparams['userid'] = $worker->id;
+                $rejecturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheetreject.php', $rejectparams);
+                $rejecticon = new pix_icon('delete', get_string('reject'),'block_timetracker');
+                $rejectaction = $OUTPUT->action_icon($rejecturl, $rejecticon,
                     new confirm_action(get_string('rejectts','block_timetracker')));
                 $mform->addElement('html',$viewaction);
                 $mform->addElement('html',' ');
-                $mform->addElement('html',$editaction);
+                $mform->addElement('html',$rejectaction);
                 $mform->addElement('html','</tr>');
             }
 

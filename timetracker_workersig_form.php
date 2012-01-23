@@ -115,7 +115,7 @@ class timetracker_workersig_form extends moodleform {
             
             </style>');
             
-            $pages = generate_html($this->start, $this->end, $this->userid, $this->courseid);
+            $pages = generate_html($this->start, $this->end, $this->userid, $this->courseid,0);
             
             foreach($pages as $page){
                 $page = str_replace('<font size="13">', '<span class="thirteen">',$page);
