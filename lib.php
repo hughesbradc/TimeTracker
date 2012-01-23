@@ -147,7 +147,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
             }
 
             //delete the original
-            $DB->delete_record('block_timetracker_workunit', array('id'=>$origid));
+            $DB->delete_records('block_timetracker_workunit', array('id'=>$origid));
             //TODO update workunit history here?
         }
     }
@@ -188,7 +188,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
             }
 
             //delete the original
-            $DB->delete_record('block_timetracker_workunit', array('id'=>$origid));
+            $DB->delete_records('block_timetracker_workunit', array('id'=>$origid));
             //TODO update workunit history here?
         }
     }

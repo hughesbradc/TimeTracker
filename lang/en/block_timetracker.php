@@ -365,3 +365,4 @@ $string['nounits'] = 'ERROR: There are no units to be signed.';
 //Deny Official Timesheet Strings
 $string['rejecttstitle'] = 'Reject Official Timesheet';
 $string['tssubject'] = 'TimetTracker Official Timesheet Denied for {$a}';
+$string['reject'] = 'Reject';
