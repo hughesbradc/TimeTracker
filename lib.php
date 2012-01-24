@@ -134,7 +134,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
             $timein = $unit->timein;
 
             unset($unit->id); 
-            $unit->timeout = $start;
+            $unit->timeout = $start-1;
 
             $result = $DB->insert_record('block_timetracker_workunit', $unit);
 
