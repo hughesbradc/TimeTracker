@@ -116,12 +116,13 @@ if(!$worker){
                 $unit->submitted = 1;
                 $DB->update_record('block_timetracker_workunit', $unit);    
             }
+            $status = 'You have successfully signed the official timesheet.';
         } else {
-            print_error('nounits','block_timetracker');
+            $status = 'There are no units to sign for the given date range.';
         }
         $redirectparams['id'] = $courseid;
-        $redirecturl = new moodle_url('/blocks/timetracker/index.php?', $redirectparams);
-        $status = 'You have successfully signed the official timesheet.';
+        $redirectparams['userid'] = $userid;
+        $redirecturl = new moodle_url('/blocks/timetracker/timesheet.php?', $redirectparams);
         redirect($redirecturl, $status, 2);
     } else {
         //form is shown for the first time

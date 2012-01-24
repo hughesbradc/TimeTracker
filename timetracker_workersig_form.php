@@ -115,6 +115,7 @@ class timetracker_workersig_form extends moodleform {
             
             </style>');
             
+              
             $pages = generate_html($this->start, $this->end, $this->userid, $this->courseid,-1,0);
             
             foreach($pages as $page){

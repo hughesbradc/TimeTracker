@@ -30,15 +30,9 @@ global $CFG, $COURSE, $USER;
 
 require_login();
 
-$courseid = required_param('id', PARAM_INTEGER);
-$userid = required_param('userid', PARAM_INTEGER);
-$unitid = required_param('unitid', PARAM_INTEGER);
-$ispending = optional_param('ispending',false,PARAM_BOOL);
+$timesheetid = required_param('timesheetid', PARAM_INTEGER);
 
-$urlparams['id'] = $courseid;
-$urlparams['userid'] = $userid;
-$urlparams['unitid'] = $unitid;
-$urlparams['ispending'] = $ispending;
+$urlparams['timesheetid'] = $courseid;
 
 $alerturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheetreject.php',$urlparams);
 
@@ -48,8 +42,8 @@ $context = $PAGE->context;
 
 $PAGE->set_url($alerturl);
 $PAGE->set_pagelayout('base');
-$PAGE->set_title('Deny Official Timesheet');
-$PAGE->set_heading('Deny Official Timesheet');
+$PAGE->set_title('Reject Official Timesheet');
+$PAGE->set_heading('Reject Official Timesheet');
 
 $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
     array('id'=>$userid,'courseid'=>$courseid));
