@@ -173,7 +173,7 @@ if($mform->is_cancelled()){
         if($num > 0){
             $supersigurl = new
                 moodle_url($CFG->wwwroot.'/blocks/timetracker/supervisorsig.php', $urlparams);
-            $desc = 'Sign timesheet(s) ('.$num.')';
+            $desc = 'Sign timesheets - ('.$num.')';
             $timesheetsub[] = new tabobject('supersig', $supersigurl, $desc);
         }
     } else {

@@ -134,7 +134,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
             $timein = $unit->timein;
 
             unset($unit->id); 
-            $unit->timeout = $start;
+            $unit->timeout = $start-1;
 
             $result = $DB->insert_record('block_timetracker_workunit', $unit);
 
@@ -176,7 +176,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
             $timein = $unit->timein;
 
             unset($unit->id); 
-            $unit->timeout = $start;
+            $unit->timeout = $end - 1;
 
             $result = $DB->insert_record('block_timetracker_workunit', $unit);
 
@@ -186,7 +186,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
             }
             
             unset($unit->id);
-            $unit->timein = $start;
+            $unit->timein = $end;
             $unit->timeout = $timeout;
             
             $result = $DB->insert_record('block_timetracker_workunit', $unit);
