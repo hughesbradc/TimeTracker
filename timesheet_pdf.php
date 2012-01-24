@@ -473,12 +473,15 @@ function generate_html($start, $end, $userid, $courseid, $timesheetid=-1,
         </table><br />';
 
     } else {
+        /*
         $htmldoc .='
+        
         <tr>
             <td style="height: 45px"><font size="13"><b>Worker Signature/Date</b></font></td>
             <td style="height: 45px"><font size="13"><b>Supervisor Signature/Date</b></font></td>
         </tr>
-        </table><br />';
+        */
+        $htmldoc .=' </table><br />';
     }
 
     $pages[$key] = $htmldoc;

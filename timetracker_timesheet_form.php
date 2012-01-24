@@ -144,7 +144,7 @@ class timetracker_timesheet_form  extends moodleform {
         //normally you use add_action_buttons instead of this code
         $buttonarray=array();
         $buttonarray[] = &$mform->createElement('submit', 
-            'unofficial', 'Generate paper timesheet');
+            'unofficial', 'Generate unofficial timesheet');
 
         //only let workers begin the official timesheet data submission process
         if(!$canmanage){ 
