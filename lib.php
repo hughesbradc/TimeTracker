@@ -61,10 +61,15 @@ function expired($timein, $now = -1){
 *
 * Note: some $unit->id may be the same, since a single unit will be broken
 * up across many days.
+* 
+* NOTE: $unsignedonly takes precedence over $timesheetid. If you ask for 
+* $unsignedonly, it will give you only those units that are NOT part of
+* an existing timesheet.
 *
 * @return an array of objects, each having all the properties of a workunit
 */
-function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, $sort='ASC', $submitted=-1){
+function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, $sort='ASC', 
+    $unsignedonly=false){
     global $CFG, $DB;
 
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
@@ -80,12 +85,10 @@ function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, 
         $sql .= ' AND courseid='.$courseid;
     }
 
-    if($timesheetid > -1){
+    if($unsignedonly){
+        $sql .= ' AND timesheetid=0';
+    } else if($timesheetid > -1){
         $sql .= ' AND timesheetid='.$timesheetid;
-    }
-
-    if($submitted > -1){
-        $sql .= ' AND submitted='.$submitted;
     }
 
     $sql .= ' ORDER BY timein '.$sort;
@@ -110,15 +113,16 @@ function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, 
 
 /**
 * If any units straddle the $start or $end boundary, split them into multiple units
-* Only consider units that have NOT been submitted (submitted==0)
+* Only consider units that have NOT been included in a timesheet already.
 */
 function split_boundary_units($start, $end, $userid, $courseid){
     global $DB, $CFG;
 
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        'userid = '.$userid.' AND courseid = '.$courseid.' AND submitted=0 AND '.
+        'userid = '.$userid.' AND courseid = '.$courseid.' AND timesheetid=0 AND '.
         'timein < '.$start.' AND timeout > '.$start;
 
+    error_log($sql);
     $startunits = $DB->get_records_sql($sql);
 
     if($startunits){
@@ -157,9 +161,10 @@ function split_boundary_units($start, $end, $userid, $courseid){
     }
 
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
-        'userid = '.$userid.' AND courseid = '.$courseid.' AND submitted=0 AND '.
+        'userid = '.$userid.' AND courseid = '.$courseid.' AND timesheetid=0 AND '.
         'timein >= '.$start.' AND timeout > '.$end;
 
+    error_log($sql);
     $endunits = $DB->get_records_sql($sql);
 
     if($endunits){
@@ -297,12 +302,12 @@ function split_unit($unit){
 *
 */
 function get_split_month_work_units($userid, $courseid, $month, $year, $timesheetid=-1,
-    $submitted = -1){
+    $unsignedonly = false){
 
     $info = get_month_info($month, $year);
 
     return get_split_units($info['firstdaytimestamp'], $info['lastdaytimestamp'],
-        $userid, $courseid, $timesheetid, 'ASC', $submitted);
+        $userid, $courseid, $timesheetid, 'ASC', $unsignedonly);
 }
 
 

@@ -28,7 +28,6 @@ require_once('lib.php');
 require_once('../../lib/tcpdf/tcpdf.php');
 
 
-/*
 function generate_pdf_from_timesheetid($timesheetid, $userid, 
     $courseid, $method = 'I', $base=''){
 
@@ -57,14 +56,14 @@ function generate_pdf_from_timesheetid($timesheetid, $userid,
     }
 
 }
-*/
 
 function generate_pdf($start, $end, $userid, $courseid, $method = 'I', 
-    $base='', $timesheetid=-1, $submitted=-1){
+    $base='', $timesheetid=-1, $unsignedonly=false){
 
     global $CFG,$DB;
 
-    $htmlpages = generate_html($start, $end, $userid, $courseid, $timesheetid, $submitted);
+    $htmlpages = generate_html($start, $end, $userid, $courseid, $timesheetid,
+        $unsignedonly);
     // Collect Data
     $conf = get_timetracker_config($courseid);
 
@@ -119,7 +118,8 @@ function generate_pdf($start, $end, $userid, $courseid, $method = 'I',
 /**
     @return an array of HTML pages used for printing - one page per array item
 */
-function generate_html($start, $end, $userid, $courseid, $timesheetid=-1, $submitted=-1){
+function generate_html($start, $end, $userid, $courseid, $timesheetid=-1,
+    $unsignedonly=false){
     global $CFG,$DB;
 
     $pages = array();
@@ -156,7 +156,7 @@ function generate_html($start, $end, $userid, $courseid, $timesheetid=-1, $submi
         $monthdollarsum = 0;
 
         $units = get_split_month_work_units($workerrecord->id, $courseid, $month, $year,
-            $timesheetid, $submitted);
+            $timesheetid, $unsignedonly);
     
         // Add Page
 
