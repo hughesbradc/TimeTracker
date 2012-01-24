@@ -40,107 +40,136 @@ $perpage = 12;
 
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
-$url = new moodle_url($CFG->wwwroot.'/blocks/timetracker/viewtimesheets.php',$urlparams);
 $baseurl = $CFG->wwwroot.'/blocks/timetracker';
-
-$userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$userid));
-//Need to check to make sure the user exists and that
-    //A.  I'm that user
-    //B.  I'm a supervisor
+$url = new moodle_url($baseurl.'/viewtimesheets.php',$urlparams);
 
 $course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
 
-$PAGE->set_url($url);
-$PAGE->set_pagelayout('base');
-$strtitle = get_string('viewofficial', 'block_timetracker');
-$PAGE->set_title($strtitle);
-$PAGE->set_heading($strtitle);
-
-$indexparams['id'] = $courseid;
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
-
+$userinfo = $DB->get_record('block_timetracker_workerinfo',array('id'=>$userid));
 $canmanage = false;
 if(has_capability('block/timetracker:manageworkers', $context)){
     $canmanage = true;
 }
 
-$maintabs = get_tabs($indexparams, $canmanage, $courseid);
+$PAGE->set_url($url);
+$PAGE->set_pagelayout('base');
+$strtitle = get_string('viewofficial', 'block_timetracker');
+if($canmanage){
+    $strtitle .= ' - '.$userinfo->firstname.' '.$userinfo->lastname;
+}
 
-$nextpage = $index;
+$PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
+
+
+//Need to check to make sure the user exists and that
+    //A.  I'm that user OR
+    //B.  I'm a supervisor
+if(!$canmanage && $USER->id != $userinfo->mdluserid)
+    print_error('notpermissible','block_timetracker');
 
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $url);
 $PAGE->navbar->add($strtitle);
 
 echo $OUTPUT->header();
-$tabs = array($maintabs);
-print_tabs($tabs, 'manage');
 
-if(!$canmanage && $USER->id != $userinfo->mdluserid){
-    print_error('notpermissible','block_timetracker');
+$tabs = get_tabs($urlparams, $canmanage, $courseid);
+$tabs = array($tabs);
+
+/* FIX THIS AT SOME POINT
+$timesheetsub=array();
+$timesheetsub[] = new tabobject('signed', '#', 'Previously submitted timesheets', false);
+$tabs[] = $timesheetsub;
+*/
+print_tabs($tabs, 'timesheet');
+
+$index = new moodle_url($baseurl.'/index.php', $urlparams);
+$index->remove_params('userid');
+$nextpage = $index;
+
+$totalcount = $DB->count_records('block_timetracker_timesheet',array('userid'=>$userid));
+$timesheets = $DB->get_records('block_timetracker_timesheet',array('userid'=>$userid),'','*',
+    $page * $perpage,$perpage);
+
+echo $OUTPUT->paging_bar($totalcount, $page, $perpage, $url, 'page');
+echo $OUTPUT->box_start();
+
+if(!$timesheets){
+    echo '<b><center>There are no official timesheets for ' 
+        .$userinfo->firstname .' '.$userinfo->lastname.'</center></b>';
 } else {
-
-    $totalcount = $DB->count_records('block_timetracker_timesheet',array('userid'=>$userid));
-    $timesheets = $DB->get_records('block_timetracker_timesheet',array('userid'=>$userid),'','*',
-        $page * $perpage,$perpage);
+    // Generate data here
+    echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">';
+    echo '
+        <tr>
+            <td style="font-weight: bold;">Worker Signature</td>
+            <td style="font-weight: bold;">Supervisor Signature</td>
+            <td style="font-weight: bold;">Processed</td>
+            <td style="font-weight: bold; text-align: center">Amount Paid</td>
+            <td style="font-weight: bold; text-align: center">Actions</td>
+        </tr>';
     
-    echo $OUTPUT->paging_bar($totalcount, $page, $perpage, $url, 'page');
-    echo $OUTPUT->box_start();
+    foreach ($timesheets as $timesheet){
     
-    if(!$timesheets){
-        echo '<b><center>There are no official timesheets for ' 
-            .$userinfo->firstname .' '.$userinfo->lastname.'</center></b>';
-    } else {
-        // Generate data here
-        echo '<table align="center" border="1" cellspacing="10px" cellpadding="5px" width="75%">';
-        echo '
-            <tr>
-                <td style="font-weight: bold">Status</td>
-                <td style="font-weight: bold; text-align: center">Amount Paid</td>
-                <td style="font-weight: bold; text-align: center">Actions</td>
-            </tr>';
+        $amountpd = 0;
+        $amountpd += $timesheet->regpay; 
+        $amountpd += $timesheet->otpay;
         
-        foreach ($timesheets as $timesheet){
+        $viewparams['id'] = $courseid;
+        $viewparams['userid'] = $userid;
+        $viewparams['timesheetid'] = $timesheet->id;
+        $viewtsurl = new moodle_url($baseurl.'/timesheet_fromid.php',$viewparams);
         
-            $amountpd = 0;
-            $amountpd += $timesheet->regpay; 
-            $amountpd += $timesheet->otpay;
-            
-            $viewparams['id'] = $courseid;
-            $viewparams['userid'] = $userid;
-            $viewparams['timesheetid'] = $timesheet->id;
-            $viewtsurl = new moodle_url($baseurl.'/timesheet_fromid.php',$viewparams);
-            
-            echo '<tr>';
-            if($timesheet->supervisorsignature == 0){
-                echo '<td>Pending supervisor signature</td>';
-                echo '<td align="center">$'.number_format(round($amountpd,2),2).'</td>';
-                echo '<td align="center">'. $OUTPUT->action_icon($viewtsurl, 
-                    new pix_icon('date', 'View Timesheet','block_timetracker')) .'</td>';
-            } else if ($timesheet->submitted == 0){
-                echo '<td>Processing</td>';
-                echo '<td align="center">$'.number_format(round($amountpd,2),2).'</td>';
-                echo '<td align="center">'. $OUTPUT->action_icon($viewtsurl, 
-                    new pix_icon('date', 'View Timesheet','block_timetracker')) .'</td>';
-            } else {
-                echo '<td>Complete</td>';
-                echo '<td align="center">$'.number_format(round($amountpd,2),2).'</td>';
-                echo '<td align="center">'. $OUTPUT->action_icon($viewtsurl, 
-                    new pix_icon('date', 'View Timesheet','block_timetracker')) .'</td>';
+        echo '<tr>';
+        if($timesheet->supervisorsignature == 0){
+            echo '<td>'.userdate($timesheet->workersignature,
+                get_string('datetimeformat', 'block_timetracker')) .'</td>';
+            echo '<td>Pending</td>';
+            echo '<td>Pending</td>';
+            echo '<td align="center">$'.number_format(round($amountpd,2),2).'</td>';
+            echo '<td align="center">'. $OUTPUT->action_icon($viewtsurl, 
+                new pix_icon('date', 'View Timesheet','block_timetracker'));
+            if($canmanage){
+                $signthemurl = new moodle_url($baseurl.'/supervisorsig.php', $viewparams);
+                $signthemurl->remove_params('userid', 'timesheetid');
+                echo ' '.$OUTPUT->action_icon($signthemurl, 
+                    new pix_icon('sign', 'Sign timesheet', 'block_timetracker'));
             }
-            echo '</tr>';
+                
+            echo '</td>';
+        } else if ($timesheet->submitted == 0){
+            echo '<td>'.userdate($timesheet->workersignature,
+                get_string('datetimeformat', 'block_timetracker')) .'</td>';
+            echo '<td>'.userdate($timesheet->supervisorsignature,
+                get_string('datetimeformat', 'block_timetracker')) .'</td>';
+            echo '<td>Pending</td>';
+            echo '<td align="center">$'.number_format(round($amountpd,2),2).'</td>';
+            echo '<td align="center">'. $OUTPUT->action_icon($viewtsurl, 
+                new pix_icon('date', 'View Timesheet','block_timetracker')) .'</td>';
+        } else {
+            echo '<td>'.userdate($timesheet->workersignature,
+                get_string('datetimeformat', 'block_timetracker')) .'</td>';
+            echo '<td>'.userdate($timesheet->supervisorsignature,
+                get_string('datetimeformat', 'block_timetracker')) .'</td>';
+            echo '<td>'.userdate($timesheet->submitted,
+                get_string('datetimeformat', 'block_timetracker')) .'</td>';
+            echo '<td align="center">$'.number_format(round($amountpd,2),2).'</td>';
+            echo '<td align="center">'. $OUTPUT->action_icon($viewtsurl, 
+                new pix_icon('date', 'View Timesheet','block_timetracker')) .'</td>';
         }
-        
-        
-        echo '</table>';
+        echo '</tr>';
     }
     
-    echo $OUTPUT->box_end();
-    echo $OUTPUT->paging_bar($totalcount, $page, $perpage, $url, 'page');
     
-    
-    echo $OUTPUT->footer();
+    echo '</table>';
 }
+
+echo $OUTPUT->box_end();
+echo $OUTPUT->paging_bar($totalcount, $page, $perpage, $url, 'page');
+
+
+echo $OUTPUT->footer();
 ?>

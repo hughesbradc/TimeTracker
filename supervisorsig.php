@@ -103,7 +103,7 @@ if(!$workers){
         //form is shown for the first time
         echo $OUTPUT->header();
         $tabs=array($maintabs);
-        print_tabs($tabs, 'timesheets');
+        print_tabs($tabs);
         $mform->display();
         echo $OUTPUT->footer();
     }

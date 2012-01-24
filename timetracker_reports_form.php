@@ -536,7 +536,22 @@ class timetracker_reports_form  extends moodleform {
                     $urlparams['unitid'] = $unit->id;
 
                     $unitdateinfo = usergetdate($unit->timein);
-                    if(!$unit->canedit){
+                    if ($unit->timesheetid && !$unit->submitted){
+                        //show greyed out icons and no URL
+                        $row .= '<td style="text-align: center">'.
+                            html_writer::empty_tag('img', 
+                                array('src' => 
+                                $CFG->wwwroot.'/blocks/timetracker/pix/wait.png', 
+                                'class' => 'icon')).
+                            '</td>';
+                    } else if ($unit->timesheetid && $unit->submitted) {
+                        $row .= '<td style="text-align: center">'.
+                            html_writer::empty_tag('img', 
+                                array('src' => 
+                                $CFG->wwwroot.'/blocks/timetracker/pix/certified.png', 
+                                'class' => 'icon')).
+                            '</td>';
+                    } else if(!$unit->canedit){
                         
                         //show greyed out icons and no URL
                         $alertaction = 
@@ -550,9 +565,9 @@ class timetracker_reports_form  extends moodleform {
                         $alerticon = new pix_icon('alert', 'Alert Supervisor of Error',
                             'block_timetracker');
                         $alertaction = $OUTPUT->action_icon($alerturl, $alerticon);
+                        $row .='<td style="text-align:center">'.$alertaction.'</td>';
 
                     }
-                    $row .='<td style="text-align:center">'.$alertaction.'</td>';
 
                 }
                 $row .= '</tr>';
