@@ -61,7 +61,7 @@ class timetracker_supervisorsig_form extends moodleform {
             foreach ($timesheets as $timesheet){
                 $mform->addElement('html','<tr><td style="text-align: center">');
                 $mform->addElement('advcheckbox', 'timesheetid['.$timesheet->id.']','',
-                    null, array('','group'=>1));
+                    null, array('group' => 1));
                 $mform->addElement('html','</td><td>');
                 
                 $worker = $DB->get_record('block_timetracker_workerinfo',
@@ -111,7 +111,7 @@ class timetracker_supervisorsig_form extends moodleform {
                 $mform->addElement('html',$editaction);
                 $mform->addElement('html','</tr>');
             }
-
+        $this->add_checkbox_controller(1);
         $mform->addElement('html','</table>');
         $mform->addElement('html', get_string('supervisorstatement','block_timetracker'));
        
