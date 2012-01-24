@@ -89,7 +89,7 @@ if(!$worker){
        
         $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE timein BETWEEN '.
             $start.' AND '.$end.' AND timeout BETWEEN '.$start.' AND '.$end.' AND userid='.
-            $userid.' AND courseid='.$courseid.' AND submitted=0';
+            $userid.' AND courseid='.$courseid.' AND timesheetid=0';
         
         $units = $DB->get_records_sql($sql);
         
@@ -113,7 +113,6 @@ if(!$worker){
             foreach ($units as $unit){
                 $unit->timesheetid = $timesheetid; 
                 $unit->canedit = 0;
-                $unit->submitted = 1;
                 $DB->update_record('block_timetracker_workunit', $unit);    
             }
             $status = 'You have successfully signed the official timesheet.';
