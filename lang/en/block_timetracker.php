@@ -363,6 +363,14 @@ $string['nounits'] = 'ERROR: There are no units to be signed.';
 
 
 //Deny Official Timesheet Strings
-$string['rejecttstitle'] = 'Reject Official Timesheet';
-$string['tssubject'] = 'TimetTracker Official Timesheet Denied for {$a}';
+$string['rejecttstitle'] = 'Reject Timesheet';
+$string['tssubject'] = 'TimeTracker Timesheet Rejected';
 $string['reject'] = 'Reject';
+$string['headername'] = '<b>Reject Timesheet for {$a}</b>';
+$string['headertimestamp'] = ' <b>signed on {$a}</b>';
+$string['remessage1'] = 'Your timesheet signed on {$a}';
+$string['remessagesup'] = ' was rejected by your supervisor for the following reason(s):';
+$string['remessageadmin'] = ' was rejected by an administrator for the following reason(s):';
+$string['rejectreason'] = 'Reason(s):';
+$string['instruction'] = 'Please contact your supervisor for more information and to re-sign the
+    timesheet.';

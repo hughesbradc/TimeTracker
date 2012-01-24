@@ -32,233 +32,144 @@ require_login();
 
 $timesheetid = required_param('timesheetid', PARAM_INTEGER);
 
-$urlparams['timesheetid'] = $courseid;
+$timesheet = $DB->get_record('block_timetracker_timesheet', array('id'=>$timesheetid));
+$courseid = $timesheet->courseid;
+$userid = $timesheet->userid;
 
+$urlparams['timesheetid'] = $timesheetid;
 $alerturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheetreject.php',$urlparams);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
 
-$PAGE->set_url($alerturl);
-$PAGE->set_pagelayout('base');
-$PAGE->set_title('Reject Official Timesheet');
-$PAGE->set_heading('Reject Official Timesheet');
-
-$workerrecord = $DB->get_record('block_timetracker_workerinfo', 
-    array('id'=>$userid,'courseid'=>$courseid));
-
-if(!$workerrecord){
-    echo "NO WORKER FOUND!";
-    die;
-}
-
 $canmanage = false;
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
-
-$strtitle = get_string('irejecttitle','block_timetracker',
-    $workerrecord->firstname.' '.$workerrecord->lastname); 
-$PAGE->set_title($strtitle);
-
-unset($urlparams['ispending']);
-unset($urlparams['unitid']);
-
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
-
-$nextpage = $index;
-/*
-if(isset($_SERVER['HTTP_REFERER'])){
-    $nextpage = $_SERVER['HTTP_REFERER'];
+if(!$canmanage){
+    print_error('notpermissible','block_timetracker');
 } else {
+
+    $PAGE->set_url($alerturl);
+        $PAGE->set_pagelayout('base');
+    $PAGE->set_title(get_string('rejecttstitle','block_timetracker'));
+    $PAGE->set_heading(get_string('rejecttstitle','block_timetracker'));
+    
+    $workerrecord = $DB->get_record('block_timetracker_workerinfo', 
+        array('id'=>$userid,'courseid'=>$courseid));
+    
+    if(!$workerrecord){
+        echo "NO WORKER FOUND!";
+        die;
+    }
+    
+    $strtitle = get_string('rejecttstitle','block_timetracker',
+        $workerrecord->firstname.' '.$workerrecord->lastname); 
+    $PAGE->set_title($strtitle);
+    
+    $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
+    
     $nextpage = $index;
-}
-if(strpos($nextpage, qualified_me()) !== false){
-    $nextpage = $SESSION->lastpage;
-} else {
-    $SESSION->lastpage = $nextpage;
-}
-
-if($nextpage == $CFG->wwwroot.'/blocks/timetracker/hourlog.php'){
-    $nextpage .=
-        '?id='.$courseid.
-        '&userid='.$userid;
-}
-*/
-
-$PAGE->navbar->add(get_string('blocks'));
-$PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
-$PAGE->navbar->add($strtitle);
-
-$mform = new timetracker_reject_form($context, $userid, $courseid,
-    $unitid, $ispending);
-
-if($workerrecord->active == 0){
-    echo $OUTPUT->header();
-    print_string('notactiveerror','block_timetracker');
-    echo '<br />';
-    echo $OUTPUT->footer();
-    die;
-}
-
-if ($mform->is_cancelled()){ 
-    //user clicked cancel
-    redirect($nextpage);
-
-} else if ($formdata=$mform->get_data()){
-    // Data collection to send email to supervisor(s)
-    $from = $DB->get_record('user',array('id'=>$USER->id));
-    $subject = get_string('tssubject','block_timetracker', //TODO Month, Year ' in '.$course->shortname);
-
-    //***** PLAIN TEXT *****//
-    $messagetext = get_string('emessage1','block_timetracker');
-    $messagetext .= get_string('br2','block_timetracker');
-
-    //***** HTML *****//
-    $messagehtml = get_string('emessage1','block_timetracker');
-    $messagehtml .= get_string('br2','block_timetracker');
-
-    // Get data from 'pending' or 'workunit' table to put into the 'alertunits' table
-    if($ispending){
-        // Pending Work Unit
-        $alertunit = $DB->get_record('block_timetracker_pending',array('id'=>$unitid));
+    /*
+    if(isset($_SERVER['HTTP_REFERER'])){
+        $nextpage = $_SERVER['HTTP_REFERER'];
     } else {
-        // Completed Work Unit
-        $alertunit = $DB->get_record('block_timetracker_workunit',array('id'=>$unitid));
+        $nextpage = $index;
     }
-
-
-    if($alertunit){
-
-        unset($formdata->id);
-        $alertunit->alerttime = time();
-        $alertunit->payrate = $workerrecord->currpayrate;
-        $alertunit->origtimein = $alertunit->timein;
-        if(!$ispending)
-            $alertunit->origtimeout = $alertunit->timeout;
-
-        $alertunit->timein = $formdata->timeinerror;
-        $alertunit->timeout = $formdata->timeouterror;
-        $alertunit->message = $formdata->message;
-
-        if($delete == 1)
-            $alertunit->todelete = 1;
-
-        $alertid = $DB->insert_record('block_timetracker_alertunits', $alertunit);
-        
-        if(!$ispending){
-            $DB->delete_records('block_timetracker_pending',array('id'=>$unitid));
-        } else {
-            $DB->delete_records('block_timetracker_workunit',array('id'=>$unitid));
-        }
-
-
-        // Send the email to the selected supervisor(s)
-
-        if($alertid){
-            $linkbase = $CFG->wwwroot.'/blocks/timetracker/alertaction.php?alertid='.
-                $alertid.'&delete='.$delete;
-            $approvelink = $linkbase.'&action=approve';
-            $deletelink = $linkbase.'&action=delete';
-            $changelink = $linkbase.'&action=change';
-            $denylink = $linkbase.'&action=deny';
+    if(strpos($nextpage, qualified_me()) !== false){
+        $nextpage = $SESSION->lastpage;
+    } else {
+        $SESSION->lastpage = $nextpage;
+    }
     
-            // Approve link
-            $messagehtml .= '<a href="'.$approvelink.'">';
-            $messagehtml .= get_string('emessageapprove','block_timetracker');
-            $messagehtml .= '</a> - Approve the work unit as proposed';
-            
-            $messagehtml .= get_string('br1','block_timetracker');
-
-            // Delete link
-            $messagehtml .= '<a href="'.$deletelink.'">';
-            $messagehtml .= get_string('emessagedelete','block_timetracker');
-            $messagehtml .= '</a> - Delete this alert and remove the work unit';
-            
-            $messagehtml .= get_string('br1','block_timetracker');
-            
-            // Change link
-            $messagehtml .= '<a href="'.$changelink.'">';
-            $messagehtml .= get_string('emessagechange','block_timetracker');
-            $messagehtml .= '</a> - Change the proposed work unit before approval';
-        
-            $messagehtml .= get_string('br1','block_timetracker');
-            
-            // Deny link
-            $messagehtml .= '<a href="'.$denylink.'">';
-            $messagehtml .= get_string('emessagedeny','block_timetracker');
-            $messagehtml .= '</a> - Deny the propsed work unit and re-insert the original';
-
-            $alertcom = new stdClass();
-            $alertcom->alertid = $alertid;
-            $alertcom->mdluserid = $USER->id;
-
-            //Insert student record into 'alert_com'
-            $res = $DB->insert_record('block_timetracker_alert_com',$alertcom); 
-
-            if (!$res){
-                print_error('cannot add student to alert_com');
-            }
-
-            foreach($formdata->teacherid as $tid=>$checkvalue){
-                //print_object($tid);
-            
-                if($checkvalue == 1){ //box was checked?
-                    $user = $DB->get_record('user',array('id'=>$tid));
-                    $alertcom->mdluserid = $tid;
-                    //insert alertcom into db
-                    //print('emailing user: '.$tid);
-                    if($user){
-                        $mailok = email_to_user($user, $from, $subject, 
-                            $messagetext, $messagehtml); 
-                            
-                        $res = $DB->insert_record('block_timetracker_alert_com',$alertcom); 
-
-                        if (!$res){
-                            print_error('cannot add teacher to alert_com');
-                        }
-
-                        // Delete the unit from the 'pending' or 'workunit' table 
-                        //since the data was inserted into the 'alertunits' table 
-                        //and any emails have been sent.
-                        if($ispending && $mailok)
-                            $DB->delete_records('block_timetracker_pending',
-                                array('id'=>$unitid));
-                        if(!$ispending && $mailok)
-                            $DB->delete_records('block_timetracker_workunit',
-                                array('id'=>$unitid));
-                        if(!$mailok)
-                            print_error(
-                                "Error sending message to $user->firstname $user->lastname");
-                    } else 
-                        print_error("Failed mailing user $tid");
-                }
-            }
-        } else {
-            //print out an error saying we can't handle this alert
-        }
+    if($nextpage == $CFG->wwwroot.'/blocks/timetracker/hourlog.php'){
+        $nextpage .=
+            '?id='.$courseid.
+            '&userid='.$userid;
     }
-
-        $status = get_string('emessagesent','block_timetracker');
-        redirect($nextpage, $status,1);
-
+    */
+    
+    $PAGE->navbar->add(get_string('blocks'));
+    $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
+    $PAGE->navbar->add($strtitle);
+    
+    $mform = new timetracker_timesheetreject_form($timesheetid); 
+    
+    $timesheet = $DB->get_record('block_timetracker_timesheet', array('id'=>$timesheetid));
+    
+    if ($mform->is_cancelled()){ 
+        //user clicked cancel
+        redirect($nextpage);
+    
+    } else if ($formdata=$mform->get_data()){
+        $timesheetid = $formdata->timesheetid;
+        // Data collection to send email to supervisor(s)
+        //$from = $DB->get_record('user',array('id'=>$USER->id));
+        $from = $USER;
+        $subject = get_string('tssubject','block_timetracker');
+    
+        //***** PLAIN TEXT *****//
+        $messagetext = $workerrecord->firstname.':';
+        $messagetext .= get_string('br2','block_timetracker');
+        $messagetext .= get_string('remessage1','block_timetracker',
+            date("n/j/Y g:i:sa", $timesheet->workersignature));
+        $messagetext .= get_string('remessagesup','block_timetracker');
+        $messagetext .= get_string('br1','block_timetracker');
+        $messagetext .= $formdata->message;
+        $messagetext .= get_string('br2','block_timetracker');
+        $messagetext .= get_string('instruction','block_timetracker');
+    
+        //***** HTML *****//
+        $messagehtml = $workerrecord->firstname.':';
+        $messagehtml .= get_string('br2','block_timetracker');
+        $messagehtml .= get_string('remessage1','block_timetracker',
+            date("n/j/Y g:i:sa", $timesheet->workersignature));
+        $messagehtml .= get_string('remessagesup','block_timetracker');
+        $messagehtml .= get_string('br1','block_timetracker');
+        $messagehtml .= $formdata->message; 
+        $messagehtml .= get_string('br2','block_timetracker');
+        $messagehtml .= get_string('instruction','block_timetracker');
+        
+        //Set all units to be editable by user and supervisor
+        $DB->set_field('block_timetracker_workunit','canedit',1,
+            array('timesheetid'=>$timesheet->id));
+        //Reset all of the units to without a timesheet id
+        $DB->set_field('block_timetracker_workunit','timesheetid',0,
+            array('timesheetid'=>$timesheet->id));
+        //Remove the timesheet entry from the table
+        $DB->delete_records('block_timetracker_timesheet',array('id'=>$timesheet->id));
+        
+        //Build the email and send to the worker
+        $ttuser = $DB->get_record('block_timetracker_workerinfo',array('id'=>$userid));
+        error_log('before getting user');
+        $user = $DB->get_record('user',array('id'=>$ttuser->mdluserid));
+        error_log('after getting user');
+        //print_object($user);
+        
+        $mailok = email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
+        if(!$mailok){
+            print_error("Error sending message to $user->firstname $user->lastname");
+        } else {
+            print_error("Failed mailing user $user->firstname $user->lastname");
+        }
+    
+    $status = get_string('emessagesent','block_timetracker');
+    redirect($nextpage, $status,1);
     
     } else {
-    //form is shown for the first time
+        //form is shown for the first time
+        
+        echo $OUTPUT->header();
+        $maintabs = get_tabs($urlparams, $canmanage, $courseid);
+        //print_object($urlparams);
     
-    echo $OUTPUT->header();
-    $maintabs = get_tabs($urlparams, $canmanage, $courseid);
-    //print_object($urlparams);
-
-    $maintabs[] = new tabobject('postalert',
-        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php#', $urlparams),
-        'Post alert');
+        $tabs = array($maintabs);
+        
+        print_tabs($tabs, 'timesheets');
     
-    $tabs = array($maintabs);
-    print_tabs($tabs, 'postalert');
-
-    $mform->display();
-    echo $OUTPUT->footer();
+        $mform->display();
+        echo $OUTPUT->footer();
+    }
 }

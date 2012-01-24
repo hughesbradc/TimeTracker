@@ -29,14 +29,9 @@ require_once ('lib.php');
 
 class timetracker_timesheetreject_form  extends moodleform {
 
-    function timetracker_timesheetreject_form($context, $userid, $courseid, 
-        $unitid, $ispending=false){
+    function timetracker_timesheetreject_form($timesheetid){
         
-        $this->context = $context;
-        $this->userid = $userid;
-        $this->courseid = $courseid;
-        $this->unitid = $unitid;
-        $this->ispending = $ispending;
+        $this->timesheetid = $timesheetid;
         parent::__construct();
     }
 
@@ -44,14 +39,15 @@ class timetracker_timesheetreject_form  extends moodleform {
         global $CFG, $USER, $DB, $COURSE;
 
         $mform =& $this->_form; // Don't forget the underscore! 
+        
+        $timesheet = $DB->get_record('block_timetracker_timesheet', array('id'=>$this->timesheetid));
+        $courseid = $timesheet->courseid;
+        $userid = $timesheet->userid;
+        error_log('courseid='.$courseid.' and userid='.$userid);
 
         //check to make sure that if $this->userid != $USER->id that they have
         //the correct capability TODO
-        $canmanage = false;
-        if(has_capability('block/timetracker:manageworkers',$this->context)){
-            $canmanage = true;
-        }
-        
+/**        
         if($this->ispending){
             //Get from pending table
             $unit = $DB->get_record('block_timetracker_pending',array('id'=>$this->unitid));
@@ -64,9 +60,9 @@ class timetracker_timesheetreject_form  extends moodleform {
             print_error('Unit does not exist for unit id of '.$this->unitid);
             return;
         }
-        
+*/     
         $userinfo = $DB->get_record('block_timetracker_workerinfo',
-            array('id'=>$this->userid));
+            array('id'=>$userid));
         
         if(!$userinfo){
             print_error('Worker info does not exist for workerinfo id of '.$this->userid);
@@ -74,30 +70,15 @@ class timetracker_timesheetreject_form  extends moodleform {
         }
 
         $index  = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',
-            array('id'=>$this->courseid,'userid'=>$this->userid));
+            array('id'=>$courseid,'userid'=>$userid));
 
         if(get_referer(false)){
             $nextpage = get_referer(false);
         } else {
             $nextpage = $index;
         }
-        if(!$canmanage && $USER->id != $userinfo->mdluserid){
-            redirect($nextpage,'No permission to add hours',1);
-        }
 
-        $mform->addElement('header', 'general', get_string('errortitle','block_timetracker', 
-            $userinfo->firstname.' '.$userinfo->lastname));
-
-        $mform->addElement('hidden','userid', $this->userid);
-        $mform->addElement('hidden','id', $this->courseid);
-        $mform->addElement('hidden','unitid', $this->unitid);
-        $mform->addElement('hidden','ispending', $this->ispending);
-
-        if($canmanage){
-        
-        } else {
-            $mform->addElement('hidden','editedby', $this->userid);
-        
+/**
         $mform->addElement('html', '<b>'); 
         $mform->addElement('html', get_string('to','block_timetracker'));
         $mform->addElement('html', '</b>'); 
@@ -129,7 +110,6 @@ class timetracker_timesheetreject_form  extends moodleform {
         $mform->addElement('html', get_string('existingtimein','block_timetracker',
             userdate($unit->timein, get_string('datetimeformat','block_timetracker'))));
         
-
         if(!$this->ispending){
             //Time out and elapsed time
             $mform->addElement('html', '<br />'); 
@@ -166,74 +146,28 @@ class timetracker_timesheetreject_form  extends moodleform {
                 get_string('deleteunit','block_timetracker'));
             $mform->addHelpButton('deleteunit', 'deleteunit', 'block_timetracker');
         }
-
+*/
+        
+        $mform->addElement('hidden','timesheetid',$this->timesheetid);
+        $mform->addElement('html',get_string('headername','block_timetracker', $userinfo->firstname
+            .' '.$userinfo->lastname));
+        $mform->addElement('html',get_string('headertimestamp','block_timetracker', 
+            date("n/j/Y g:i:sa", $timesheet->workersignature)));
+        $mform->addElement('html','<br /><br />');
         $mform->addElement('textarea', 'message', 
-            get_string('messageforerror','block_timetracker'), 
-            'wrap="virtual" rows="6" cols="75"');
-		$mform->addHelpButton('message','messageforerror','block_timetracker');
+            get_string('rejectreason','block_timetracker'), 
+            'wrap="virtual" rows="3" cols="75"');
         $mform->addRule('message', null, 'required', null, 'client', 'false');
         $mform->addElement('html', '</b>'); 
-
         $this->add_action_buttons(true,get_string('sendbutton','block_timetracker'));
+/*        
         }
+*/
     }   
-
+    
     function validation ($data){
         global $OUTPUT;
         $errors = array();
-
-        $teachers = $data['teacherid'];
-
-        $hasteach = false;
-        foreach($teachers as $teacherid=>$selectedval){
-            //if($firstteach == -1) $firstteach = $teacherid; 
-            $firstteach = $teacherid;
-            if($selectedval==1){ 
-                $hasteach = true;
-                break;
-            }
-        }
-
-        //if it gets here, we had no teachers selected. Use the first teacherid value to
-        //place the error
-        if(!$hasteach)
-            $errors['teacherid['.$firstteach.']'] = 
-                'You didn\'t select any supervisors to alert. 
-                As default, all supervisors have been selected.';
-
-        //if delete was checked, don't check any of the times/conflicts
-        if(isset($data['deleteunit'])){
-            return $errors;  
-        }
-
-        if($data['timeinerror'] > time()){
-            $errors['timeinerror'] = 'Time cannot be set in the future.';
-        } else if($data['timeinerror'] > $data['timeouterror']){
-            $errors['timeinerror'] = 'Your time out cannot be before your time in.';
-        } else if($data['timeouterror'] > time()){
-            $errors['timeouterror'] = 'Time cannot be set in the future.';
-        } else {
-
-            $conflicts = find_conflicts($data['timeinerror'], $data['timeouterror'],
-                $data['userid'], $data['unitid'], -1, $data['ispending']);
-            
-            if(sizeof($conflicts) > 0){
-                $errormsg = 'Work unit conflicts with existing unit(s):<br />';
-                $errormsg .= '<table>';
-                foreach($conflicts as $conflict){
-                    $errormsg .= '<tr>';
-                    $alerticon= new pix_icon('alert',
-                        'Alert Supervisor of Error','block_timetracker');
-    
-                    //$alertaction= $OUTPUT->action_icon($conflict->alertlink, $alerticon);
-        
-                    $errormsg .= '<td>'.$conflict->display.'</td><td>';
-                    //$errormsg .= ' '.$alertaction.'</td></tr>';
-                }
-                $errormsg .= '</table>';
-                $errors['timeinerror'] = $errormsg;
-            }
-        }
 
         return $errors;
     }
