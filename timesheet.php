@@ -36,6 +36,8 @@ $courseid = required_param('id', PARAM_INTEGER);
 $userid = optional_param('userid', -1, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
+if($userid > -1)
+    $urlparams['userid'] = $userid;
 
 $timesheeturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet.php',$urlparams);
 
@@ -166,8 +168,15 @@ if($mform->is_cancelled()){
     $tabs = array($tabs);
 
     $timesheetsub = array();
-    $timesheetsub[] = new tabobject('submittedts', "#", 'Submitted Timesheets');
-    $timesheetsub[] = new tabobject('pending', "#", 'Pending Timesheets');
+    if(!$canmanage){
+        $myself = $DB->get_record('block_timetracker_workerinfo',
+            array('mdluserid'=>$USER->id));
+        $urlparams['userid'] = $myself->id;
+        $submittedurl = new moodle_url($CFG->wwwroot.
+            '/blocks/timetracker/viewtimesheets.php', $urlparams);
+        $timesheetsub[] = new tabobject('signed', 
+            $submittedurl, 'Previously signed timesheets');
+    }
     $tabs[] = $timesheetsub;
 
 
