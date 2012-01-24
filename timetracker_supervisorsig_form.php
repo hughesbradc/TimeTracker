@@ -98,11 +98,11 @@ class timetracker_supervisorsig_form extends moodleform {
                 } else {
                     $last = $first;
                 }
-                $editparams['id'] = $this->courseid;
-                $editparams['userid'] = $worker->id;
+                $editparams['timesheetid'] = $timesheet->id;
                 //$editparams['repstart'] = $first->timein;
                 //$editparams['repend'] = $last->timeout;
-                $editurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php', $editparams);
+                $editurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheetreject.php', 
+                    $editparams);
                 $editicon = new pix_icon('date_edit', get_string('edit'),'block_timetracker');
                 $editaction = $OUTPUT->action_icon($editurl, $editicon,
                     new confirm_action(get_string('editwarning','block_timetracker')));

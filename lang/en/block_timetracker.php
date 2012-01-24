@@ -374,3 +374,5 @@ $string['remessageadmin'] = ' was rejected by an administrator for the following
 $string['rejectreason'] = 'Reason(s):';
 $string['instruction'] = 'Please contact your supervisor for more information and to re-sign the
     timesheet.';
+$string['remessagesent'] = 'The student has been notified that his or her timesheet has been edited
+    and requires a new signature.';

@@ -70,6 +70,7 @@ if(!$canmanage){
     $PAGE->set_title($strtitle);
     
     $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
+    $index->param('id', $courseid);
     
     $nextpage = $index;
     /*
@@ -151,12 +152,10 @@ if(!$canmanage){
         $mailok = email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
         if(!$mailok){
             print_error("Error sending message to $user->firstname $user->lastname");
-        } else {
-            print_error("Failed mailing user $user->firstname $user->lastname");
-        }
+        } 
     
-    $status = get_string('emessagesent','block_timetracker');
-    redirect($nextpage, $status,1);
+        $status = get_string('remessagesent','block_timetracker');
+        redirect($nextpage, $status,1);
     
     } else {
         //form is shown for the first time
