@@ -15,8 +15,9 @@ global $CFG, $DB, $USER;
         studentEmail,fromCourseID,toCourseID
 */
 
-$file='/tmp/transferWorkers.csv';
+$file='/tmp/newtransfers.csv';
 
+$count = 0;
 if(($handle = fopen($file, "r")) !== FALSE){
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
@@ -30,6 +31,8 @@ if(($handle = fopen($file, "r")) !== FALSE){
             echo "Invalid data for worker $email\n";
             continue;
         }
+
+        $count++;
 
         //delete all of the alert units for this user
         $alerts = $DB->get_records('block_timetracker_alertunits',
@@ -55,7 +58,58 @@ if(($handle = fopen($file, "r")) !== FALSE){
         $worker->courseid = $tocourseid;
 
         $DB->update_record('block_timetracker_workerinfo', $worker);
-        
+
+
+        //get the TO course context
+        $context = get_context_instance(CONTEXT_COURSE, $tocourseid);
+
+
+        //get the FROM course context
+        $context = get_context_instance(CONTEXT_COURSE, $fromcourseid);
+
+        //un-enroll from first course, if enrolled.
+        if(is_enrolled($context, $worker->mdluserid)){
+            $manual = enrol_get_plugin('manual');
+
+            $instances = enrol_get_instances($fromcourseid, false);
+            foreach($instances as $instance){
+                    if($instance->enrol == 'manual'){
+                        $winner = $instance;
+                        break;
+                    }
+            }
+            if(isset($winner)){
+                $manual->unenrol_user($winner, $worker->mdluserid);
+            } else {
+                echo "Cannot unenroll $worker->firstname $worker->lastname\n";
+            }
+        } else {
+            echo "$worker->firstname $worker->lastname is NOT enrolled in FROM course\n";
+        }
+
+
+        //enroll in second course, if NOT enrolled
+        if(!is_enrolled($context, $worker->mdluserid)){
+            $manual = enrol_get_plugin('manual');
+
+            $instances = enrol_get_instances($tocourseid, false);
+            foreach($instances as $instance){
+                    if($instance->enrol == 'manual'){
+                        $winner = $instance;
+                        break;
+                    }
+            }
+
+            if(isset($winner)){
+                $manual->enrol_user($winner, $worker->mdluserid);
+            }else{
+                echo "Cannot enroll $worker->firstname $worker->lastname\n";
+            }
+        } else {
+            echo "$worker->firstname $worker->lastname is already enrolled in TO course\n";
+        }
+
 
     }
 }
+echo "Handled $count transfers\n";
