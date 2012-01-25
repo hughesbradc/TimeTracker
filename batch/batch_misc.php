@@ -9,6 +9,29 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
+$manual = enrol_get_plugin('manual');
+
+$instances = enrol_get_instances(113, false);
+/*
+foreach($instances as $instance){
+    if($instance->enrol == 'manual'){
+        $winner = $instance;
+        break;
+    }
+}
+*/
+//print_r($winner);
+
+//$context = get_context_instance(CONTEXT_COURSE, 113);
+
+if(isset($winner))
+    $manual->unenrol_user($winner, 3);
+
+
+//unenrol_user
+
+
+/*
 $courses = get_courses(5, 'fullname ASC', 'c.id,c.shortname');
 
 
@@ -21,6 +44,7 @@ foreach($courses as $course){
     $config->value = '900';
 
     $DB->update_record('block_timetracker_config', $config);
+    */
     /*
     $workers = $DB->get_records('block_timetracker_workerinfo',
         array('courseid'=>$course->id));
@@ -38,4 +62,4 @@ foreach($courses as $course){
     }
     */
     
-}
+//}
