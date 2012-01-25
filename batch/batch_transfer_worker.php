@@ -101,7 +101,7 @@ if(($handle = fopen($file, "r")) !== FALSE){
             }
 
             if(isset($winner)){
-                $manual->enrol_user($winner, $worker->mdluserid);
+                $manual->enrol_user($winner, $worker->mdluserid, NULL, time());
             }else{
                 echo "Cannot enroll $worker->firstname $worker->lastname\n";
             }
