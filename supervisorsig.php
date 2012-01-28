@@ -89,9 +89,11 @@ if(!$workers){
             array('courseid'=>$COURSE->id, 'supervisorsignature'=>0));
 
         foreach($timesheets as $timesheet){
-            $timesheet->supervisorsignature = time();
-            $timesheet->supermdlid = $USER->id;
-            $DB->update_record('block_timetracker_timesheet',$timesheet);
+           if($formdata->signid[$timesheet->id] == 1){
+                $timesheet->supervisorsignature = time();
+                $timesheet->supermdlid = $USER->id;
+                $DB->update_record('block_timetracker_timesheet',$timesheet);
+           }
         }
         
         $redirectparams['id'] = $courseid;
