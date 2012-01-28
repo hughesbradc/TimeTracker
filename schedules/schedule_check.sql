@@ -30,6 +30,8 @@ CREATE TABLE `mdl_block_timetracker_schedules` (
   `days` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
   `begin_time` int(4) NOT NULL,
   `end_time` int(4) NOT NULL,
+  `begin_date` bigint(10) unsigned NOT NULL,
+  `end_date` bigint(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Holds student schedule data.';
 /*!40101 SET character_set_client = @saved_cs_client */;

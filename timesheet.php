@@ -108,8 +108,24 @@ if($mform->is_cancelled()){
             $urlparams['userid'] = $formdata->workerid;
             $urlparams['start'] = $start;
             $urlparams['end'] = $end;
-            $workersigpage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/workersig.php',$urlparams);
-            redirect($workersigpage);
+
+
+            //send work-study courses to be processed for errors
+            $wscourses = get_courses(2, 'fullname ASC', 'c.id,c.shortname');
+
+
+            if(array_key_exists($formdata->id, $wscourses)){
+                $conflict_reporturl = new moodle_url(
+                    $CFG->wwwroot.'/blocks/timetracker/schedules/conflict_report.php', $urlparams);
+                redirect($conflict_reporturl);
+            } else {
+                //Uncomment these lines, and comment out the above to bypass checking student
+                //schedules
+                $workersigpage = new 
+                    moodle_url($CFG->wwwroot.'/blocks/timetracker/workersig.php',$urlparams);
+                redirect($workersigpage);
+            }
+
         }
         
         if($format == 'pdf'){

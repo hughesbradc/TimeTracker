@@ -78,50 +78,61 @@ if(!$worker){
 
     } else if ($formdata=$mform->get_data()){
        /*
-        Look for units that straddle the pay period boundary
-        TODO Check for course conflicts against submitted work units
-        Create timesheet entry
-        Assign all of the work units the timesheet id
-        Set all of the work units canedit=0
+            Look for units that straddle the pay period boundary
+            TODO Check for course conflicts against submitted work units
+            Create timesheet entry
+            Assign all of the work units the timesheet id
+            Set all of the work units canedit=0
        */
         
-        split_boundary_units($start, $end, $userid, $courseid);
-       
         $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE timein BETWEEN '.
-            $start.' AND '.$end.' AND timeout BETWEEN '.$start.' AND '.$end.' AND userid='.
+            $start.' AND '.$end.' OR timeout BETWEEN '.$start.' AND '.$end.' AND userid='.
             $userid.' AND courseid='.$courseid.' AND timesheetid=0';
-        
-        $units = $DB->get_records_sql($sql);
-        
-        if($units){
 
-            $earnings = break_down_earnings($units);
-            
-            //Create entry in timesheet table
-            $newtimesheet = new stdClass();
-            $newtimesheet->userid = $userid;
-            $newtimesheet->courseid = $courseid;
-            $newtimesheet->submitted = 0;
-            $newtimesheet->workersignature = time();
-            $newtimesheet->reghours = $earnings['reghours'];
-            $newtimesheet->regpay = $earnings['regearnings'];
-            $newtimesheet->othours = $earnings['ovthours'];
-            $newtimesheet->otpay = $earnings['ovtearnings'];
+        $numunits = $DB->count_records_sql($sql);
+
+        if($numunits){
         
-            $timesheetid = $DB->insert_record('block_timetracker_timesheet', $newtimesheet);
+            split_boundary_units($start, $end, $userid, $courseid);
+       
+            $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE timein BETWEEN '.
+                $start.' AND '.$end.' AND timeout BETWEEN '.$start.' AND '.$end.' AND userid='.
+                $userid.' AND courseid='.$courseid.' AND timesheetid=0';
+            
+            $units = $DB->get_records_sql($sql);
+            
+            if($units){
+    
+                $earnings = break_down_earnings($units);
                 
-            foreach ($units as $unit){
-                $unit->timesheetid = $timesheetid; 
-                $unit->canedit = 0;
-                $DB->update_record('block_timetracker_workunit', $unit);    
+                //Create entry in timesheet table
+                $newtimesheet = new stdClass();
+                $newtimesheet->userid = $userid;
+                $newtimesheet->courseid = $courseid;
+                $newtimesheet->submitted = 0;
+                $newtimesheet->workersignature = time();
+                $newtimesheet->reghours = $earnings['reghours'];
+                $newtimesheet->regpay = $earnings['regearnings'];
+                $newtimesheet->othours = $earnings['ovthours'];
+                $newtimesheet->otpay = $earnings['ovtearnings'];
+            
+                $timesheetid = $DB->insert_record('block_timetracker_timesheet', $newtimesheet);
+                    
+                foreach ($units as $unit){
+                    $unit->timesheetid = $timesheetid; 
+                    $unit->canedit = 0;
+                    $DB->update_record('block_timetracker_workunit', $unit);    
+                }
+                $status = 'You have successfully signed the official timesheet.';
+            } else {
+                $status = 'There are no units to sign for the given date range.';
             }
-            $status = 'You have successfully signed the official timesheet.';
         } else {
             $status = 'There are no units to sign for the given date range.';
         }
         $redirectparams['id'] = $courseid;
         $redirectparams['userid'] = $userid;
-        $redirecturl = new moodle_url('/blocks/timetracker/timesheet.php?', $redirectparams);
+        $redirecturl = new moodle_url('/blocks/timetracker/viewtimesheets.php?', $redirectparams);
         redirect($redirecturl, $status, 2);
     } else {
         //form is shown for the first time

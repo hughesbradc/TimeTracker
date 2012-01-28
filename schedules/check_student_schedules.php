@@ -35,6 +35,7 @@ function check_worker_hours_for_conflicts($workerid, $from, $to){
         return $myconflicts;
     }
 
+
     $scheduleitems = $DB->get_records('block_timetracker_schedules',
         array('studentid'=>strtolower($mdlworker->username)));
 
@@ -80,6 +81,16 @@ function check_worker_hours_for_conflicts($workerid, $from, $to){
             }
     
             while($iterator < $to){
+
+                if($iterator > $item->end_date){
+                   break; 
+                }
+
+                if($iterator < $item->begin_date){
+                    $iterator = strtotime('+1 week', $iterator);
+                    continue;
+                }
+
                 $tdate = usergetdate($iterator);
                 
                 //class start
@@ -115,7 +126,7 @@ function check_worker_hours_for_conflicts($workerid, $from, $to){
                     'start <= '.$in.' AND end >= '.$out);
                 if(!$duringbreak) {
                     $conflicts = find_conflicts($in, $out, $worker->id, -1,
-                        $worker->courseid);
+                        $worker->courseid, false, true);
                     if(sizeof($conflicts) > 0){
                         foreach($conflicts as $conflict){
                             $conflict->conflictcourse = 

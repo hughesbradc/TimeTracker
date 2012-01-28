@@ -415,7 +415,7 @@ function overlaps($timein, $timeout, $userid, $unitid=-1, $courseid=-1){
 * If the array is empty, there are no overlapping units
 */
 function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1,
-    $ispending=false){
+    $ispending=false, $onlyunsigned=false){
 
     global $CFG, $COURSE, $DB;
     if($courseid == -1) $courseid = $COURSE->id;
@@ -429,6 +429,10 @@ function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1,
         
     if($unitid != -1 && !$ispending){
         $sql.=" AND id != $unitid"; 
+    }
+
+    if($onlyunsigned){
+        $sql .= " AND timesheetid=0";
     }
 
     $conflictingunits = $DB->get_records_sql($sql);
