@@ -60,7 +60,7 @@ class timetracker_supervisorsig_form extends moodleform {
 
             foreach ($timesheets as $timesheet){
                 $mform->addElement('html','<tr><td style="text-align: center">');
-                $mform->addElement('advcheckbox', 'timesheetid['.$timesheet->id.']','',
+                $mform->addElement('advcheckbox', 'signid['.$timesheet->id.']','',
                     null, array('group' => 1));
                 $mform->addElement('html','</td><td>');
                 

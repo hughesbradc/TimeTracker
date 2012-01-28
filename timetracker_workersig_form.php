@@ -76,7 +76,7 @@ class timetracker_workersig_form extends moodleform {
             }
             table,div,td,th,tr{
                 font-weight: normal;
-                font-size: 18px;
+                font-size: 15px;
                 font-family: helvetica;
             }
             
@@ -91,26 +91,35 @@ class timetracker_workersig_form extends moodleform {
             
             span.thirteen{
                 font-weight: bold;
-                font-size: 23px;
+                font-size: 18px;
                 font-family: helvetica;
             }
             
             span.ten{
                 font-weight: bold;
-                font-size: 20px;
+                font-size: 15px;
                 font-family: helvetica;
             }
             
-            span.eight{
+            span.eightpointfive{
                 font-weight: bold;
-                font-size: 18px;
+                font-size: 13px;
+                font-family; helvetica;
+            }
+
+            span.eight{
+                display: inline-block;
+                font-weight: bold;
+                font-size: 13px;
                 font-family: helvetica;
+                width: 75px;
             }
             
             span.seven{
-                font-weight: bold;
-                font-size: 17px;
+                display: inline-block;
+                font-size: 12px;
                 font-family: helvetica;
+                height: 95px;
             }
             
             </style>');
@@ -121,6 +130,7 @@ class timetracker_workersig_form extends moodleform {
             foreach($pages as $page){
                 $page = str_replace('<font size="13">', '<span class="thirteen">',$page);
                 $page = str_replace('<font size="10">', '<span class="ten">',$page);
+                $page = str_replace('<font size="8.5">', '<span class="eightpointfive">',$page);
                 $page = str_replace('<font size="8">', '<span class="eight">',$page);
                 $page = str_replace('<font size="7">', '<span class="seven">',$page);
                 $page = str_replace('</font>', '</span>',$page);
