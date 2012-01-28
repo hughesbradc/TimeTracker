@@ -71,35 +71,37 @@ if(!$workers){
 
     if ($mform->is_cancelled()){ //user clicked cancel
         //redirect($nextpage);
-        redirect($index, $urlparams);
+        redirect($index);
 
     } else if ($formdata=$mform->get_data()){
-    
-        $indexparams['id'] = $courseid;
-        $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $indexparams);
-    
-        //redirect($nextpage);
 
-        /*
-         * Set supervisorsignature in timesheet table 
-         * Set supermdlid in timesheet table
-         */
+        $reparams['id'] = $courseid;
+        $reurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/supervisorsig.php', $reparams);
         
-        $timesheets = $DB->get_records('block_timetracker_timesheet',
-            array('courseid'=>$COURSE->id, 'supervisorsignature'=>0));
-
-        foreach($timesheets as $timesheet){
-           if($formdata->signid[$timesheet->id] == 1){
-                $timesheet->supervisorsignature = time();
-                $timesheet->supermdlid = $USER->id;
-                $DB->update_record('block_timetracker_timesheet',$timesheet);
-           }
+        if(!in_array(1, $formdata->signid)){
+            $status = 'You have not selected any timesheets to be signed. <br />
+                Redirecting you back to the supervisor signature page.';    
+        } else {
+    
+            /*
+            * Set supervisorsignature in timesheet table 
+            * Set supermdlid in timesheet table
+            */
+            
+            $timesheets = $DB->get_records('block_timetracker_timesheet',
+                array('courseid'=>$COURSE->id, 'supervisorsignature'=>0));
+    
+            foreach($timesheets as $timesheet){
+                if($formdata->signid[$timesheet->id] == 1){
+                    $timesheet->supervisorsignature = time();
+                    $timesheet->supermdlid = $USER->id;
+                    $DB->update_record('block_timetracker_timesheet',$timesheet);
+                }
+            }
+            $status = 'You have successfully signed the selected timesheet(s).';
         }
         
-        $redirectparams['id'] = $courseid;
-        $redirecturl = new moodle_url('/blocks/timetracker/index.php?', $redirectparams);
-        $status = 'You have successfully signed the selected timesheet(s).';
-        redirect($redirecturl, $status, 2);
+        redirect($reurl, $status, 2);
     
     } else {
         //form is shown for the first time

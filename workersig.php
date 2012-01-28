@@ -74,7 +74,7 @@ if(!$worker){
 
     if ($mform->is_cancelled()){ //user clicked cancel
         //redirect($nextpage);
-        redirect($index, $urlparams);
+        redirect($index);
 
     } else if ($formdata=$mform->get_data()){
        /*

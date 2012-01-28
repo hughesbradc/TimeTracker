@@ -113,8 +113,10 @@ if(!$workers){
         }
         
         foreach($timesheets as $timesheet){
-            $timesheet->transactionid = $transactionid; 
-            $DB->update_record('block_timetracker_timesheet',$timesheet);
+            if($formdata->signid[$timesheet->id] == 1){
+                $timesheet->transactionid = $transactionid; 
+                $DB->update_record('block_timetracker_timesheet',$timesheet);
+            }
         }
 
     } else {

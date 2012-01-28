@@ -101,8 +101,9 @@ if(!$canmanage){
     $timesheet = $DB->get_record('block_timetracker_timesheet', array('id'=>$timesheetid));
     
     if ($mform->is_cancelled()){ 
-        //user clicked cancel
-        redirect($nextpage);
+        $reparams['id'] = $courseid;
+        $reurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/supervisorsig.php', $reparams);
+        redirect($reurl);
     
     } else if ($formdata=$mform->get_data()){
         $timesheetid = $formdata->timesheetid;

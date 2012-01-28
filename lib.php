@@ -1218,7 +1218,7 @@ function get_workers_stats($courseid){
 
 
 /**
-* XXX TODO document this function
+* XX TODO document this function
 * @return an array of config items for this course;
 */
 function get_timetracker_config($courseid){
