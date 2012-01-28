@@ -187,13 +187,13 @@ function generate_html($start, $end, $userid, $courseid, $timesheetid=-1,
             <table style="margin-left: auto: margin-right: auto" cellspacing="0"'.
             'cellpadding="0" width="540px">
             <tr>
-                <td><font size="8"><b>WORKER: '.strtoupper($workerrecord->lastname).', '
+                <td><font size="8.5"><b>WORKER: '.strtoupper($workerrecord->lastname).', '
                     .strtoupper($workerrecord->firstname).'<br />'
                 .'ID: '.$workerrecord->idnum.'<br />'
                 .'ADDRESS: '.$workerrecord->address.'<br />
                 YTD Earnings: $ '.get_earnings_this_year($userid, $courseid).
                 '</b></font></td>
-                <td><font size="8"><b>SUPERVISOR: '.$conf['supname'].'<br />'
+                <td><font size="8.5"><b>SUPERVISOR: '.$conf['supname'].'<br />'
                 .'DEPARTMENT: '.$conf['department'].'<br />'
                 .'POSITION: '.$conf['position'].'<br />'
                 .'BUDGET: '.$conf['budget'].'</b></font></td>
