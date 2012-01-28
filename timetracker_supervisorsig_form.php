@@ -111,7 +111,9 @@ class timetracker_supervisorsig_form extends moodleform {
                 $mform->addElement('html',$editaction);
                 $mform->addElement('html','</tr>');
             }
+        $mform->addElement('html','<tr><td align="center" colspan="5">');
         $this->add_checkbox_controller(1);
+        $mform->addElement('html','</td></tr>');
         $mform->addElement('html','</table>');
         $mform->addElement('html', get_string('supervisorstatement','block_timetracker'));
         $mform->addElement('checkbox','supervisorsig',get_string('clicktosign','block_timetracker'));
