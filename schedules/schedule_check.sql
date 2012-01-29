@@ -38,13 +38,13 @@ CREATE TABLE `mdl_block_timetracker_schedules` (
 
 
 --
--- Table structure for table `mdl_block_timetracker_calendar`
+-- Table structure for table `mdl_block_timetracker_holiday`
 --
 
-DROP TABLE IF EXISTS `mdl_block_timetracker_calendar`;
+DROP TABLE IF EXISTS `mdl_block_timetracker_holiday`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `mdl_block_timetracker_calendar` (
+CREATE TABLE `mdl_block_timetracker_holiday` (
   `id` bigint(10) unsigned NOT NULL AUTO_INCREMENT,
   `description` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `start` bigint(10) NOT NULL,

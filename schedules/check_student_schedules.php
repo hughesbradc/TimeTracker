@@ -122,7 +122,7 @@ function check_worker_hours_for_conflicts($workerid, $from, $to){
                     $tdate['hours'], $tdate['minutes']);
                 
                 //check to see if this class was during a break; if so, skip it.
-                $duringbreak = $DB->count_records_select('block_timetracker_calendar', 
+                $duringbreak = $DB->count_records_select('block_timetracker_holiday', 
                     'start <= '.$in.' AND end >= '.$out);
                 if(!$duringbreak) {
                     $conflicts = find_conflicts($in, $out, $worker->id, -1,
