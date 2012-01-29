@@ -85,12 +85,9 @@ if(!$worker){
             Set all of the work units canedit=0
        */
         
-        $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE timein BETWEEN '.
-            $start.' AND '.$end.' OR timeout BETWEEN '.$start.' AND '.$end.' AND userid='.
-            $userid.' AND courseid='.$courseid.' AND timesheetid=0';
-
-        $numunits = $DB->count_records_sql($sql);
-
+        $numunits = $DB->count_records_select('block_timetracker_workunit',
+            'timein BETWEEN '.$start.' AND '.$end.' OR timeout BETWEEN '.$start.' AND '.  $end,
+            array('userid'=>$userid, 'courseid'=>$courseid, 'timesheetid'=>0));
         if($numunits){
         
             split_boundary_units($start, $end, $userid, $courseid);

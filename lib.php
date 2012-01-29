@@ -122,7 +122,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
         'userid = '.$userid.' AND courseid = '.$courseid.' AND timesheetid=0 AND '.
         'timein < '.$start.' AND timeout > '.$start;
 
-    error_log($sql);
+    //error_log($sql);
     $startunits = $DB->get_records_sql($sql);
 
     if($startunits){
@@ -164,7 +164,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
         'userid = '.$userid.' AND courseid = '.$courseid.' AND timesheetid=0 AND '.
         'timein >= '.$start.' AND timeout > '.$end;
 
-    error_log($sql);
+    //error_log($sql);
     $endunits = $DB->get_records_sql($sql);
 
     if($endunits){

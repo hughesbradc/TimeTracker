@@ -145,10 +145,7 @@ if(!$canmanage){
         
         //Build the email and send to the worker
         $ttuser = $DB->get_record('block_timetracker_workerinfo',array('id'=>$userid));
-        error_log('before getting user');
         $user = $DB->get_record('user',array('id'=>$ttuser->mdluserid));
-        error_log('after getting user');
-        //print_object($user);
         
         $mailok = email_to_user($user, $from, $subject, $messagetext, $messagehtml); 
         if(!$mailok){

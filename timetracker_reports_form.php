@@ -262,7 +262,6 @@ class timetracker_reports_form  extends moodleform {
         }
 
         $sql .= ' ORDER BY timein DESC';
-        //error_log($sql);
         $units = $DB->get_records_sql($sql);
 
         $mform->addElement('header', 'general', $workerdesc); 
