@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/timetracker/db" VERSION="20111221" COMMENT="XMLDB file for Moodle Timetracker block"
+<XMLDB PATH="blocks/timetracker/db" VERSION="20120101" COMMENT="XMLDB file for Moodle Timetracker block"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -127,26 +127,13 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_timetracker_transactn" COMMENT="Describes a transaction as a group of time sheets that have been 'processed', e.g. by your payroll department." PREVIOUS="block_timetracker_timesheet" NEXT="block_timetracker_txdetail">
+    <TABLE NAME="block_timetracker_transactn" COMMENT="Describes a transaction as a group of time sheets that have been 'processed', e.g. by your payroll department." PREVIOUS="block_timetracker_timesheet">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="submitted"/>
         <FIELD NAME="submitted" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="unix time of the date/time that this transaction was processed" PREVIOUS="id" NEXT="description"/>
         <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="A description of this transaction" PREVIOUS="submitted" NEXT="mdluserid"/>
         <FIELD NAME="mdluserid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The Moodle user id of the user that finalized this transaction" PREVIOUS="description" NEXT="categoryid"/>
         <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The moodle categoryid to which this transaction refers" PREVIOUS="mdluserid"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="block_timetracker_txdetail" COMMENT="Info about each pay entry for this transaction" PREVIOUS="block_timetracker_transactn">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The workerinfo.id of the worker in question" PREVIOUS="id" NEXT="hours"/>
-        <FIELD NAME="hours" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" DECIMALS="2" COMMENT="The hours worked, associated with this entry" PREVIOUS="userid" NEXT="pay"/>
-        <FIELD NAME="pay" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" DECIMALS="2" COMMENT="Total pay amount" PREVIOUS="hours" NEXT="paycode"/>
-        <FIELD NAME="paycode" TYPE="char" LENGTH="50" NOTNULL="false" DEFAULT="Reg" SEQUENCE="false" COMMENT="Code for this pay type. REG, OVT, etc." PREVIOUS="pay" NEXT="transactionid"/>
-        <FIELD NAME="transactionid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The id of the transaction with which this entry is associated" PREVIOUS="paycode"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
