@@ -32,9 +32,9 @@ if(($handle = fopen($file, "r")) !== FALSE){
         $end            = $data[2];
 
         $entry              = new stdClass();
-        $entry->description = $holidaydesc
+        $entry->description = $holidaydesc;
         $entry->start       = $start;
-        $entry->end        = $end;
+        $entry->end         = $end;
 
         $holidayitems[] = $entry;
     }
