@@ -9,9 +9,9 @@ global $CFG, $DB, $USER;
 
 $files = array();
 
-$files[]='12_2_sept_earnings.csv';
-$files[]='12_2_oct_earnings.csv';
-$files[]='12_2_nov_earnings.csv';
+$files[]='oct_earnings.csv';
+$files[]='nov_earnings.csv';
+$files[]='dec_earnings.csv';
 
 /**
  The purpose of this script is to find earnings/max earnings for this term
@@ -38,6 +38,7 @@ foreach ($files as $file){
             } else {
                 $this_worker = new  stdClass();
                 $this_worker->studentid = $id;
+                $this_worker->fileid = str_replace('s000','',$id);
                 $this_worker->hours = $hours;
                 $this_worker->firstname = $data[3];
                 $this_worker->lastname = $data[2];
@@ -54,7 +55,7 @@ foreach ($files as $file){
 //print out the consolidated numbers
 foreach ($workers as $worker){
     //print_object($worker);
-    echo '"'.$worker->studentid.'","'.$worker->hours.'","'.
+    echo '"'.$worker->fileid.'","'.$worker->hours.'","'.
         $worker->lastname.'","'.$worker->firstname.'","'.
         $worker->department.'"'. "\n";
 

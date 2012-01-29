@@ -10,12 +10,17 @@ require_once('../lib.php');
 global $CFG, $DB, $USER;
 
 $courses = get_courses(2, 'fullname ASC', 'c.id, c.shortname');
+$MONTH = 12;
+$YEAR = 2011;
+$FILE='/tmp/december.csv';
 
 //foreach($workers as $worker){
-if(($handle = fopen("12_2november.csv", "r")) !== FALSE){
+if(($handle = fopen($FILE, "r")) !== FALSE){
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
-        $fileid = $data[0]; 
+        $fileid = $data[2];  //student ID field
+        $fileid = strtolower($fileid);
+
         $email = $fileid.'@mhc.edu';
 
     
@@ -26,22 +31,17 @@ if(($handle = fopen("12_2november.csv", "r")) !== FALSE){
         }
         foreach($workers as $worker){
 
-            //demo courses, et. al.
-            if($worker->courseid >= 73 && $worker->courseid <= 76){
-                continue;
-            }
-
             $course = $courses[$worker->courseid];
             if(!$course){ //not a course in this category;
                 continue;
             }
 
-            $earnings = get_hours_this_month($worker->id,$worker->courseid, 11, 2011);
+            $earnings = get_hours_this_month($worker->id, $worker->courseid, $MONTH, $YEAR);
         
 
-            $id = str_replace('@mhc.edu', '', $worker->email);
+            //$id = str_replace('@mhc.edu', '', $worker->email);
         
-            echo '"'.$id.'","'.$earnings.'","'.$worker->lastname.'","'.
+            echo '"'.$fileid.'","'.$earnings.'","'.$worker->lastname.'","'.
                 $worker->firstname.'","'.$course->shortname.'"'."\n";
     
         }
