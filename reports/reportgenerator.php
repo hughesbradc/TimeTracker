@@ -72,7 +72,6 @@ if ($mform->is_cancelled()){
 
 } else if ($formdata=$mform->get_data()){
     $genConflicts = false;
-
     $urlparams['catid'] = $catid;
     $urlparams['start'] = $formdata->reportstart;
     $urlparams['end'] = strtotime('+ 1 day ', $formdata->reportend) - 1;
@@ -101,7 +100,6 @@ if ($mform->is_cancelled()){
     //form is shown for the first time
     
     echo $OUTPUT->header();
-    
     //$maintabs = get_tabs($urlparams, $canmanage);
     //$maintabs = get_tabs($urlparams, $canmanage, $courseid);
     //print_object($urlparams);

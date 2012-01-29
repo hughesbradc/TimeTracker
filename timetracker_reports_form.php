@@ -50,11 +50,6 @@ class timetracker_reports_form  extends moodleform {
             $canmanage = true;
         }
 
-        $canmanageold = false;
-        if (has_capability('block/timetracker:manageoldunits', $this->context)){
-            $canmanageold = true;
-        }
-
         $issiteadmin = false;
         if(has_capability('moodle/site:config',$this->context)){
             $issiteadmin = true;
@@ -267,7 +262,6 @@ class timetracker_reports_form  extends moodleform {
         }
 
         $sql .= ' ORDER BY timein DESC';
-        //error_log($sql);
         $units = $DB->get_records_sql($sql);
 
         $mform->addElement('header', 'general', $workerdesc); 
@@ -482,7 +476,22 @@ class timetracker_reports_form  extends moodleform {
 
                     $unitdateinfo = usergetdate($unit->timein);
 
-                    if(!$canmanageold && expired($unit->timein, $now)){
+                    if ($unit->timesheetid && !$unit->submitted){
+                        //show greyed out icons and no URL
+                        $row .= '<td style="text-align: center">'.
+                            html_writer::empty_tag('img', 
+                                array('src' => 
+                                $CFG->wwwroot.'/blocks/timetracker/pix/wait.png', 
+                                'class' => 'icon')).
+                            '</td>';
+                    } else if ($unit->timesheetid && $unit->submitted) {
+                        $row .= '<td style="text-align: center">'.
+                            html_writer::empty_tag('img', 
+                                array('src' => 
+                                $CFG->wwwroot.'/blocks/timetracker/pix/certified.png', 
+                                'class' => 'icon')).
+                            '</td>';
+                    } else if(!$unit->canedit){
                         
                         //show greyed out icons and no URL
                         $row .= '<td style="text-align: center">'.
@@ -495,7 +504,7 @@ class timetracker_reports_form  extends moodleform {
                                 $CFG->wwwroot.'/blocks/timetracker/pix/clock_delete_bw.png', 
                                 'class' => 'icon')).
                             '</td>';
-                    }else {
+                    } else {
                  
             
                         $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php', 
@@ -526,7 +535,22 @@ class timetracker_reports_form  extends moodleform {
                     $urlparams['unitid'] = $unit->id;
 
                     $unitdateinfo = usergetdate($unit->timein);
-                    if(!$canmanageold && expired($unit->timein, $now)){
+                    if ($unit->timesheetid && !$unit->submitted){
+                        //show greyed out icons and no URL
+                        $row .= '<td style="text-align: center">'.
+                            html_writer::empty_tag('img', 
+                                array('src' => 
+                                $CFG->wwwroot.'/blocks/timetracker/pix/wait.png', 
+                                'class' => 'icon')).
+                            '</td>';
+                    } else if ($unit->timesheetid && $unit->submitted) {
+                        $row .= '<td style="text-align: center">'.
+                            html_writer::empty_tag('img', 
+                                array('src' => 
+                                $CFG->wwwroot.'/blocks/timetracker/pix/certified.png', 
+                                'class' => 'icon')).
+                            '</td>';
+                    } else if(!$unit->canedit){
                         
                         //show greyed out icons and no URL
                         $alertaction = 
@@ -540,9 +564,9 @@ class timetracker_reports_form  extends moodleform {
                         $alerticon = new pix_icon('alert', 'Alert Supervisor of Error',
                             'block_timetracker');
                         $alertaction = $OUTPUT->action_icon($alerturl, $alerticon);
+                        $row .='<td style="text-align:center">'.$alertaction.'</td>';
 
                     }
-                    $row .='<td style="text-align:center">'.$alertaction.'</td>';
 
                 }
                 $row .= '</tr>';

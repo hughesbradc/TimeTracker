@@ -43,7 +43,7 @@ class timetracker_timesheet_form  extends moodleform {
             $canmanage = true;
         }
 
-        $mform->addElement('header','general','Generate Monthly Timesheet');
+        $mform->addElement('header','general','Generate Timesheet');
 
         // Collect all of the workers under the supervisor
 
@@ -144,28 +144,23 @@ class timetracker_timesheet_form  extends moodleform {
         //normally you use add_action_buttons instead of this code
         $buttonarray=array();
         $buttonarray[] = &$mform->createElement('submit', 
-            //'unofficial', 'Generate unofficial timesheet');
-            'unofficial', 'Generate paper timesheet');
+            'unofficial', 'Generate unofficial timesheet');
 
         //only let workers begin the official timesheet data submission process
-        /*
         if(!$canmanage){ 
             $buttonarray[] = &$mform->createElement('submit', 'official', 
                 'Submit official timesheet');
         } 
-        */
         //$buttonarray[] = &$mform->createElement('cancel');
 
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
-        $mform->closeHeaderBefore('buttonar');
+        //$mform->closeHeaderBefore('buttonar');
     }
 
     function validation($data){
         $errors = array();
-
+        
         if(!isset($data['entiremonth'])){
-            $monthinfo = get_month_info($data['month'], $data['year']); 
-            
             if($data['endday'] < $data['startday']){
                 $errors['startday'] = 'Start day cannot be after end day';
             }

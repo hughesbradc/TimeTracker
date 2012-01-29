@@ -85,7 +85,7 @@
             if(has_capability('moodle/site:config', $this->context)){
                 $hasalerts = has_course_alerts($COURSE->id);
             }
-
+            
             $indexparams['id'] = $courseid;
             $this->content->text .= '<div style="text-align: left">';
 
@@ -94,8 +94,19 @@
                 $alertsurl = new moodle_url($baseurl.'/managealerts.php', $indexparams);
                 $alerticon= new pix_icon('alert','Manage Alerts', 'block_timetracker');
                 $alertaction= $OUTPUT->action_icon($alertsurl, $alerticon);
-                $this->content->text .= $alertaction.' <a href="'.$alertsurl.
-                    '" style="color: red">Manage worker alerts</a><br /><br />';
+                $this->content->text .= get_alerts_link($COURSE->id, $alerticon, $alertaction);
+            }
+
+            $hastimesheets = has_unsigned_timesheets($COURSE->id);
+            if(has_capability('moodle/site:config', $this->context)){
+                $hastimesheets = has_unsigned_timesheets($COURSE->id);
+            }
+            
+            if($hastimesheets){
+                $timesheetsurl = new moodle_url($baseurl.'/supervisorsig.php', $indexparams);
+                $timesheetsicon = new pix_icon('alert','Sign Timesheets','block_timetracker');
+                $timesheetsaction = $OUTPUT->action_icon($timesheetsurl, $timesheetsicon);
+                $this->content->text .= get_timesheet_link($COURSE->id, $timesheetsicon, $timesheetsaction);
             }
 
             $index = new moodle_url($baseurl.'/index.php', $indexparams);
@@ -114,7 +125,7 @@
 
             $timesheeturl = new moodle_url($baseurl.'/timesheet.php', $indexparams);
             $timesheetaction=$OUTPUT->action_icon($timesheeturl, 
-                new pix_icon('i/calendar', 'Timesheets')); 
+                new pix_icon('date', 'Timesheets','block_timetracker')); 
 
             $this->content->text .= $timesheetaction.' '.
                 $OUTPUT->action_link($timesheeturl, 'Timesheet').'<br />';
@@ -249,7 +260,7 @@
                         $indexparams);
                     $timesheeturl->params(array('userid'=>$worker->id));
                     $timesheetaction=$OUTPUT->action_icon($reportsurl, 
-                        new pix_icon('i/calendar', 'Timesheets')); 
+                        new pix_icon('date', 'Timesheets','block_timetracker')); 
             
                     $this->content->text .= '<div style="text-align: left">';
                     $this->content->text .= 
@@ -310,7 +321,7 @@
                         $indexparams);
                     $timesheeturl->params(array('userid'=>$worker->id));
                     $timesheetaction=$OUTPUT->action_icon($reportsurl, 
-                        new pix_icon('i/calendar', 'Timesheets')); 
+                        new pix_icon('date', 'Timesheets', 'block_timetracker')); 
 
                     $this->content->text .= '<div style="text-align: left">';
                     $this->content->text .= 

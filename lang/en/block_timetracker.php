@@ -257,7 +257,7 @@ $string['notpermissible'] = 'You do not have permissions to perform this action'
 $string['errordeleting'] = 'Invalid session key or user id';
 $string['usernotexist'] = 'User does not exist';
 $string['alreadyapproved'] = 'This work unit has already been approved by {$a}';
-
+$string['invalidtimesheetid'] = 'Timesheet ID does not exist for this user';
 $string['timesheettitle'] = 'Timesheet Report';
 
 //Context-Sensitive Help
@@ -344,5 +344,38 @@ $string['terms_title'] = 'Edit Terms';
 //Electronic Signatures
 $string['timesheet'] = 'Timesheet';
 $string['signbutton'] = 'Sign timesheet';
+$string['signbuttonsup'] = 'Sign selected timesheet(s)';
 $string['signature'] = 'Signature';
+$string['signheader'] = 'Sign Timesheets';
+$string['editwarning'] = 'Are you sure you wish to edit this timesheet?  Doing so will remove the student\'s signature and require him or her to re-sign before the timesheet can be approved.';
+$string['viewofficial'] = 'View Official Timesheets';
+$string['workerstatement'] = 'I certify that the hours reported on this timesheet are true, correct, and are within my allotted maximum earnings.  
+    I understand that if my timesheet is not signed by the due date, I will not be paid for these hours until the next pay period.';
+$string['supervisorstatement'] = 'I certify that the hours reported on the selected timesheet(s) are true, correct, and are within each student\'s allotted 
+    maximum earnings. I understand that if the timesheets are not signed by the due date, the students will not be paid for these hours until the next pay 
+    period.';
+$string['clicktosign'] = 'Click here to sign:';
+$string['supsignerror'] = '<B>ERROR: A supervisor cannot sign a student\'s timesheet.</B>';
+$string['notstosign'] = '<b><center>There are no timesheets requiring your signature
+    at this time.</center></b>';
+$string['signtsheading'] = 'Sign Timesheet';
+$string['rejectts'] = 'Reject Timesheet';
+$string['nocourseserror'] = 'There are no courses in this category.';
+$string['noworkerserror'] = 'There are no workers enrolled in this course.';
+$string['nounits'] = 'ERROR: There are no units to be signed.'; 
 
+
+//Deny Official Timesheet Strings
+$string['rejecttstitle'] = 'Reject Timesheet';
+$string['tssubject'] = 'TimeTracker Timesheet Rejected';
+$string['reject'] = 'Reject';
+$string['headername'] = '<b>Reject Timesheet for {$a}</b>';
+$string['headertimestamp'] = ' <b>signed on {$a}</b>';
+$string['remessage1'] = 'Your timesheet signed on {$a}';
+$string['remessagesup'] = ' was rejected by your supervisor for the following reason(s):';
+$string['remessageadmin'] = ' was rejected by an administrator for the following reason(s):';
+$string['rejectreason'] = 'Reason(s):';
+$string['instruction'] = 'Please contact your supervisor for more information and to re-sign the
+    timesheet.';
+$string['remessagesent'] = 'The student has been notified that his or her timesheet has been edited
+    and requires a new signature.';
