@@ -7,6 +7,7 @@ require_once('../lib.php');
 
 
 function check_worker_hours_for_conflicts($workerid, $from, $to){
+    error_log("checking for class conflicts");
     global $CFG, $DB, $USER;
     $myconflicts = array();
 
@@ -62,7 +63,7 @@ function check_worker_hours_for_conflicts($workerid, $from, $to){
             }
     
             $iterator = strtotime("Next $day_names[$day]", $from);
-            if($item->begin_time > 1200){
+            if($item->begin_time >=1200){
                 $dispstarttime = $item->begin_time;
                 if($item->begin_time >=1300)
                     $dispstarttime -= 1200;
@@ -71,7 +72,7 @@ function check_worker_hours_for_conflicts($workerid, $from, $to){
                 $dispstarttime = $item->begin_time.'am';
             }
     
-            if($item->end_time > 1200){
+            if($item->end_time >= 1200){
                 $dispendtime = $item->end_time;
                 if($item->end_time >=1300)
                     $dispendtime -= 1200;
@@ -81,6 +82,7 @@ function check_worker_hours_for_conflicts($workerid, $from, $to){
             }
     
             while($iterator < $to){
+
 
                 if($iterator > $item->end_date){
                    break; 
@@ -124,6 +126,7 @@ function check_worker_hours_for_conflicts($workerid, $from, $to){
                 //check to see if this class was during a break; if so, skip it.
                 $duringbreak = $DB->count_records_select('block_timetracker_holiday', 
                     'start <= '.$in.' AND end >= '.$out);
+                //error_log($duringbreak);
                 if(!$duringbreak) {
                     $conflicts = find_conflicts($in, $out, $worker->id, -1,
                         $worker->courseid, false, true);

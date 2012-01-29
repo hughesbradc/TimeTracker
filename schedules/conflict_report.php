@@ -45,6 +45,7 @@ $PAGE->set_course($course);
 $context = $PAGE->context;
 
 
+
 if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     print_error('This page is not accessible by a supervisor');
 }
