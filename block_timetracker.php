@@ -517,6 +517,7 @@
      * @return boolean true if all feeds were retrieved succesfully
      */
     function cron() {
+        /*
 
         global $CFG, $DB;
 
@@ -586,6 +587,7 @@
             }
         }
         mtrace($emails.' reminder emails sent');
+        */
     }
 
 
