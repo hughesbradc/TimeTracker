@@ -30,6 +30,8 @@ if(($handle = fopen($file, "r")) !== FALSE){
         $days       = $data[2];
         $start      = $data[3];
         $end        = $data[4];
+        $sdate      = $data[5];
+        $edate      = $data[6];
 
         $entry              = new stdClass();
         $entry->studentid   = $studentid;
@@ -37,6 +39,8 @@ if(($handle = fopen($file, "r")) !== FALSE){
         $entry->days        = $days;
         $entry->begin_time  = $start;
         $entry->end_time    = $end;
+        $entry->begin_date  = $sdate;
+        $entry->end_date    = $edate;
 
         $scheduleitems[] = $entry;
     }
