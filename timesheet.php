@@ -182,15 +182,21 @@ if($mform->is_cancelled()){
 
     $tabs = get_tabs($urlparams, $canmanage, $courseid);
     $tabs = array($tabs);
+    print_tabs($tabs, 'timesheets');
 
-    $timesheetsub = array();
+    //$timesheetsub = array();
     if($canmanage){
         $num = has_unsigned_timesheets($courseid);
         if($num > 0){
             $supersigurl = new
                 moodle_url($CFG->wwwroot.'/blocks/timetracker/supervisorsig.php', $urlparams);
             $desc = 'Sign timesheets - ('.$num.')';
-            $timesheetsub[] = new tabobject('supersig', $supersigurl, $desc);
+            /*
+                $timesheetsub[] = new tabobject('supersig', $supersigurl, $desc);
+            */
+            $OUTPUT->box_start('generalbox boxaligncenter');
+            echo $OUTPUT->action_link($supersigurl, $desc);
+            $OUTPUT->box_end();
         }
     } else {
         $myself = $DB->get_record('block_timetracker_workerinfo',
@@ -198,13 +204,18 @@ if($mform->is_cancelled()){
         $urlparams['userid'] = $myself->id;
         $submittedurl = new moodle_url($CFG->wwwroot.
             '/blocks/timetracker/viewtimesheets.php', $urlparams);
+        /*
         $timesheetsub[] = new tabobject('submitted', 
             $submittedurl, 'Previously submitted timesheets');
+        */
+        $OUTPUT->box_start('generalbox boxaligncenter');
+        echo $OUTPUT->action_link($submittedurl, 'Previously submitted timesheets');
+        $OUTPUT->box_end();
+
     }
-    $tabs[] = $timesheetsub;
+    //$tabs[] = $timesheetsub;
 
 
-    print_tabs($tabs, 'timesheets');
 
     $mform->display();
     echo $OUTPUT->footer();

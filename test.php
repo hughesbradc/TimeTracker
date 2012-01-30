@@ -28,8 +28,21 @@ require_once(dirname(__FILE__) . '/../../config.php');
 
 //require_login();
 
+//error_log("this is only a test!!");
+//error_log("this is only a test!!");
+//error_log("this is only a test!!");
+//error_log("this is only a test!!");
+//error_log("this is only a test!!");
+//error_log("this is only a test!!");
+error_log("this is only a test!!");
+error_log("this is only a test!!");
 
+phpinfo();
+
+
+/*
 $courses = get_courses(4, 'fullname ASC', 'c.id,c.shortname');
+
 
 if($courses){
 
@@ -38,6 +51,9 @@ if($courses){
     $sql .= $list.')';
     echo $sql;
 }
+
+*/
+
 
 
 /*
