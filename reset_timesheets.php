@@ -29,6 +29,9 @@ require_once('lib.php');
 
 require_login();
 
+print_error("not available");
+/*
+
 global $SESSION;
 
 $courseid = required_param('id', PARAM_INTEGER);
@@ -45,3 +48,4 @@ $DB->set_field('block_timetracker_workunit', 'timesheetid', 0);
 
 
 redirect($index, 'All timesheets have been deleted and data has been reset', 1);
+*/

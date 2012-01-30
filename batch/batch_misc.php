@@ -8,10 +8,12 @@ require_once('../lib.php');
  The purpose of this script is to find earnings/max earnings for this term
 */
 global $CFG, $DB, $USER;
+/*
 
 $manual = enrol_get_plugin('manual');
 
 $instances = enrol_get_instances(113, false);
+*/
 /*
 foreach($instances as $instance){
     if($instance->enrol == 'manual'){
@@ -24,19 +26,32 @@ foreach($instances as $instance){
 
 //$context = get_context_instance(CONTEXT_COURSE, 113);
 
+/*
 if(isset($winner))
     $manual->unenrol_user($winner, 3);
+*/
 
 
 //unenrol_user
 
 
-/*
+
 $courses = get_courses(5, 'fullname ASC', 'c.id,c.shortname');
+
+print_object($courses);
+
+$str = implode (',', array_keys($courses));
+
+//echo($str);
+
+$sql = 'UPDATE mdl_block_timetracker_workunit SET canedit=0,timesheetid=NULL where timeout < 1326690000 AND courseid IN ('.$str.')';
+
+echo $sql;
+
+exit;
 
 
 foreach($courses as $course){
-    */
 
     /*
     //delete old alerts
@@ -58,6 +73,7 @@ foreach($courses as $course){
     */
 
     //$workers = $DB->get_records('block_timetracker_workerinfo');
+    /*
     $workers = $DB->get_records('user');
     foreach($workers as $worker){
         
@@ -72,6 +88,7 @@ foreach($courses as $course){
         //}
 
     }
+    */
 
 
     /*
@@ -119,5 +136,4 @@ foreach($courses as $course){
 
     $DB->update_record('block_timetracker_config', $config);
     */
-/*
 }
