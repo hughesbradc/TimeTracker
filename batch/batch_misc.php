@@ -35,15 +35,19 @@ foreach($courses as $course){
     }
     */
 
-    $workers = $DB->get_records('block_timetracker_workerinfo');
+    //$workers = $DB->get_records('block_timetracker_workerinfo');
+    $workers = $DB->get_records('user');
     foreach($workers as $worker){
         
         $worker->email = str_replace('S000','s000', $worker->email);
+        if($worker->lastname == 'Hedberg' ||
+            $worker->lastname == 'Freeman')
+            print_object($worker);
         //$worker->active = 0;
-        $res = $DB->update_record('block_timetracker_workerinfo', $worker);
-        if(!$res){
-            echo "Error updating $worker->firstname $worker->lastname\n";
-        }
+        //$res = $DB->update_record('block_timetracker_workerinfo', $worker);
+        //if(!$res){
+            //echo "Error updating $worker->firstname $worker->lastname\n";
+        //}
 
     }
 
