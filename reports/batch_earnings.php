@@ -56,18 +56,6 @@ foreach($courses as $course){
     
     
     foreach($workers as $worker){
-<<<<<<< HEAD
-        //demo courses, et. al.
-        /*
-        if($worker->courseid >= 73 && $worker->courseid <= 76){
-            continue;
-        }
-        */
-    
-        $earnings = get_earnings($worker->id, $course->id, $start, $end);
-        $hours = get_hours_this_period($worker->id, $course->id, $start, $end);
-=======
->>>>>>> transaction
 
         $units = get_split_units($start, $end, $worker->id, $course->id);
 
