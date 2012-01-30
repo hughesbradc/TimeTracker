@@ -174,12 +174,6 @@ class timetracker_editunit_form extends moodleform {
                 $errors['timein'] = 'Time cannot be set in the future';    
             }
 
-            if(!has_capability('block/timetracker:manageoldunits', $this->context) && 
-                expired($data['timein'])){
-                $errors['timein'] = 'You are not authorized to add work units this far in the
-                past. See an administrator for assistance';
-            }
-
             if(!isset($data['payrate']) || $data['payrate'] == ''){
                 $errors['payrate'] = 'Payrate cannot be empty';
             }

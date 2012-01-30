@@ -85,7 +85,7 @@
             if(has_capability('moodle/site:config', $this->context)){
                 $hasalerts = has_course_alerts($COURSE->id);
             }
-
+            
             $indexparams['id'] = $courseid;
             $this->content->text .= '<div style="text-align: left">';
 
@@ -94,8 +94,19 @@
                 $alertsurl = new moodle_url($baseurl.'/managealerts.php', $indexparams);
                 $alerticon= new pix_icon('alert','Manage Alerts', 'block_timetracker');
                 $alertaction= $OUTPUT->action_icon($alertsurl, $alerticon);
-                $this->content->text .= $alertaction.' <a href="'.$alertsurl.
-                    '" style="color: red">Manage worker alerts</a><br /><br />';
+                $this->content->text .= get_alerts_link($COURSE->id, $alerticon, $alertaction);
+            }
+
+            $hastimesheets = has_unsigned_timesheets($COURSE->id);
+            if(has_capability('moodle/site:config', $this->context)){
+                $hastimesheets = has_unsigned_timesheets($COURSE->id);
+            }
+            
+            if($hastimesheets){
+                $timesheetsurl = new moodle_url($baseurl.'/supervisorsig.php', $indexparams);
+                $timesheetsicon = new pix_icon('alert','Sign Timesheets','block_timetracker');
+                $timesheetsaction = $OUTPUT->action_icon($timesheetsurl, $timesheetsicon);
+                $this->content->text .= get_timesheet_link($COURSE->id, $timesheetsicon, $timesheetsaction);
             }
 
             $index = new moodle_url($baseurl.'/index.php', $indexparams);
@@ -114,7 +125,7 @@
 
             $timesheeturl = new moodle_url($baseurl.'/timesheet.php', $indexparams);
             $timesheetaction=$OUTPUT->action_icon($timesheeturl, 
-                new pix_icon('i/calendar', 'Timesheets')); 
+                new pix_icon('date', 'Timesheets','block_timetracker')); 
 
             $this->content->text .= $timesheetaction.' '.
                 $OUTPUT->action_link($timesheeturl, 'Timesheet').'<br />';
@@ -249,7 +260,7 @@
                         $indexparams);
                     $timesheeturl->params(array('userid'=>$worker->id));
                     $timesheetaction=$OUTPUT->action_icon($reportsurl, 
-                        new pix_icon('i/calendar', 'Timesheets')); 
+                        new pix_icon('date', 'Timesheets','block_timetracker')); 
             
                     $this->content->text .= '<div style="text-align: left">';
                     $this->content->text .= 
@@ -310,7 +321,7 @@
                         $indexparams);
                     $timesheeturl->params(array('userid'=>$worker->id));
                     $timesheetaction=$OUTPUT->action_icon($reportsurl, 
-                        new pix_icon('i/calendar', 'Timesheets')); 
+                        new pix_icon('date', 'Timesheets', 'block_timetracker')); 
 
                     $this->content->text .= '<div style="text-align: left">';
                     $this->content->text .= 
@@ -506,10 +517,77 @@
      * @return boolean true if all feeds were retrieved succesfully
      */
     function cron() {
-        //global $CFG, $DB, $USER;
+        /*
 
-        //what would we need to do? Send reminders if last day of month?
+        global $CFG, $DB;
 
+        $days = 7;
+        $now = time();
+        $limit = $now - (7 * 60 * 60 * 24);
+        $thistime = usergetdate($now);
+        $monthinfo = get_month_info ($thistime['month'], $thistime['year']);
+        
+        $sql = 'SELECT DISTINCT courseid from mdl_block_timetracker_alertunits '.
+            'WHERE alerttime < '.$limit.
+            ' AND alerttime between '.$monthinfo['firstdaytimestamp'] .' AND '.
+            $now.'  ORDER BY courseid, alerttime ASC';
+        
+        $courses = $DB->get_records_sql($sql);
+
+
+        $emails = 0;
+        
+        foreach($courses as $course){
+        
+            $id = $course->courseid;
+            $courseinfo = $DB->get_record('course', array('id'=>$id));
+            $context = get_context_instance(CONTEXT_COURSE, $id);
+            $teachers = get_users_by_capability($context, 'block/timetracker:manageworkers');
+            //print_object($teachers);
+        
+            $coursealerts = $DB->get_records('block_timetracker_alertunits', array(
+                'courseid'=>$id));
+        
+        
+            $num = sizeof($coursealerts);
+            mtrace($num.' alerts for course '.$courseinfo->shortname);
+        
+            if($num == 1){
+                $body = "Hello!\n\nYou have $num work unit alert ".
+                    "that requires your attention for $courseinfo->shortname.\n\n";
+                $subj = $num.' Work Unit Alerts for '.$courseinfo->shortname;
+            } else {
+                $body = "Hello!\n\nYou have $num work unit alerts ".
+                    "that require your attention for $courseinfo->shortname.\n\n";
+                $subj = $num.' Work Unit Alert(s) for '.$courseinfo->shortname;
+            }
+
+            $body.= "To visit the TimeTracker Alerts page, either click the below ".
+                "link or copy/paste it into your browser window.\n\n".
+                $CFG->wwwroot.'/blocks/timetracker/managealerts.php?id='.$id. 
+                "\n\n".
+                "Thanks for your timely attention to this matter";
+        
+            $body_html = format_text($body);
+            $body = format_text_email($body_html, 'FORMAT_HTML');
+        
+            foreach($coursealerts as $alert){
+            
+                $alertcoms = $DB->get_records('block_timetracker_alert_com', array(
+                    'alertid'=>$alert->id));
+                foreach($alertcoms as $com){
+                    if(array_key_exists($com->mdluserid, $teachers)){
+                        $user = $DB->get_record('user', array('id'=>$com->mdluserid));
+                        email_to_user($user, $user, $subj, $body, $body_html);
+                        //email_to_user($user, $user, $subj, $body);
+                        $emails++;
+                    }
+                }
+        
+            }
+        }
+        mtrace($emails.' reminder emails sent');
+        */
     }
 
 

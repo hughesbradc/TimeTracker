@@ -18,13 +18,25 @@
 /**
  * This block will display a summary of hours and earnings for the worker.
  *
- * @package    Block
- * @subpackage TimeTracker
- * @copyright  2011 Marty Gilbert & Brad Hughes
+ * @package    TimeTracker
+ * @copyright  Marty Gilbert & Brad Hughes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
-$plugin->version = '2012013001';
-//$plugin->cron = (60 * 60 * 24 * 7); // Set min time between cron executions to 300 secs (5 mins)
-$plugin->cron = (60 * 60 * 24 * 1); // Set min time between cron executions to  1 day
-?>
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once('timesheet_pdf.php');
+
+require_login();
+
+$courseid = required_param('id', PARAM_INTEGER);
+$userid = required_param('userid', PARAM_INTEGER);
+$timesheetid = required_param('timesheetid', PARAM_INTEGER);
+
+
+$urlparams['id'] = $courseid;
+$urlparams['userid'] = $userid;
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
+
+generate_pdf_from_timesheetid($timesheetid, $userid, $courseid);
+
+//redirect($index, 2);

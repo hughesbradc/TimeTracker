@@ -18,13 +18,30 @@
 /**
  * This block will display a summary of hours and earnings for the worker.
  *
- * @package    Block
- * @subpackage TimeTracker
- * @copyright  2011 Marty Gilbert & Brad Hughes
+ * @package    TimeTracker
+ * @copyright  Marty Gilbert & Brad Hughes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
-$plugin->version = '2012013001';
-//$plugin->cron = (60 * 60 * 24 * 7); // Set min time between cron executions to 300 secs (5 mins)
-$plugin->cron = (60 * 60 * 24 * 1); // Set min time between cron executions to  1 day
-?>
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once('lib.php');
+
+
+require_login();
+
+global $SESSION;
+
+$courseid = required_param('id', PARAM_INTEGER);
+
+$urlparams['id'] = $courseid;
+$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
+
+
+$DB->delete_records('block_timetracker_timesheet', 
+    array('courseid'=>$courseid));
+
+$DB->set_field('block_timetracker_workunit', 'canedit', 1);
+$DB->set_field('block_timetracker_workunit', 'timesheetid', 0);
+
+
+redirect($index, 'All timesheets have been deleted and data has been reset', 1);

@@ -149,10 +149,15 @@ class timetracker_manageworkers_form  extends moodleform {
                     new pix_icon('clock_add', 
                     get_string('addentry', 'block_timetracker'), 'block_timetracker'));
 
+                $timesheetsurl = new moodle_url($baseurl.'/viewtimesheets.php', $urlparams);
+                $timesheetaction = $OUTPUT->action_icon($timesheetsurl,
+                    new pix_icon('date', 'View signed timesheets', 'block_timetracker'));
+
 
     
                 $row .= '<td style="text-align: center">'.
                     $editaction . ' ' . $deleteaction. ' '.$addunitaction.' '.$reportsaction.
+                    $timesheetaction.
                     '</td>';
     
     

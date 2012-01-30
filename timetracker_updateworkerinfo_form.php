@@ -56,6 +56,11 @@ class timetracker_updateworkerinfo_form extends moodleform {
         if (has_capability('block/timetracker:managepayrate', $this->context)) {
             $canmanagepayrate = true;
         }
+
+        $canmanageid = false;
+        if (has_capability('block/timetracker:manageid', $this->context)) {
+            $canmanageid = true;
+        }
          
         $worker = $DB->get_record('block_timetracker_workerinfo',
             array('courseid'=>$this->courseid,'mdluserid'=>$this->mdluserid));
@@ -106,6 +111,11 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $opstring2='';
         }
 
+        $opstring3='readonly="readonly"';
+        if($canmanageid){
+            $opstring3='';
+        }
+
         $mform->addElement('text','firstname',
             get_string('firstname','block_timetracker'), $opstring);
         $mform->setDefault('firstname',$worker->firstname);
@@ -127,7 +137,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
 		$mform->addHelpButton('email','email','block_timetracker');
 
         $mform->addElement('text','idnum',get_string('idnum','block_timetracker'),
-            $opstring);
+            $opstring3);
         $mform->setDefault('idnum',$idnum);
         $mform->addRule('idnum', 'ID is a required field', 
             'required', null, 'server', 'false');

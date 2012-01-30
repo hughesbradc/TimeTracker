@@ -36,6 +36,8 @@ $courseid = required_param('id', PARAM_INTEGER);
 $userid = optional_param('userid', -1, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
+if($userid > -1)
+    $urlparams['userid'] = $userid;
 
 $timesheeturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet.php',$urlparams);
 
@@ -101,6 +103,31 @@ if($mform->is_cancelled()){
         } else {
 	        $uid = $formdata->workerid;
         }
+        if($official){
+            $urlparams['id'] = $formdata->id;
+            $urlparams['userid'] = $formdata->workerid;
+            $urlparams['start'] = $start;
+            $urlparams['end'] = $end;
+
+
+            //send work-study courses to be processed for errors
+            $wscourses = get_courses(2, 'fullname ASC', 'c.id,c.shortname');
+
+
+            if(array_key_exists($formdata->id, $wscourses)){
+                $conflict_reporturl = new moodle_url(
+                    $CFG->wwwroot.'/blocks/timetracker/schedules/conflict_report.php', $urlparams);
+                redirect($conflict_reporturl);
+            } else {
+                //Uncomment these lines, and comment out the above to bypass checking student
+                //schedules
+                $workersigpage = new 
+                    moodle_url($CFG->wwwroot.'/blocks/timetracker/workersig.php',$urlparams);
+                redirect($workersigpage);
+            }
+
+        }
+        
         if($format == 'pdf'){
             generate_pdf($start, $end, $uid, $cid);
         } else {
@@ -155,6 +182,26 @@ if($mform->is_cancelled()){
 
     $tabs = get_tabs($urlparams, $canmanage, $courseid);
     $tabs = array($tabs);
+
+    $timesheetsub = array();
+    if($canmanage){
+        $num = has_unsigned_timesheets($courseid);
+        if($num > 0){
+            $supersigurl = new
+                moodle_url($CFG->wwwroot.'/blocks/timetracker/supervisorsig.php', $urlparams);
+            $desc = 'Sign timesheets - ('.$num.')';
+            $timesheetsub[] = new tabobject('supersig', $supersigurl, $desc);
+        }
+    } else {
+        $myself = $DB->get_record('block_timetracker_workerinfo',
+            array('mdluserid'=>$USER->id));
+        $urlparams['userid'] = $myself->id;
+        $submittedurl = new moodle_url($CFG->wwwroot.
+            '/blocks/timetracker/viewtimesheets.php', $urlparams);
+        $timesheetsub[] = new tabobject('submitted', 
+            $submittedurl, 'Previously submitted timesheets');
+    }
+    $tabs[] = $timesheetsub;
 
 
     print_tabs($tabs, 'timesheets');
