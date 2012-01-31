@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/timetracker/db" VERSION="2012013001" COMMENT="XMLDB file for Moodle Timetracker block"
+<XMLDB PATH="blocks/timetracker/db" VERSION="20120131" COMMENT="XMLDB file for Moodle Timetracker block"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -117,7 +117,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="the workerinfo.id of this user" PREVIOUS="id" NEXT="courseid"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The mdl course id of the course" PREVIOUS="userid" NEXT="submitted"/>
-        <FIELD NAME="submitted" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The unix time stamp of when this time sheet was submitted" PREVIOUS="courseid" NEXT="workersignature"/>
+        <FIELD NAME="submitted" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The unix time stamp of when this time sheet was submitted" PREVIOUS="courseid" NEXT="workersignature"/>
         <FIELD NAME="workersignature" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the unix time when the worker signed this time sheet" PREVIOUS="submitted" NEXT="supervisorsignature"/>
         <FIELD NAME="supervisorsignature" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the unix time when the supervisor signed the time sheet" PREVIOUS="workersignature" NEXT="supermdlid"/>
         <FIELD NAME="supermdlid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The supervisor's Moodle id" PREVIOUS="supervisorsignature" NEXT="transactionid"/>
@@ -130,10 +130,11 @@
     <TABLE NAME="block_timetracker_transactn" COMMENT="Describes a transaction as a group of time sheets that have been 'processed', e.g. by your payroll department." PREVIOUS="block_timetracker_timesheet">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="submitted"/>
-        <FIELD NAME="submitted" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="unix time of the date/time that this transaction was processed" PREVIOUS="id" NEXT="description"/>
+        <FIELD NAME="submitted" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="unix time of the date/time that this transaction was processed" PREVIOUS="id" NEXT="description"/>
         <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="A description of this transaction" PREVIOUS="submitted" NEXT="mdluserid"/>
         <FIELD NAME="mdluserid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The Moodle user id of the user that finalized this transaction" PREVIOUS="description" NEXT="categoryid"/>
-        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The moodle categoryid to which this transaction refers" PREVIOUS="mdluserid"/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The moodle categoryid to which this transaction refers" PREVIOUS="mdluserid" NEXT="created"/>
+        <FIELD NAME="created" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="when this transaction was created" PREVIOUS="categoryid"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

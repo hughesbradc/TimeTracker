@@ -106,7 +106,8 @@
                 $timesheetsurl = new moodle_url($baseurl.'/supervisorsig.php', $indexparams);
                 $timesheetsicon = new pix_icon('alert','Sign Timesheets','block_timetracker');
                 $timesheetsaction = $OUTPUT->action_icon($timesheetsurl, $timesheetsicon);
-                $this->content->text .= get_timesheet_link($COURSE->id, $timesheetsicon, $timesheetsaction);
+                $this->content->text .= 
+                    get_timesheet_link($COURSE->id, $timesheetsicon, $timesheetsaction);
             }
 
             $index = new moodle_url($baseurl.'/index.php', $indexparams);

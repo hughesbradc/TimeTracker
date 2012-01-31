@@ -51,6 +51,7 @@ if($courses){
     $sql .= $list.')';
     echo $sql;
 }
+*/
 
 */
 

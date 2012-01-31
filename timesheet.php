@@ -212,6 +212,7 @@ if($mform->is_cancelled()){
         //$OUTPUT->box_start('generalbox boxaligncenter');
         echo $OUTPUT->action_link($submittedurl, 'Previously submitted timesheets').
             '<br /><br />';
+        //$OUTPUT->box_start('generalbox boxaligncenter');
         //$OUTPUT->box_end();
 
     }

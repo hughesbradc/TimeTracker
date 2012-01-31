@@ -40,7 +40,6 @@ class timetracker_editterms_form extends moodleform {
 
         $mform->addElement('hidden','id',$COURSE->id);
 
-
         //check to make sure that if $this->userid != $USER->id that they have
         //the correct capability TODO
         if(!has_capability('block/timetracker:manageworkers',$this->context)){
@@ -100,8 +99,6 @@ class timetracker_editterms_form extends moodleform {
             }
              
         }
-
-        //$mform->addElement('header', 'general', get_string('terms_title','block_timetracker')); 
 
         for($i = 0; $i < 3; $i++){
             $mform->addElement('header', 'general', 'Term '.($i+1)); 

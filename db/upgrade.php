@@ -142,5 +142,37 @@ function xmldb_block_timetracker_upgrade($oldversion) {
 
     }            
 
+    //update 'submitted' in DB
+    if ($oldversion < 2012013101) {
+
+        // Changing type of field submitted on table block_timetracker_transactn to int
+        $table = new xmldb_table('block_timetracker_transactn');
+        $field = new xmldb_field('submitted', 
+            XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, '0', 'id');
+
+        // Launch change of type for field submitted
+        $dbman->change_field_type($table, $field);
+
+        $table = new xmldb_table('block_timetracker_timesheet');
+        $field = new xmldb_field('submitted', 
+            XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, '0', 'id');
+        // Launch change of type for field submitted
+        $dbman->change_field_type($table, $field);
+
+        // Define field created to be added to block_timetracker_transactn
+        $table = new xmldb_table('block_timetracker_transactn');
+        $field = new xmldb_field('created', XMLDB_TYPE_INTEGER, 
+            '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'categoryid');
+
+        // Conditionally launch add field created
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // timetracker savepoint reached
+        upgrade_block_savepoint(true, 2012013101, 'timetracker');
+    }
+
+
     return true;
 }
