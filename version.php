@@ -24,7 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
-$plugin->version = '2012013101';
+$plugin->version = '2012013102';
 //$plugin->cron = (60 * 60 * 24 * 7); // Set min time between cron executions to 300 secs (5 mins)
 $plugin->cron = (60 * 60 * 24 * 1); // Set min time between cron executions to  1 day
 ?>
