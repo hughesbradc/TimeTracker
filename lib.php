@@ -72,10 +72,16 @@ function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, 
     $unsignedonly=false){
     global $CFG, $DB;
 
-    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
+    $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE ';
+
+    if($timesheetid != -1){
+        $sql .= ' timesheetid='.$timesheetid;
+    } else {
+        $sql.=
         '(timein BETWEEN '.
         $start. ' AND '.$end.' OR timeout BETWEEN '.
         $start. ' AND '.$end.') ';
+    }
 
     if($userid > 0){
         $sql .= ' AND userid='.$userid;
@@ -87,9 +93,7 @@ function get_split_units($start, $end, $userid=0, $courseid=0, $timesheetid=-1, 
 
     if($unsignedonly){
         $sql .= ' AND timesheetid=0';
-    } else if($timesheetid > -1){
-        $sql .= ' AND timesheetid='.$timesheetid;
-    }
+    } 
 
     $sql .= ' ORDER BY timein '.$sort;
 
