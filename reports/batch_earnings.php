@@ -11,9 +11,7 @@ $start = required_param('start', PARAM_INTEGER);
 $end = required_param('end', PARAM_INTEGER);
 $active = optional_param('active', 0, PARAM_INTEGER);
 
-/**
- The purpose of this script is to find earnings/max earnings for this term
-*/
+/** The purpose of this script is to find earnings/max earnings for this term */
 global $CFG, $DB, $USER;
 
 
