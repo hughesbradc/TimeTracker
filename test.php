@@ -28,7 +28,10 @@ require_once(dirname(__FILE__) . '/../../config.php');
 
 //require_login();
 
+global $COURSE;
+echo "$COURSE->id";
 
+/*
 $courses = get_courses(4, 'fullname ASC', 'c.id,c.shortname');
 
 if($courses){
@@ -38,6 +41,7 @@ if($courses){
     $sql .= $list.')';
     echo $sql;
 }
+*/
 
 
 /*
