@@ -40,10 +40,11 @@ class timetracker_timesheetreject_form  extends moodleform {
 
         $mform =& $this->_form; // Don't forget the underscore! 
         
-        $timesheet = $DB->get_record('block_timetracker_timesheet', array('id'=>$this->timesheetid));
+        $timesheet = $DB->get_record('block_timetracker_timesheet', 
+            array('id'=>$this->timesheetid));
         $courseid = $timesheet->courseid;
         $userid = $timesheet->userid;
-        error_log('courseid='.$courseid.' and userid='.$userid);
+        //error_log('courseid='.$courseid.' and userid='.$userid);
 
         //check to make sure that if $this->userid != $USER->id that they have
         //the correct capability TODO

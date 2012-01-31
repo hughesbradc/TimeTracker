@@ -59,6 +59,13 @@ foreach($courses as $course){
 
         $units = get_split_units($start, $end, $worker->id, $course->id);
 
+        //don't include the ones that aren't between $start and $end
+        foreach($units as $key => $unit){
+            if(!($unit->timein>= $start && $unit->timeout <= $end)){
+                unset($units[$key]);
+            }
+        }
+
         $info = break_down_earnings($units);
 
         $remaining = $worker->maxtermearnings - $info['earnings']; 

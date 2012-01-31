@@ -810,6 +810,7 @@ function get_earnings($userid, $courseid, $start, $end, $processovt=1){
 * @return array
 */
 function break_down_earnings($units, $processovt = 1){
+
     global $DB;
     $info = array();
     $info['reghours'] = 0;
@@ -840,6 +841,7 @@ function break_down_earnings($units, $processovt = 1){
         }
     
         $info['earnings'] = $info['regearnings'] = round($earnings, 2);
+
     } else {
 
         $earnings =  $weekhours = $prevweekday = $prevdate = 0;
