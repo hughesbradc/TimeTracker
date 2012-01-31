@@ -7,7 +7,7 @@ require_once('../lib.php');
 
 
 function check_worker_hours_for_conflicts($workerid, $from, $to){
-    error_log("checking for class conflicts");
+    //error_log("checking for class conflicts");
     global $CFG, $DB, $USER;
     $myconflicts = array();
 
@@ -133,7 +133,8 @@ function check_worker_hours_for_conflicts($workerid, $from, $to){
                     if(sizeof($conflicts) > 0){
                         foreach($conflicts as $conflict){
                             $conflict->conflictcourse = 
-                                "$item->course_code $item->days $dispstarttime to $dispendtime";
+                                "$item->course_code $item->days $dispstarttime to ".
+                                $dispendtime;
                             $myconflicts[] = $conflict;
                             /*
                                 echo "\"$worker->lastname\",\"$worker->firstname\",".

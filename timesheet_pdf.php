@@ -59,7 +59,6 @@ function generate_pdf_from_timesheetid($timesheetid, $userid,
 
 function generate_pdf($start, $end, $userid, $courseid, $method = 'I', 
     $base='', $timesheetid=-1, $unsignedonly=false){
-
     global $CFG,$DB;
 
     $htmlpages = generate_html($start, $end, $userid, $courseid, $timesheetid,

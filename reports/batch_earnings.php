@@ -11,9 +11,7 @@ $start = required_param('start', PARAM_INTEGER);
 $end = required_param('end', PARAM_INTEGER);
 $active = optional_param('active', 0, PARAM_INTEGER);
 
-/**
- The purpose of this script is to find earnings/max earnings for this term
-*/
+/** The purpose of this script is to find earnings/max earnings for this term */
 global $CFG, $DB, $USER;
 
 
@@ -58,6 +56,13 @@ foreach($courses as $course){
     foreach($workers as $worker){
 
         $units = get_split_units($start, $end, $worker->id, $course->id);
+
+        //don't include the ones that aren't between $start and $end
+        foreach($units as $key => $unit){
+            if(!($unit->timein>= $start && $unit->timeout <= $end)){
+                unset($units[$key]);
+            }
+        }
 
         $info = break_down_earnings($units);
 
