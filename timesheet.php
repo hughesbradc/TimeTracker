@@ -194,7 +194,7 @@ if($mform->is_cancelled()){
         }
     } else {
         $myself = $DB->get_record('block_timetracker_workerinfo',
-            array('mdluserid'=>$USER->id));
+            array('mdluserid'=>$USER->id,'courseid'=>$courseid));
         $urlparams['userid'] = $myself->id;
         $submittedurl = new moodle_url($CFG->wwwroot.
             '/blocks/timetracker/viewtimesheets.php', $urlparams);
