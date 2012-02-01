@@ -179,10 +179,10 @@
                     '&userid='.$worker->id;
                 $action = null; 
                 $this->content->text = '<center>';
-                $this->content->text .= $OUTPUT->action_link($link, 
-                    get_string('registerinfo', 'block_timetracker'), $action,
-                    array('style'=>'color: red'));
-                $this->content->text .= '</center>';
+                $this->content->text .= '<span style="color: red">'.
+                    $OUTPUT->action_link($link, 
+                    get_string('registerinfo', 'block_timetracker'), $action);
+                $this->content->text .= '</span></center>';
                 return $this->content;
             } else {
                   
