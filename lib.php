@@ -125,8 +125,7 @@ function split_boundary_units($start, $end, $userid, $courseid){
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
         'userid = '.$userid.' AND courseid = '.$courseid.' AND timesheetid=0 AND '.
         'timein < '.$start.' AND timeout > '.$start;
-
-    //error_log($sql);
+    
     $startunits = $DB->get_records_sql($sql);
 
     if($startunits){
@@ -134,8 +133,8 @@ function split_boundary_units($start, $end, $userid, $courseid){
         //split them up to timein->$start and $start->timeout
         foreach($startunits as $unit){
             $origid = $unit->id;
-            $timeout = $unit->timeout; 
             $timein = $unit->timein;
+            $timeout = $unit->timeout; 
 
             unset($unit->id); 
             $unit->timeout = $start-1;
@@ -166,9 +165,8 @@ function split_boundary_units($start, $end, $userid, $courseid){
 
     $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE '.
         'userid = '.$userid.' AND courseid = '.$courseid.' AND timesheetid=0 AND '.
-        'timein >= '.$start.' AND timeout > '.$end;
+        'timein BETWEEN '.$start.' AND '.$end.' AND timeout > '.$end;
 
-    //error_log($sql);
     $endunits = $DB->get_records_sql($sql);
 
     if($endunits){
@@ -176,11 +174,11 @@ function split_boundary_units($start, $end, $userid, $courseid){
         //split them up to timein->$end and $end->timeout
         foreach($endunits as $unit){
             $origid = $unit->id;
-            $timeout = $unit->timeout; 
             $timein = $unit->timein;
+            $timeout = $unit->timeout; 
 
             unset($unit->id); 
-            $unit->timeout = $end - 1;
+            $unit->timeout = $end;
 
             $result = $DB->insert_record('block_timetracker_workunit', $unit);
 
@@ -190,9 +188,9 @@ function split_boundary_units($start, $end, $userid, $courseid){
             }
             
             unset($unit->id);
-            $unit->timein = $end;
+            $unit->timein = $end + 1;
             $unit->timeout = $timeout;
-            
+
             $result = $DB->insert_record('block_timetracker_workunit', $unit);
 
             if(!$result) {
