@@ -41,9 +41,19 @@ class timetracker_managealerts_form  extends moodleform {
         $mform =& $this->_form; // Don't forget the underscore! 
         $canmanage = false;
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
-            //$mform->addElement('html','You don\'t have permission to view alerts'); 
-            //return;
             $canmanage = true;
+        }
+
+        $canview = false;
+        if (has_capability('block/timetracker:viewonly', $this->context)) {
+            $canview = true;
+        }
+
+        if($canview && !$canmanage){
+            $urlparams['id'] = $COURSE->id;
+            $nextpage = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
+            redirect($nextpage, 'You do not have permission to view alerts for this course. <br />
+                Redirecting you now.', 2);
         }
 
         $mform->addElement('header', 'general', 
@@ -56,7 +66,7 @@ class timetracker_managealerts_form  extends moodleform {
         $strproposed = get_string('proposed', 'block_timetracker');
         $strmsg = get_string('message', 'block_timetracker');
 
-        if(!has_course_alerts($COURSE->id)){
+        if(!has_course_alerts($COURSE->id && $USER->id)){
             $mform->addElement('html','<div style="text-align:center">');
             $mform->addElement('html',get_string('noalerts','block_timetracker'));
             $mform->addElement('html','</div>'); 

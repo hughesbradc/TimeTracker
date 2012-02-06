@@ -53,6 +53,11 @@ if(has_capability('block/timetracker:manageworkers', $context)){
     $canmanage = true;
 }
 
+$canview = false;
+if(has_capability('block/timetracker:viewonly', $context)){
+    $canview = true;
+}
+
 
 $strtitle = get_string('timesheettitle','block_timetracker');
 $PAGE->set_title($strtitle);
@@ -180,12 +185,12 @@ if($mform->is_cancelled()){
 } else {
     echo $OUTPUT->header();
 
-    $tabs = get_tabs($urlparams, $canmanage, $courseid);
+    $tabs = get_tabs($urlparams, $canview, $courseid);
     $tabs = array($tabs);
     print_tabs($tabs, 'timesheets');
 
     //$timesheetsub = array();
-    if($canmanage){
+    if($canmanage || $canview){
         $num = has_unsigned_timesheets($courseid);
         if($num > 0){
             $supersigurl = new

@@ -45,16 +45,22 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $urlparams['userid']=0;
 }
 
+$canview = false;
+if (has_capability('block/timetracker:viewonly', $context)) {
+    $canview = true;
+    $urlparams['userid']=0;
+}
+
 $worker = $DB->get_record('block_timetracker_workerinfo',array('mdluserid'=>$USER->id, 
     'courseid'=>$course->id));
 
 
-if(!$canmanage && !$worker){
+if(!$canmanage && !$canview && !$worker){
     print_error('usernotexist', 'block_timetracker',
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
 }
 
-if(!$canmanage && $USER->id != $worker->mdluserid){
+if(!($canmanage || $canview) && $USER->id != $worker->mdluserid){
     print_error('notpermissible', 'block_timetracker',
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$course->id);
 }
@@ -78,12 +84,12 @@ $PAGE->set_pagelayout('base');
 echo $OUTPUT->header();
 
 
-$tabs = get_tabs($urlparams, $canmanage, $courseid);
+$tabs = get_tabs($urlparams, $canview, $courseid);
 $tabs = array($tabs);
 print_tabs($tabs, 'home');
 
 
-if ($canmanage) { //supervisor
+if ($canmanage || $canview) { //supervisor
     /*
     echo $OUTPUT->box_start('generalbox boxaligncenter');
     echo '<h2>Welcome, ' .$USER->firstname .'!</h2>'; 

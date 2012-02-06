@@ -39,11 +39,15 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
+$canview = false;
+if (has_capability('block/timetracker:viewonly', $context)) { //supervisor
+    $canview = true;
+}
 
 $urlparams['id'] = $courseid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
 
-$maintabs = get_tabs($urlparams, $canmanage, $courseid);
+$maintabs = get_tabs($urlparams, $canview, $courseid);
 
 $workers = $DB->get_records('block_timetracker_workerinfo', array('courseid'=>$courseid));
 
@@ -60,14 +64,14 @@ $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
 
-if(!$canmanage){
+if(!$canmanage && !$canview){
     print_error('notpermissible','block_timetracker');
 }
 
 if(!$workers){
     echo 'No users are enrolled in your course.';
 } else {
-    $mform = new timetracker_supervisorsig_form($courseid);
+    $mform = new timetracker_supervisorsig_form($courseid, $context);
 
     if ($mform->is_cancelled()){ //user clicked cancel
         //redirect($nextpage);

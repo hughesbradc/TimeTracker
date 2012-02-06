@@ -56,11 +56,18 @@ class timetracker_manageworkers_form  extends moodleform {
         $me = new moodle_url(qualified_me());
         $me->params(array('reload'=>true));
 
-        $reloadaction = $OUTPUT->action_icon($me, new pix_icon('refresh', 'Refresh worker list',
-            'block_timetracker'));
+
+        $canview = false;
+        if(has_capability('block/timetracker:viewonly', $this->context))
+            $canview = true;
+
+        if(!$canview){
+            $reloadaction = $OUTPUT->action_icon($me, new pix_icon('refresh', 'Refresh worker list',
+                'block_timetracker'));
 
         $mform->addElement('html', $reloadaction.' '.$OUTPUT->action_link($me, 
             'Refresh worker list'));
+        }
 
 
         $mform->addElement('html', 
@@ -89,6 +96,10 @@ class timetracker_manageworkers_form  extends moodleform {
             $canactivate = false;
             if (has_capability('block/timetracker:activateworkers', $this->context)) 
                 $canactivate = true;
+
+            $canmanage = false;
+            if(has_capability('block/timetracker:manageworkers', $this->context))
+                $canmanage = true;
 
             foreach ($workers as $worker){ 
                 $mform->addElement('html','<tr><td>'); 
@@ -153,12 +164,16 @@ class timetracker_manageworkers_form  extends moodleform {
                 $timesheetaction = $OUTPUT->action_icon($timesheetsurl,
                     new pix_icon('date', 'View signed timesheets', 'block_timetracker'));
 
-
-    
-                $row .= '<td style="text-align: center">'.
-                    $editaction . ' ' . $deleteaction. ' '.$addunitaction.' '.$reportsaction.
-                    $timesheetaction.
-                    '</td>';
+                $row .= '<td style="text-align: center">';
+                
+                if($canmanage){
+                    $row .= $editaction . ' ' . $deleteaction. ' '.$addunitaction.' '.$reportsaction.
+                    $timesheetaction;
+                } else {
+                    $row .= $editaction . ' ' .$reportsaction. ' ' .$timesheetaction;
+                    //$row .= '&nbsp;';
+                }
+                $row .= '</td>';
     
     
                 $row.='</tr>';
@@ -175,10 +190,12 @@ class timetracker_manageworkers_form  extends moodleform {
             $mform->addElement('html','</table>');
     
             $mform->addElement('hidden','id', $COURSE->id);
-    
-            $this->add_action_buttons(false, 'Save Activation Changes');
-    
+   
+            if($canmanage){
+                $this->add_action_buttons(false, 'Save Activation Changes');
             }
+            
+        }
     }
 
 }

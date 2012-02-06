@@ -53,10 +53,15 @@ if(has_capability('block/timetracker:manageworkers', $context)){
     $canmanage = true;
 }
 
+$canview = false;
+if(has_capability('block/timetracker:viewonly', $context)){
+    $canview = true;
+}
+
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('base');
 $strtitle = get_string('viewofficial', 'block_timetracker');
-if($canmanage){
+if($canmanage || $canview){
     $strtitle .= ' - '.$userinfo->firstname.' '.$userinfo->lastname;
 }
 
@@ -67,7 +72,7 @@ $PAGE->set_heading($strtitle);
 //Need to check to make sure the user exists and that
     //A.  I'm that user OR
     //B.  I'm a supervisor
-if(!$canmanage && $USER->id != $userinfo->mdluserid)
+if(!($canmanage || $canview) && $USER->id != $userinfo->mdluserid)
     print_error('notpermissible','block_timetracker');
 
 $PAGE->navbar->add(get_string('blocks'));
@@ -76,7 +81,7 @@ $PAGE->navbar->add($strtitle);
 
 echo $OUTPUT->header();
 
-$tabs = get_tabs($urlparams, $canmanage, $courseid);
+$tabs = get_tabs($urlparams, $canview, $courseid);
 $tabs = array($tabs);
 
 /* FIX THIS AT SOME POINT

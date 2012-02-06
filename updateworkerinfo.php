@@ -40,6 +40,11 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
+$canview = false;
+if (has_capability('block/timetracker:viewonly', $context)) {
+    $canview = true;
+}
+
 $urlparams['id'] = $courseid;
 $urlparams['userid'] = $userid;
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php',$urlparams);
@@ -65,7 +70,7 @@ if($worker){
     $index->params(array('userid'=>$userid));
 
     $ttuserid = $worker->id;
-    if($USER->id != $worker->mdluserid && !$canmanage){
+    if($USER->id != $worker->mdluserid && !($canmanage || $canview)){
         print_error('notpermissible', 'block_timetracker',$index);
     }
 }

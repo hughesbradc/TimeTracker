@@ -43,12 +43,16 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
+$canview = false;
+if (has_capability('block/timetracker:viewonly', $context)) { //supervisor
+    $canview = true;
+}
 $worker =
     $DB->get_record('block_timetracker_workerinfo',
     array('mdluserid'=>$USER->id,'courseid'=>$courseid));
 
 if($userid == -1 && $worker) $userid = $worker->id;
-else if ($userid == -1 && $canmanage) $userid = 0;
+else if ($userid == -1 && ($canmanage || $canview)) $userid = 0;
 
 
 $urlparams['id'] = $courseid;
@@ -99,7 +103,7 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
     //echo $OUTPUT->heading($strtitle, 2);
     echo $OUTPUT->header();
 
-    $maintabs = get_tabs($urlparams, $canmanage, $courseid);
+    $maintabs = get_tabs($urlparams, $canview, $courseid);
     $tabs = array($maintabs);
 
     print_tabs($tabs, 'reports');
