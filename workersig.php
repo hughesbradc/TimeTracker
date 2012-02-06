@@ -101,26 +101,31 @@ if(!$worker){
             if($units){
     
                 $earnings = break_down_earnings($units);
+
+                if(($earnings['regearnings'] + $earnings['ovtearnings']) > 0){
                 
-                //Create entry in timesheet table
-                $newtimesheet = new stdClass();
-                $newtimesheet->userid = $userid;
-                $newtimesheet->courseid = $courseid;
-                $newtimesheet->submitted = 0;
-                $newtimesheet->workersignature = time();
-                $newtimesheet->reghours = $earnings['reghours'];
-                $newtimesheet->regpay = $earnings['regearnings'];
-                $newtimesheet->othours = $earnings['ovthours'];
-                $newtimesheet->otpay = $earnings['ovtearnings'];
+                    //Create entry in timesheet table
+                    $newtimesheet = new stdClass();
+                    $newtimesheet->userid = $userid;
+                    $newtimesheet->courseid = $courseid;
+                    $newtimesheet->submitted = 0;
+                    $newtimesheet->workersignature = time();
+                    $newtimesheet->reghours = $earnings['reghours'];
+                    $newtimesheet->regpay = $earnings['regearnings'];
+                    $newtimesheet->othours = $earnings['ovthours'];
+                    $newtimesheet->otpay = $earnings['ovtearnings'];
             
-                $timesheetid = $DB->insert_record('block_timetracker_timesheet', $newtimesheet);
+                    $timesheetid = $DB->insert_record('block_timetracker_timesheet', $newtimesheet);
                     
-                foreach ($units as $unit){
-                    $unit->timesheetid = $timesheetid; 
-                    $unit->canedit = 0;
-                    $DB->update_record('block_timetracker_workunit', $unit);    
+                    foreach ($units as $unit){
+                        $unit->timesheetid = $timesheetid; 
+                        $unit->canedit = 0;
+                        $DB->update_record('block_timetracker_workunit', $unit);    
+                    }
+                    $status = 'You have successfully signed the official timesheet.';
+                } else { // no pay for these units
+                    $status = 'There are no earnings for you to sign, given the date range.';
                 }
-                $status = 'You have successfully signed the official timesheet.';
             } else {
                 $status = 'There are no units to sign for the given date range.';
             }

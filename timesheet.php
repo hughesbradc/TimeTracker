@@ -213,14 +213,15 @@ if($mform->is_cancelled()){
         $timesheetsub[] = new tabobject('submitted', 
             $submittedurl, 'Previously submitted timesheets');
         */
+
         //$OUTPUT->box_start('generalbox boxaligncenter');
-        echo $OUTPUT->action_link($submittedurl, 'Previously submitted timesheets');
+        echo $OUTPUT->action_link($submittedurl, 'Previously submitted timesheets').
+            '<br /><br />';
+        //$OUTPUT->box_start('generalbox boxaligncenter');
         //$OUTPUT->box_end();
 
     }
     //$tabs[] = $timesheetsub;
-
-
 
     $mform->display();
     echo $OUTPUT->footer();
