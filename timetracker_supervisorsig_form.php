@@ -158,9 +158,110 @@ class timetracker_supervisorsig_form extends moodleform {
                 $mform->disabledIf('buttonar','supervisorsig');
             }
         }
+    
+    //Add all timesheets signed within the last 30 days
+        $sql = 'SELECT * from '.$CFG->prefix.
+            'block_timetracker_timesheet where courseid='.$this->courseid.' AND workersignature >
+            '.(time()-(30*86400)).' ORDER BY workersignature DESC'; 
+        $timesheets = $DB->get_records_sql($sql);
         
-    }
+        $mform->addElement('header','general','Timesheets from the last 30 days');
 
+        if(!$timesheets){
+            $mform->addElement('html','No timesheets within the last 30 days.');
+        } else {
+            $mform->addElement('html','<table align="center" border="1" cellspacing="10px"
+                cellpadding="5px width="75%">');
+                $row = '<tr>';
+                $row .= '
+                    <td style="font-weight: bold;">Worker Name</td>
+                    <td style="font-weight: bold;">Worker Signature</td>
+                    <td style="font-weight: bold;">Supervisor Name</td>
+                    <td style="font-weight: bold;">'.
+                        'Supervisor Signature</td>
+                    <td style="font-weight: bold;">Total Hours</td>
+                    <td style="font-weight: bold;">Total Pay</td>
+                    <td style="font-weight: bold;">Status</td>
+                    <td style="font-weight: bold; text-align:center">Actions</td>
+                </tr>';
+            $mform->addElement('html',$row);
+    
+            foreach ($timesheets as $timesheet){
+    
+                $mform->addElement('html','<tr>');
+                $mform->addElement('html','<td>');
+                
+                $worker = $DB->get_record('block_timetracker_workerinfo',
+                    array('id'=>$timesheet->userid));
+    
+                $mform->addElement('html',$worker->firstname .' '.$worker->lastname);
+                $mform->addElement('html','</td>');
+    
+                $mform->addElement('html','<td>');
+                $mform->addElement('html', userdate($timesheet->workersignature,
+                    get_string('dateformat', 'block_timetracker')));
+                $mform->addElement('html','</td>');
+    
+                $mform->addElement('html','<td>');
+                $super = $DB->get_record('user', 
+                    array('id'=>$timesheet->supermdlid));
+                if(!$super){
+                    $name = 'Undefined';
+                } else {
+                    $name = $super->lastname.', '.$super->firstname;
+                }
+                $mform->addElement('html', $name);
+                $mform->addElement('html','</td>');
+    
+                $mform->addElement('html','<td>');
+                $mform->addElement('html', userdate($timesheet->supervisorsignature,
+                    get_string('dateformat', 'block_timetracker')));
+                $mform->addElement('html','</td>');
+        
+                $hours = 0;
+                $pay = 0;
+                $hours += $timesheet->reghours;
+                $hours += $timesheet->othours;
+                $pay += $timesheet->regpay;
+                $pay += $timesheet->otpay;
+        
+                $mform->addElement('html','<td>');
+                $mform->addElement('html',number_format(round($hours,3),3));
+                $mform->addElement('html','</td><td>');
+                $mform->addElement('html','$'.number_format(round($pay,2),2));
+                $mform->addElement('html','</td>');
+                
+                $mform->addElement('html','<td>');
+                
+                $status = 'Pending';
+                if($timesheet->submitted > 0){
+                    $status = 'Processed';
+                } else if($timesheet->transactionid > 0){
+                    $status='Processing';
+                }
+                
+                $mform->addElement('html',$status);
+                $mform->addElement('html','</td>');
+
+                $mform->addElement('html','<td style="text-align: center">');
+                $viewparams['id'] = $timesheet->courseid;
+                $viewparams['userid'] = $worker->id;
+                $viewparams['timesheetid'] = $timesheet->id;
+                $viewurl = 
+                    new moodle_url($CFG->wwwroot.
+                        '/blocks/timetracker/timesheet_fromid.php', $viewparams);
+                $viewaction = 
+                    $OUTPUT->action_icon($viewurl, new pix_icon('date','View Timesheet',
+                    'block_timetracker'));
+                
+                $mform->addElement('html',$viewaction);
+                $mform->addElement('html','</tr>');
+            }
+    
+            $mform->addElement('html','</table>');
+     
+        }
+    }
     function validation($data){
     }
 }
