@@ -6,24 +6,26 @@ require_once('../../../config.php');
 require_once('../lib.php');
 
 global $CFG, $DB, $USER;
-
 /**
     The purpose of this script is to  transfer a worker(and associated hours) from one
     course to another.
 
     CSV file needs the following format
-        studentEmail,fromCourseID,toCourseID
+        studentEmail,fromCourseID,toCourseID,supername,department
 */
 
-$file='/tmp/newtransfers.csv';
+//$file='/tmp/onemore.csv';
+$file='transferAriel.csv';
 
 $count = 0;
 if(($handle = fopen($file, "r")) !== FALSE){
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
 
-        $email = strtolower($data[0]); 
-        $fromcourseid = $data[1];
-        $tocourseid = $data[2];
+        $email          = strtolower($data[0]); 
+        $fromcourseid   = $data[1];
+        $tocourseid     = $data[2];
+        $supername      = $data[3];
+        $department     = $data[4];
 
         $worker = $DB->get_record('block_timetracker_workerinfo',
             array('email'=>$email, 'courseid'=>$fromcourseid));
@@ -54,8 +56,14 @@ if(($handle = fopen($file, "r")) !== FALSE){
         $DB->set_field('block_timetracker_workunit', 'courseid', $tocourseid,
             array('userid'=>$worker->id, 'courseid'=>$fromcourseid));
 
+        //update all of the work units
+        $DB->set_field('block_timetracker_workunit', 'courseid', $tocourseid,
+            array('userid'=>$worker->id, 'courseid'=>$fromcourseid));
+
         //update the workerinfo field
-        $worker->courseid = $tocourseid;
+        $worker->courseid       = $tocourseid;
+        $worker->supervisor     = $supername;
+        $worker->dept     = $department;
 
         $DB->update_record('block_timetracker_workerinfo', $worker);
 
