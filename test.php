@@ -22,134 +22,87 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
+require_once('lib.php');
 
-//require_once($CFG->libdir . '/tablelib.php');
-//require_once('lib.php');
-//require_once('timesheet_pdf.php');
+require_login();
+
 $courseid = required_param('id', PARAM_INTEGER);
-
-$course = $DB->get_record('course', array('id'=>$courseid));
-
-global $COURSE;
-$PAGE->set_course($course);
-
-print_object($COURSE);
-
-//require_login();
-
-/*
-$courses = get_courses(4, 'fullname ASC', 'c.id,c.shortname');
-
-
-if($courses){
-
-    $sql = 'SELECT * from mdl_block_timetracker_timesheet where courseid in (';
-    $list = implode(",", array_keys($courses));    
-    $sql .= $list.')';
-    echo $sql;
-}
-*/
-
-
-/*
-$courseid = required_param('id', PARAM_INTEGER);
-$userid = optional_param('userid',$USER->id, PARAM_INTEGER);
-
-$urlparams['id'] = $courseid;
-$urlparams['userid'] = $userid;
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $PAGE->set_course($course);
 $context = $PAGE->context;
 
-$index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
+global $DB, $CFG, $COURSE;
 
-$PAGE->set_url($index);
 
-$strtitle = 'TimeTracker';
-
-$PAGE->set_title($strtitle);
-$PAGE->set_heading($strtitle);
-
-$PAGE->set_pagelayout('base');
+$catcontext = get_context_instance(CONTEXT_COURSECAT, $COURSE->category);
 
 $canmanage = false;
-if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+if (has_capability('block/timetracker_admin:managetransactions', $catcontext)) { 
     $canmanage = true;
 }
 
+$canview = false;
+if (has_capability('block/timetracker_admin:viewtransactions', $catcontext)) { 
+    $canview = true;
+}
+
+if(!$canmanage && !$canview){
+    print_error('nocatpermission', 'block_timetracker_admin');
+}
+
+$strtitle = 'View unsigned timesheets';
+$index = new moodle_url($CFG->wwwroot.'/course/view.php', array('id'=>$courseid));
+$PAGE->set_url($index);
+$PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
+$PAGE->set_pagelayout('base');
+
 echo $OUTPUT->header();
+$html = $OUTPUT->action_link($index, 'Back to course page');
 
-//start here, using $mform->addElement... 
-echo '
-<style type="text/css">
+$timesheets = get_unsigned_timesheets_by_category($COURSE->category);
+if($timesheets){
+    $html .= '<table border="1">
+            <tr>
+                <td>Worker signature</td>
+                <td>Supervisor name(s)</td>
+                <td>Department</td>
+            </tr>';
 
-table{
-    width: 80%;
-    height: 80%;
+    foreach ($timesheets as $ts){
+        $worker = $DB->get_record('block_timetracker_workerinfo', array('id'=>$ts->userid));
+        if(!$worker) continue;
+    
+        $html .= '<tr>';
+        $html .= '<td>';
+        $html .= $worker->lastname.', '.$worker->firstname.' ';
+        $html .= userdate($ts->workersignature, get_string('dateformat', 'block_timetracker'));
+        $html .= '</td>';
+    
+        $thiscoursecon = get_context_instance(CONTEXT_COURSE, $ts->courseid);
+        $teachers = get_enrolled_users($thiscoursecon, 'mod/assignment:grade');
+        $html .= '<td>';
+        foreach($teachers as $teacher){
+            $html .= $teacher->lastname.', '.$teacher->firstname.'<br />';
+        }
+        $html = substr($html,0,-6); //trim the last 'br' off
+        $html .= '</td>';
+    
+        $tcourse = $DB->get_record('course', array('id'=>$ts->courseid));
+        $html .= '<td>';
+        if($tcourse){
+            $html .= $tcourse->shortname;
+        } else {
+            $html .= 'Unknown';
+        }
+        $html .= '</td>';
+    
+    }
+} else {
+    echo '<br />No unsigned timesheets found for this category<br />'; 
 }
-.calendar{
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
-    border-top: 1px solid black;
-}
-table,div,td,th,tr{
-    font-weight: normal;
-    font-size: 18px;
-    font-family: helvetica;
-}
+    
+echo $html;
 
-table{
-   padding: 0;
-   spacing: 0;
-   border: 1px solid black;
-   border-collapse: separate;
-   margin-left: auto;
-   margin-right: auto;
-}
-
-span.thirteen{
-    font-weight: bold;
-    font-size: 23px;
-    font-family: helvetica;
-}
-
-span.ten{
-    font-weight: bold;
-    font-size: 20px;
-    font-family: helvetica;
-}
-
-span.eight{
-    font-weight: bold;
-    font-size: 18px;
-    font-family: helvetica;
-}
-
-span.seven{
-    font-weight: bold;
-    font-size: 17px;
-    font-family: helvetica;
-}
-
-</style>
-';
-
-$pages = generate_html(1320120000, time(), 4, 112,1);
-
-foreach($pages as $page){
-    $page = str_replace('<font size="13">', '<span class="thirteen">',$page);
-    $page = str_replace('<font size="10">', '<span class="ten">',$page);
-    $page = str_replace('<font size="8">', '<span class="eight">',$page);
-    $page = str_replace('<font size="7">', '<span class="seven">',$page);
-    $page = str_replace('</font>', '</span>',$page);
-    $page = str_replace('<hr style="height: 1px" />','', $page);
-    echo $page;
-    echo "\n\n\n";
-}
-//stop here
-//echo '</div>';
-*/
-
-
-//echo $OUTPUT->footer();
+echo $OUTPUT->footer();
