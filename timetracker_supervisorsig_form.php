@@ -125,9 +125,10 @@ class timetracker_supervisorsig_form extends moodleform {
                 //$editparams['repend'] = $last->timeout;
                 $editurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheetreject.php', 
                     $editparams);
-                $editicon = new pix_icon('date_edit', get_string('edit'),'block_timetracker');
+                $editicon = new pix_icon('delete',
+                    get_string('rejectts','block_timetracker'),'block_timetracker');
                 $editaction = $OUTPUT->action_icon($editurl, $editicon,
-                    new confirm_action(get_string('editwarning','block_timetracker')));
+                    new confirm_action(get_string('rejectwarning','block_timetracker')));
                 $mform->addElement('html',$viewaction);
                 $mform->addElement('html',' ');
                 if($canmanage || !$canview)

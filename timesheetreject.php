@@ -153,7 +153,9 @@ if(!$canmanage){
         } 
     
         $status = get_string('remessagesent','block_timetracker');
-        redirect($nextpage, $status,1);
+        $redirparams['id'] = $courseid;
+        $redirect = new moodle_url($CFG->wwwroot.'/blocks/timetracker/supervisorsig.php', $redirparams);
+        redirect($redirect, $status,1);
     
     } else {
         //form is shown for the first time
