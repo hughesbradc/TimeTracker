@@ -162,7 +162,7 @@ class timetracker_supervisorsig_form extends moodleform {
     //Add all timesheets signed within the last 30 days
         $sql = 'SELECT * from '.$CFG->prefix.
             'block_timetracker_timesheet where courseid='.$this->courseid.' AND workersignature >
-            '.(time()-(30*86400)).' ORDER BY workersignature DESC'; 
+            '.(time()-(30*86400)).' AND supervisorsignature > 0 ORDER BY workersignature DESC'; 
         $timesheets = $DB->get_records_sql($sql);
         
         $mform->addElement('header','general','Timesheets from the last 30 days');
@@ -187,7 +187,6 @@ class timetracker_supervisorsig_form extends moodleform {
             $mform->addElement('html',$row);
     
             foreach ($timesheets as $timesheet){
-    
                 $mform->addElement('html','<tr>');
                 $mform->addElement('html','<td>');
                 
@@ -203,25 +202,33 @@ class timetracker_supervisorsig_form extends moodleform {
                 $mform->addElement('html','</td>');
     
                 $mform->addElement('html','<td>');
-                $super = $DB->get_record('user', 
-                    array('id'=>$timesheet->supermdlid));
-                if(!$super){
-                    $name = 'Undefined';
+                if($timesheet->supervisorsignature > 0){
+                    $super = $DB->get_record('user', 
+                        array('id'=>$timesheet->supermdlid));
+                    if(!$super){
+                        $name = 'Undefined';
+                    } else {
+                        $name = $super->lastname.', '.$super->firstname;
+                    }
                 } else {
-                    $name = $super->lastname.', '.$super->firstname;
+                    $name = 'Not signed';
                 }
                 $mform->addElement('html', $name);
                 $mform->addElement('html','</td>');
     
                 $mform->addElement('html','<td>');
-                $mform->addElement('html', userdate($timesheet->supervisorsignature,
-                    get_string('dateformat', 'block_timetracker')));
+                if($timesheet->supervisorsignature > 0){
+                    $mform->addElement('html', userdate($timesheet->supervisorsignature,
+                        get_string('dateformat', 'block_timetracker')));
+                } else {
+                    $mform->addElement('html','Not signed');
+                }
                 $mform->addElement('html','</td>');
-        
+                
                 $hours = 0;
                 $pay = 0;
-                $hours += $timesheet->reghours;
-                $hours += $timesheet->othours;
+                $hours += $timesheet->reghours; 
+                $hours += $timesheet->othours; 
                 $pay += $timesheet->regpay;
                 $pay += $timesheet->otpay;
         

@@ -96,8 +96,8 @@ $index->remove_params('userid');
 $nextpage = $index;
 
 $totalcount = $DB->count_records('block_timetracker_timesheet',array('userid'=>$userid));
-$timesheets = $DB->get_records('block_timetracker_timesheet',array('userid'=>$userid),'','*',
-    $page * $perpage,$perpage);
+$timesheets = $DB->get_records('block_timetracker_timesheet',array('userid'=>$userid),
+    'workersignature DESC','*', $page * $perpage,$perpage);
 
 echo $OUTPUT->paging_bar($totalcount, $page, $perpage, $url, 'page');
 echo $OUTPUT->box_start();

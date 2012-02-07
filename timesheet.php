@@ -192,17 +192,17 @@ if($mform->is_cancelled()){
     //$timesheetsub = array();
     if($canmanage || $canview){
         $num = has_unsigned_timesheets($courseid);
-        if($num > 0){
             $supersigurl = new
                 moodle_url($CFG->wwwroot.'/blocks/timetracker/supervisorsig.php', $urlparams);
-            $desc = 'Sign timesheets - ('.$num.')';
+            $desc = 'View timesheets';
+            if($num > 0)
+                $desc = 'Sign timesheets - ('.$num.')';
             /*
                 $timesheetsub[] = new tabobject('supersig', $supersigurl, $desc);
             */
             $OUTPUT->box_start('generalbox boxaligncenter');
             echo $OUTPUT->action_link($supersigurl, $desc);
             $OUTPUT->box_end();
-        }
     } else {
         $myself = $DB->get_record('block_timetracker_workerinfo',
             array('mdluserid'=>$USER->id,'courseid'=>$courseid));
