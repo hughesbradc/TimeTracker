@@ -61,12 +61,16 @@ class timetracker_manageworkers_form  extends moodleform {
         if(has_capability('block/timetracker:viewonly', $this->context))
             $canview = true;
 
-        if(!$canview){
+        $canmanage = false;
+        if(has_capability('block/timetracker:manageworkers', $this->context))
+            $canmanage = true;
+
+        if($canmanage){
             $reloadaction = $OUTPUT->action_icon($me, new pix_icon('refresh', 'Refresh worker list',
                 'block_timetracker'));
 
-        $mform->addElement('html', $reloadaction.' '.$OUTPUT->action_link($me, 
-            'Refresh worker list'));
+            $mform->addElement('html', $reloadaction.' '.$OUTPUT->action_link($me, 
+                'Refresh worker list'));
         }
 
 
@@ -97,9 +101,6 @@ class timetracker_manageworkers_form  extends moodleform {
             if (has_capability('block/timetracker:activateworkers', $this->context)) 
                 $canactivate = true;
 
-            $canmanage = false;
-            if(has_capability('block/timetracker:manageworkers', $this->context))
-                $canmanage = true;
 
             foreach ($workers as $worker){ 
                 $mform->addElement('html','<tr><td>'); 

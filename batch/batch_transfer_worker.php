@@ -15,7 +15,8 @@ global $CFG, $DB, $USER;
 */
 
 //$file='/tmp/onemore.csv';
-$file='transferAriel.csv';
+//$file='transferAriel.csv';
+$file='transfer.csv';
 
 $count = 0;
 if(($handle = fopen($file, "r")) !== FALSE){
