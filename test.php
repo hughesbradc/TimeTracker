@@ -22,23 +22,20 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
+
 //require_once($CFG->libdir . '/tablelib.php');
 //require_once('lib.php');
 //require_once('timesheet_pdf.php');
+$courseid = required_param('id', PARAM_INTEGER);
+
+$course = $DB->get_record('course', array('id'=>$courseid));
+
+global $COURSE;
+$PAGE->set_course($course);
+
+print_object($COURSE);
 
 //require_login();
-
-//error_log("this is only a test!!");
-//error_log("this is only a test!!");
-//error_log("this is only a test!!");
-//error_log("this is only a test!!");
-//error_log("this is only a test!!");
-//error_log("this is only a test!!");
-error_log("this is only a test!!");
-error_log("this is only a test!!");
-
-phpinfo();
-
 
 /*
 $courses = get_courses(4, 'fullname ASC', 'c.id,c.shortname');
@@ -52,9 +49,6 @@ if($courses){
     echo $sql;
 }
 */
-
-*/
-
 
 
 /*
