@@ -92,7 +92,8 @@ if(!$worker){
         
             split_boundary_units($start, $end, $userid, $courseid);
        
-            $sql = 'SELECT * FROM '.$CFG->prefix.'block_timetracker_workunit WHERE timein BETWEEN '.
+            $sql = 'SELECT * FROM '.$CFG->prefix.
+                'block_timetracker_workunit WHERE timein BETWEEN '.
                 $start.' AND '.$end.' AND timeout BETWEEN '.$start.' AND '.$end.' AND userid='.
                 $userid.' AND courseid='.$courseid.' AND timesheetid=0';
             
@@ -115,7 +116,8 @@ if(!$worker){
                     $newtimesheet->othours = $earnings['ovthours'];
                     $newtimesheet->otpay = $earnings['ovtearnings'];
             
-                    $timesheetid = $DB->insert_record('block_timetracker_timesheet', $newtimesheet);
+                    $timesheetid = $DB->insert_record('block_timetracker_timesheet', 
+                        $newtimesheet);
                     
                     foreach ($units as $unit){
                         $unit->timesheetid = $timesheetid; 
@@ -134,7 +136,8 @@ if(!$worker){
         }
         $redirectparams['id'] = $courseid;
         $redirectparams['userid'] = $userid;
-        $redirecturl = new moodle_url('/blocks/timetracker/viewtimesheets.php?', $redirectparams);
+        $redirecturl = new moodle_url('/blocks/timetracker/viewtimesheets.php?', 
+            $redirectparams);
         redirect($redirecturl, $status, 2);
     } else {
         //form is shown for the first time

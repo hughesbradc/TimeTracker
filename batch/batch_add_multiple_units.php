@@ -9,10 +9,11 @@ require_once('../lib.php');
 */
 global $CFG, $DB, $USER;
 
-$courseid = 95; //residential living
+//$courseid = 95; //residential living
 //$courseid = 111; //SGA
 //$courseid = 105;//Judicial
 //$courseid = 112; //test site
+$courseid = 119; //Dept_Gateway
 
 $duration = 1 * 3600; //1 hour
 //$date = 1; //put unit on first day of month
