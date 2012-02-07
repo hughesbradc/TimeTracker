@@ -65,6 +65,11 @@ if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
     $canmanage = true;
 }
 
+$canview = false;
+if (has_capability('block/timetracker:viewonly', $context)) { //supervisor
+    $canview = true;
+}
+
 
 $strtitle = get_string('errortitle','block_timetracker',
     $workerrecord->firstname.' '.$workerrecord->lastname); 
@@ -342,7 +347,7 @@ if ($mform->is_cancelled()){
     //form is shown for the first time
     
     echo $OUTPUT->header();
-    $maintabs = get_tabs($urlparams, $canmanage, $courseid);
+    $maintabs = get_tabs($urlparams, $canview, $courseid);
     //print_object($urlparams);
 
     $maintabs[] = new tabobject('postalert',

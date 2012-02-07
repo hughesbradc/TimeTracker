@@ -49,10 +49,19 @@ $context = $PAGE->context;
 $PAGE->set_url($termsURL);
 $PAGE->set_pagelayout('base');
 
-if (!has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+$canmanage = false;
+if (has_capability('block/timetracker:manageworkers', $context)) { //supervisor
+    $canmanage = true;
+}
+
+$canview = false;
+if (has_capability('block/timetracker:viewonly', $context)) { 
+    $canview = true;
+}
+
+if(!$canmanage && !$canview){
     print_error(get_string('notpermissible','block_timetracker'));
 }
-$canmanage = true;
 
 $strtitle = get_string('terms_title','block_timetracker');
 
@@ -62,6 +71,7 @@ $strtitle = get_string('terms_title','block_timetracker');
 $index = new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams);
 
 $PAGE->set_title($strtitle);
+$PAGE->set_heading($strtitle);
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('pluginname','block_timetracker'), $index);
 $PAGE->navbar->add($strtitle);
@@ -103,7 +113,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
 } else {
     //form is shown for the first time
     echo $OUTPUT->header();
-    $maintabs = get_tabs($urlparams, $canmanage, $courseid); 
+    $maintabs = get_tabs($urlparams, $canview, $courseid); 
     $tabs = array($maintabs);
     print_tabs($tabs,'terms');
 

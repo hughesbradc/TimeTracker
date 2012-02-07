@@ -498,9 +498,12 @@ function find_conflicts($timein, $timeout, $userid, $unitid=-1, $courseid=-1,
 */
 function get_tabs($urlparams, $canmanage = false, $courseid = -1){
     global $CFG;
+    $basicparams = $urlparams;
+    unset($basicparams['userid']);
+
     $tabs = array();
     $tabs[] = new tabobject('home',
-        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $urlparams),
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/index.php', $basicparams),
         'Main');
     $tabs[] = new tabobject('reports',
         new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports.php',
@@ -514,11 +517,11 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
     if($canmanage){
         $manageurl = 
             new moodle_url($CFG->wwwroot.'/blocks/timetracker/manageworkers.php', 
-            $urlparams);
+            $basicparams);
         $manageurl->remove_params('userid');
         $tabs[] = new tabobject('manage', $manageurl, 'Manage Workers');
         $tabs[] = new tabobject('terms',
-            new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php', $urlparams),
+            new moodle_url($CFG->wwwroot.'/blocks/timetracker/terms.php', $basicparams),
             'Terms');
         if($courseid != -1){
             //getnumalerts from $courseid
@@ -529,7 +532,7 @@ function get_tabs($urlparams, $canmanage = false, $courseid = -1){
         }
     }
     $tabs[] = new tabobject('alerts',
-        new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $urlparams),
+        new moodle_url($CFG->wwwroot.'/blocks/timetracker/managealerts.php', $basicparams),
         'Alerts '.$numalerts);
 
     return $tabs;

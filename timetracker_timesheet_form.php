@@ -43,12 +43,17 @@ class timetracker_timesheet_form  extends moodleform {
             $canmanage = true;
         }
 
+        $canview = false;
+        if (has_capability('block/timetracker:viewonly', $this->context)) {
+            $canview = true;
+        }
+        
         $mform->addElement('header','general','Generate Timesheet');
 
         // Collect all of the workers under the supervisor
 
         $mform->addElement('hidden','id',$COURSE->id);    
-        if($canmanage) {
+        if($canmanage || $canview) {
             $workerlist = array();
             $workers =
                 $DB->get_records('block_timetracker_workerinfo',array('courseid'=>$COURSE->id),
@@ -147,7 +152,7 @@ class timetracker_timesheet_form  extends moodleform {
             'unofficial', 'Generate unofficial timesheet');
 
         //only let workers begin the official timesheet data submission process
-        if(!$canmanage){ 
+        if(!$canmanage && !$canview){ 
             $buttonarray[] = &$mform->createElement('submit', 'official', 
                 'Submit official timesheet');
         } 

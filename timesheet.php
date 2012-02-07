@@ -53,6 +53,11 @@ if(has_capability('block/timetracker:manageworkers', $context)){
     $canmanage = true;
 }
 
+$canview = false;
+if(has_capability('block/timetracker:viewonly', $context)){
+    $canview = true;
+}
+
 
 $strtitle = get_string('timesheettitle','block_timetracker');
 $PAGE->set_title($strtitle);
@@ -180,24 +185,24 @@ if($mform->is_cancelled()){
 } else {
     echo $OUTPUT->header();
 
-    $tabs = get_tabs($urlparams, $canmanage, $courseid);
+    $tabs = get_tabs($urlparams, $canview, $courseid);
     $tabs = array($tabs);
     print_tabs($tabs, 'timesheets');
 
     //$timesheetsub = array();
-    if($canmanage){
+    if($canmanage || $canview){
         $num = has_unsigned_timesheets($courseid);
-        if($num > 0){
             $supersigurl = new
                 moodle_url($CFG->wwwroot.'/blocks/timetracker/supervisorsig.php', $urlparams);
-            $desc = 'Sign timesheets - ('.$num.')';
+            $desc = 'View timesheets';
+            if($num > 0)
+                $desc = 'Sign timesheets - ('.$num.')';
             /*
                 $timesheetsub[] = new tabobject('supersig', $supersigurl, $desc);
             */
             $OUTPUT->box_start('generalbox boxaligncenter');
             echo $OUTPUT->action_link($supersigurl, $desc);
             $OUTPUT->box_end();
-        }
     } else {
         $myself = $DB->get_record('block_timetracker_workerinfo',
             array('mdluserid'=>$USER->id,'courseid'=>$courseid));
@@ -208,14 +213,15 @@ if($mform->is_cancelled()){
         $timesheetsub[] = new tabobject('submitted', 
             $submittedurl, 'Previously submitted timesheets');
         */
+
         //$OUTPUT->box_start('generalbox boxaligncenter');
-        echo $OUTPUT->action_link($submittedurl, 'Previously submitted timesheets');
+        echo $OUTPUT->action_link($submittedurl, 'Previously submitted timesheets').
+            '<br /><br />';
+        //$OUTPUT->box_start('generalbox boxaligncenter');
         //$OUTPUT->box_end();
 
     }
     //$tabs[] = $timesheetsub;
-
-
 
     $mform->display();
     echo $OUTPUT->footer();

@@ -64,8 +64,18 @@
 
         }
         $baseurl = $CFG->wwwroot.'/blocks/timetracker';
+        
+        $canmanage = false;
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
+            $canmanage = true;
+        }
+        
+        $canview = false;
+        if(has_capability('block/timetracker:viewonly', $this->context)){
+            $canview = true;
+        }
 
+        if($canmanage || $canview){
             //if config is setup to show term hours/earnings AND
             //terms are not configured, provide a link to the terms page.
             if($this->config->block_timetracker_show_term_hours == 1 ||
@@ -90,7 +100,7 @@
             $this->content->text .= '<div style="text-align: left">';
 
             //check to see if the supervisor needs to manage
-            if($hasalerts){
+            if($hasalerts && $canmanage){
                 $alertsurl = new moodle_url($baseurl.'/managealerts.php', $indexparams);
                 $alerticon= new pix_icon('alert','Manage Alerts', 'block_timetracker');
                 $alertaction= $OUTPUT->action_icon($alertsurl, $alerticon);
@@ -102,7 +112,7 @@
                 $hastimesheets = has_unsigned_timesheets($COURSE->id);
             }
             
-            if($hastimesheets){
+            if($hastimesheets && $canmanage){
                 $timesheetsurl = new moodle_url($baseurl.'/supervisorsig.php', $indexparams);
                 $timesheetsicon = new pix_icon('alert','Sign Timesheets','block_timetracker');
                 $timesheetsaction = $OUTPUT->action_icon($timesheetsurl, $timesheetsicon);

@@ -56,15 +56,21 @@ if($loadusers){
 
 
 $canmanage = false;
-
 if (has_capability('block/timetracker:manageworkers', $context)) {
     $canmanage = true;
-} else {
+} 
+
+$canview = false;
+if (has_capability('block/timetracker:viewonly', $context)){
+    $canview = true;
+}
+
+if(!$canmanage && !$canview){
     print_error('notpermissible','block_timetracker',
         $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$COURSE->id);
 }
 
-$maintabs = get_tabs($urlparams, $canmanage, $courseid);
+$maintabs = get_tabs($urlparams, $canview, $courseid);
 
 $manageworkerurl = new moodle_url($CFG->wwwroot.
     '/blocks/timetracker/manageworkers.php', $urlparams);

@@ -61,11 +61,16 @@ class timetracker_updateworkerinfo_form extends moodleform {
         if (has_capability('block/timetracker:manageid', $this->context)) {
             $canmanageid = true;
         }
-         
+
+        $canview = false;
+        if (has_capability('block/timetracker:viewonly', $this->context)) {
+            $canview = true;
+        }
+
         $worker = $DB->get_record('block_timetracker_workerinfo',
             array('courseid'=>$this->courseid,'mdluserid'=>$this->mdluserid));
 
-        if(!$worker){ //set the config defaults from config table
+        if(!$worker && !$canview){ //set the config defaults from config table
             $config = get_timetracker_config($this->courseid);
             $payrate = $config['curr_pay_rate'];
             $maxearnings = $config['default_max_earnings'];
@@ -116,6 +121,11 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $opstring3='';
         }
 
+        $opstring4='readonly="readonly"';
+        if($canmanage || !$canview){
+            $opstring4='';
+        }
+        
         $mform->addElement('text','firstname',
             get_string('firstname','block_timetracker'), $opstring);
         $mform->setDefault('firstname',$worker->firstname);
@@ -143,7 +153,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
             'required', null, 'server', 'false');
         $mform->addHelpButton('idnum','idnum','block_timetracker');
         
-        $mform->addElement('text','address',get_string('address','block_timetracker'));
+        $mform->addElement('text','address',get_string('address','block_timetracker'), $opstring4);
         //$mform->addRule('address', null, 'required', null, 'client', 'false');
 		$mform->addHelpButton('address','address','block_timetracker');
 
@@ -151,7 +161,7 @@ class timetracker_updateworkerinfo_form extends moodleform {
             $mform->setDefault('address', $worker->address);
         //}
 
-        $mform->addElement('text','phonenumber',get_string('phone','block_timetracker'));
+        $mform->addElement('text','phonenumber',get_string('phone','block_timetracker'), $opstring4);
 		$mform->addHelpButton('phonenumber','phone','block_timetracker');
         $mform->setDefault('phonenumber', $worker->phonenumber);
 
@@ -204,7 +214,10 @@ class timetracker_updateworkerinfo_form extends moodleform {
         } else {
             $mform->addElement('hidden','timetrackermethod', $trackermethod);
         }
-        $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
+        
+        if($canmanage || !$canview){
+            $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
+        }
     }
 
      function validation($data) {

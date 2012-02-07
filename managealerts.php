@@ -77,9 +77,12 @@ if ($mform->is_cancelled()){ //user clicked 'cancel'
 } else if($formdata = $mform->get_data()){
 
 } else {
+    $canview = false;
+    if(has_capability('block/timetracker:viewonly', $context)){
+        $canview = true;
+    }
     echo $OUTPUT->header();
-    $maintabs = get_tabs($urlparams,
-        has_capability('block/timetracker:manageworkers',$context), $courseid);
+    $maintabs = get_tabs($urlparams, $canview, $courseid);
     $tabs = array($maintabs);
     print_tabs($tabs, 'alerts');
     //echo $OUTPUT->heading($strtitle, 2);

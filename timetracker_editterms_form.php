@@ -42,7 +42,17 @@ class timetracker_editterms_form extends moodleform {
 
         //check to make sure that if $this->userid != $USER->id that they have
         //the correct capability TODO
-        if(!has_capability('block/timetracker:manageworkers',$this->context)){
+        $canmanage = false;
+        if(has_capability('block/timetracker:manageworkers',$this->context)){
+            $canmanage = true;
+        }
+
+        $canview = false;
+        if(has_capability('block/timetracker:viewonly',$this->context)){
+            $canview = true;
+        }
+        
+        if(!$canmanage && !$canview){
             print_error('Insufficient permission to edit this workunit');
             return;
         }
@@ -115,8 +125,10 @@ class timetracker_editterms_form extends moodleform {
             $mform->setDefault('day'.$i, $termday[$i]);
 
         }
-		
-        $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
+	    
+        if($canmanage){
+            $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
+        }
     }
 
     function validation ($data){

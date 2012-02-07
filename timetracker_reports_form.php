@@ -49,20 +49,24 @@ class timetracker_reports_form  extends moodleform {
         if (has_capability('block/timetracker:manageworkers', $this->context)) {
             $canmanage = true;
         }
-
+        $canview = false;
+        if (has_capability('block/timetracker:viewonly', $this->context)) {
+            $canview = true;
+        }
+        
         $issiteadmin = false;
         if(has_capability('moodle/site:config',$this->context)){
             $issiteadmin = true;
         }
 
-        if($this->userid == 0 && !$canmanage){
+        if($this->userid == 0 && !($canmanage || $canview)){
             print_error('notpermissible','block_timetracker',
                 $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
         }
 
         $now = time();
 
-        if($this->userid == 0 && $canmanage){
+        if($this->userid == 0 && ($canmanage || $canview)){
             //supervisor -- show all!
             $workers =
                 $DB->get_records('block_timetracker_workerinfo',
@@ -73,11 +77,9 @@ class timetracker_reports_form  extends moodleform {
             }
 
         }  else {
-
             $user = $DB->get_record('block_timetracker_workerinfo',
                 array('id'=>$this->userid));
-
-            if(!$user && $user->id != $this->userid && !$canmanage){
+            if($user && $user->id != $this->userid && !($canmanage || $canview)){
                 print_error('notpermissible','block_timetracker',
                     $CFG->wwwroot.'/blocks/timetracker/index.php?id='.$this->courseid);
             }
@@ -249,7 +251,7 @@ class timetracker_reports_form  extends moodleform {
             $sql .= 'AND courseid='.$this->courseid;
             $workerdesc .= ' for all workers';
         } else { //specific user, this course
-            if($canmanage){
+            if($canmanage || $canview){
                 $allurl = new moodle_url($baseurl.'/reports.php',
                     array('id'=>$this->courseid,
                     'userid'=>0,
@@ -273,7 +275,7 @@ class timetracker_reports_form  extends moodleform {
                 cellpadding="5px" width="95%" style="border: 1px solid #000;" >');
         
             $headers = '<tr>';
-            if($canmanage){
+            if($canmanage || $canview){
                 $headers .='<td style="font-weight: bold">Name</td>';
 
             }
@@ -304,7 +306,7 @@ class timetracker_reports_form  extends moodleform {
                         $workers[$unit->userid]->lastname.', '.
                         $workers[$unit->userid]->firstname).
                         '</td>';
-                } else if($canmanage){
+                } else if($canmanage || $canview){
                     $row .='<td>'.
                         $user->lastname.', '.
                         $user->firstname.'</td>';
@@ -467,7 +469,7 @@ class timetracker_reports_form  extends moodleform {
     
                 }
 
-                if($canmanage){
+                if($canmanage || $canview){
 
                     $urlparams['id'] = $unit->courseid;
                     $urlparams['userid'] = $unit->userid;
@@ -506,7 +508,6 @@ class timetracker_reports_form  extends moodleform {
                             '</td>';
                     } else {
                  
-            
                         $deleteurl = new moodle_url($baseurl.'/deleteworkunit.php', 
                             $urlparams);
                         $deleteicon = new pix_icon('clock_delete',
@@ -523,9 +524,15 @@ class timetracker_reports_form  extends moodleform {
                         $editaction = $OUTPUT->action_icon($editurl, 
                             new pix_icon('clock_edit', 
                             get_string('edit'),'block_timetracker'));
-        
-                        $row .= '<td style="text-align: center">'.$editaction . ' '.
-                            $deleteaction.'</td>';
+     
+                        $row .= '<td style="text-align: center">';
+                        
+                        if($canmanage){
+                            $row .= $editaction . ' '.$deleteaction.'</td>';
+                        } else {
+                            $row .= '&nbsp;'; 
+                        }
+                        $row .= '</td>';
                     }
     
                 } else {
