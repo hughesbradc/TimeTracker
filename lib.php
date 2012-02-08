@@ -1255,7 +1255,8 @@ function get_unsigned_timesheets_by_category($categoryid){
         $CFG->prefix.'block_timetracker_workerinfo WHERE '.
         'userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.
         'supervisorsignature=0 AND '.
-        $CFG->prefix.'block_timetracker_timesheet.courseid in ('.$courselist.') ORDER BY lastname';
+        $CFG->prefix.'block_timetracker_timesheet.courseid in ('.
+        $courselist.') ORDER BY lastname, firstname';
 
     $timesheets = $DB->get_records_sql($sql);
     return $timesheets;
