@@ -528,6 +528,28 @@
      * @return boolean true if all feeds were retrieved succesfully
      */
     function cron() {
+        global $CFG, $DB; 
+
+        /*
+        $lastcron = $DB->get_field('block', 'lastcron', 
+            array('name'=>$this->title));
+        
+        $numemails = 0;
+        $sql = 'SELECT DISTINCT courseid from '.$CFG->prefix.
+            'block_timetracker_timesheet WHERE supervisorsignature=0';
+        
+        $courseids = $DB->get_records_sql($sql);
+        foreach($courseids as $course){
+            $numemails += send_timesheet_reminders_to_supervisors($course->courseid);    
+        }
+
+        mtrace('Number of emails sent: '.$numemails.'<br />');
+
+        $DB->set_field('block', 'lastcron', time(),
+            array('name'=>$this->title));
+        */
+
+
         /*
 
         global $CFG, $DB;
@@ -544,7 +566,6 @@
             $now.'  ORDER BY courseid, alerttime ASC';
         
         $courses = $DB->get_records_sql($sql);
-
 
         $emails = 0;
         
