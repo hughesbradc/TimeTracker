@@ -96,15 +96,21 @@ class timetracker_changealert_form extends moodleform {
             $mform->addElement('html', get_string('br2','block_timetracker'));
             $mform->addElement('html', get_string('changeto','block_timetracker'));
             $mform->addElement('html', get_string('br1','block_timetracker'));
+
             $mform->addElement('date_time_selector','timein',
-                get_string('timeinerror','block_timetracker'));
+                get_string('timeinerror','block_timetracker'), 
+                array('optional'=>false, 'step'=>1));
             $mform->setDefault('timein',$alertunit->timein);
             $mform->addHelpButton('timein','timein','block_timetracker');
+
             $mform->addElement('date_time_selector','timeout',
-                get_string('timeouterror','block_timetracker'));
+                get_string('timeouterror','block_timetracker'),
+                array('optional'=>false, 'step'=>1));
             $mform->setDefault('timeout',$alertunit->timeout);
             $mform->addHelpButton('timeout','timeout','block_timetracker');
-            $mform->addElement('checkbox', 'deleteunit', get_string('deleteunit','block_timetracker'));
+
+            $mform->addElement('checkbox', 'deleteunit', 
+                get_string('deleteunit','block_timetracker'));
             $mform->addHelpButton('deleteunit', 'deleteunit', 'block_timetracker');
             $this->add_action_buttons(true, get_string('savebutton','block_timetracker'));
         }
