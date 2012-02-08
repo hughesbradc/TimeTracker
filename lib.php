@@ -1244,32 +1244,3 @@ function get_timetracker_config($courseid){
     return $config;
 }
 
-function get_unsigned_timesheets_by_category($categoryid){
-    global $CFG, $DB;
-    $courses = get_courses($categoryid, 'fullname ASC', 'c.id');
-
-    if(!$courses) return;
-    $courselist = implode(',', array_keys($courses));
-
-    $sql = 'SELECT * from '.$CFG->prefix.'block_timetracker_timesheet,'.
-        $CFG->prefix.'block_timetracker_workerinfo WHERE '.
-        'userid='.$CFG->prefix.'block_timetracker_workerinfo.id AND '.
-        'supervisorsignature=0 AND '.
-        $CFG->prefix.'block_timetracker_timesheet.courseid in ('.
-        $courselist.') ORDER BY lastname, firstname';
-
-    $timesheets = $DB->get_records_sql($sql);
-    return $timesheets;
-}
-
-//for cron usage
-function count_unsigned_timesheets($courseid){
-
-    $unsigned = $DB->count_records('block_timetracker_timesheet',
-        array('courseid'=>$courseid, 'supervisorsignature'=>0));
-
-    return $unsigned; 
-}
-
-
-
