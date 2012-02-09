@@ -64,14 +64,22 @@ class backup_timetracker_block_structure_step extends backup_block_structure_ste
         $terms->set_source_table($pre.'term', array('courseid' => backup::VAR_COURSEID));
         $config->set_source_table($pre.'config', array('courseid' => backup::VAR_COURSEID));
         if($userinfo){
-            $workerinfo->set_source_table($pre.'workerinfo', array('courseid' => backup::VAR_COURSEID));
-            $alertunits->set_source_table($pre.'alertunits', array('courseid' => backup::VAR_COURSEID,
+            $workerinfo->set_source_table($pre.'workerinfo', 
+                array('courseid' => backup::VAR_COURSEID));
+            $alertunits->set_source_table($pre.'alertunits', 
+                array('courseid' => backup::VAR_COURSEID,
                 'userid'=>'../id'));
-            $alertcom->set_source_table($pre.'alert_com', array('courseid' => backup::VAR_COURSEID,
+            /*
+            //need to fix all of this
+            $alertcom->set_source_table($pre.'alert_com', 
+                array('courseid' => backup::VAR_COURSEID,
                 'alertid'=>'../id'));
-            $pending->set_source_table($pre.'pending', array('courseid' => backup::VAR_COURSEID,
+            */
+            $pending->set_source_table($pre.'pending', 
+                array('courseid' => backup::VAR_COURSEID,
                 'userid'=>'../id'));
-            $workunits->set_source_table($pre.'workunit', array('courseid' => backup::VAR_COURSEID,
+            $workunits->set_source_table($pre.'workunit', 
+                array('courseid' => backup::VAR_COURSEID,
                 'userid'=>'../id'));
         }
 
