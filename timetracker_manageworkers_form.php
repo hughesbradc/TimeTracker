@@ -168,7 +168,10 @@ class timetracker_manageworkers_form  extends moodleform {
                 $row .= '<td style="text-align: center">';
                 
                 if($canmanage){
-                    $row .= $editaction . ' ' . $deleteaction. ' '.$addunitaction.' '.$reportsaction.
+                    $row .= $editaction . ' ' . 
+                        //$deleteaction. ' '. //comment out for now
+                        $addunitaction.' '.
+                        $reportsaction.
                     $timesheetaction;
                 } else {
                     $row .= $editaction . ' ' .$reportsaction. ' ' .$timesheetaction;
