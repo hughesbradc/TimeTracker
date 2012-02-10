@@ -26,7 +26,7 @@
 require_once('../../config.php');
 require_once('timetracker_timesheet_form.php');
 require_once('timesheet_pdf.php');
-require_once('timesheet_xls.php');
+//require_once('timesheet_xls.php');
 
 global $CFG, $COURSE, $USER, $DB;
 
@@ -37,8 +37,7 @@ $userid = optional_param('userid', -1, PARAM_INTEGER);
 
 $urlparams['id'] = $courseid;
 if($userid > -1)
-    $urlparams['userid'] = $userid;
-
+    $urlparams['userid'] = $userid; 
 $timesheeturl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet.php',$urlparams);
 
 $course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
@@ -100,9 +99,8 @@ if($mform->is_cancelled()){
         $start = $formdata->startday;
         $end = strtotime('+ 1 day ', $formdata->endday) - 1;
     }
-
+    
     if(!is_array($formdata->workerid) || count($formdata->workerid)==1){ // a single id?
-
         if(is_array($formdata->workerid)){
 	        $uid = $formdata->workerid[0];
         } else {
@@ -114,14 +112,13 @@ if($mform->is_cancelled()){
             $urlparams['start'] = $start;
             $urlparams['end'] = $end;
 
-
             //send work-study courses to be processed for errors
             $wscourses = get_courses(2, 'fullname ASC', 'c.id,c.shortname');
 
-
             if(array_key_exists($formdata->id, $wscourses)){
                 $conflict_reporturl = new moodle_url(
-                    $CFG->wwwroot.'/blocks/timetracker/schedules/conflict_report.php', $urlparams);
+                    $CFG->wwwroot.'/blocks/timetracker/schedules/conflict_report.php', 
+                    $urlparams);
                 redirect($conflict_reporturl);
             } else {
                 //Uncomment these lines, and comment out the above to bypass checking student
@@ -171,8 +168,12 @@ if($mform->is_cancelled()){
         }
     
         //zip them up, give them to the user
-        $fn = $formdata->year.'_'.($formdata->month<10?'0'.
-            $formdata->month:$formdata->month).'Timesheets.zip';
+        $startmon   = userdate($start, "%m");
+        $startday   = userdate($start, "%d");
+        $endmon     = userdate($end, "%m");
+        $endday     = userdate($end, "%d");
+
+        $fn = $formdata->year.'_'.$startmon.$startday.'_'.$endmon.$endday.'Timesheets.zip';
         $zipfile = $basepath.'/'.$fn;
     
         $zippacker = get_file_packer('application/zip');
@@ -183,6 +184,7 @@ if($mform->is_cancelled()){
     }
     
 } else {
+
     echo $OUTPUT->header();
 
     $tabs = get_tabs($urlparams, $canview, $courseid);
@@ -222,8 +224,8 @@ if($mform->is_cancelled()){
 
     }
     //$tabs[] = $timesheetsub;
-
     $mform->display();
+    
     echo $OUTPUT->footer();
 }
 
