@@ -22,7 +22,7 @@
 $string['datetimeformat']   ='%m/%d/%y %I:%M %p';
 $string['timeformat']       ='%I:%M %p';
 $string['dateformat']       ='%b %e, %Y';
-$string['simpledate']       ='%m/%d/%Y';
+$string['simpledate']       ='%m/%d/%y';
 
 $string['couldnotclockout'] = 'Error adding clock out'; 
 $string['trackermethod'] = 'Which timetracking method would you like to use?';
