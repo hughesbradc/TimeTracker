@@ -106,9 +106,11 @@ class timetracker_supervisorsig_form extends moodleform {
                 $viewparams['id'] = $this->courseid;
                 $viewparams['userid'] = $worker->id;
                 $viewparams['timesheetid'] = $timesheet->id;
-                $viewurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheet_fromid.php',
+                $viewurl = new moodle_url($CFG->wwwroot.
+                    '/blocks/timetracker/timesheet_fromid.php',
                     $viewparams);
-                $viewaction = $OUTPUT->action_icon($viewurl, new pix_icon('date','View Timesheet',
+                $viewaction = $OUTPUT->action_icon($viewurl, 
+                    new pix_icon('date','View Timesheet',
                     'block_timetracker'));
                 
                 $editsql =$DB->get_records('block_timetracker_workunit',
@@ -123,8 +125,8 @@ class timetracker_supervisorsig_form extends moodleform {
                 $editparams['timesheetid'] = $timesheet->id;
                 //$editparams['repstart'] = $first->timein;
                 //$editparams['repend'] = $last->timeout;
-                $editurl = new moodle_url($CFG->wwwroot.'/blocks/timetracker/timesheetreject.php', 
-                    $editparams);
+                $editurl = new moodle_url($CFG->wwwroot.
+                    '/blocks/timetracker/timesheetreject.php', $editparams);
                 $editicon = new pix_icon('delete',
                     get_string('rejectts','block_timetracker'),'block_timetracker');
                 $editaction = $OUTPUT->action_icon($editurl, $editicon,
