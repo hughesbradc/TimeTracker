@@ -44,9 +44,6 @@ function generate_pdf_from_timesheetid($timesheetid, $userid,
         $endinfo = get_month_info(userdate($end->timeout, "%m"),
             userdate($end->timeout, "%Y"));
 
-        //error_log($start->timein);
-        //error_log($end->timeout);
-
         return generate_pdf($startinfo['firstdaytimestamp'], $endinfo['lastdaytimestamp'], 
             $userid, $courseid, $method, $base, $timesheetid);
 
@@ -138,7 +135,14 @@ function generate_html($start, $end, $userid, $courseid, $timesheetid=-1,
     // Collect Data
     $conf = get_timetracker_config($courseid);
 
-    $curr = $start;
+    $firstmonth= userdate($start, "%m");
+    $firstyear = userdate($start, "%Y");
+    $firstmonthinfo = make_timestamp($firstyear, $firstmonth, 1);
+
+
+    //$curr = $start;
+    $curr = $firstmonthinfo;
+
 
     $overallhoursum = 0;
     $overalldollarsum = 0;
@@ -242,13 +246,12 @@ function generate_html($start, $end, $userid, $courseid, $timesheetid=-1,
             $counter %= 7;
         }
         
+        //a "week" - a row in the table
         for($row=0; $row < 6; $row++){
 
             $dayofweek = $dayofweek % 7;
 
-        
             do {
-                //error_log($dayofweek.' '.$date);
                 $days[] = '<td class="calendar" style="height: 10px" align="center"><b>'.
                     $date.'</b></td>';
 
@@ -356,10 +359,9 @@ function generate_html($start, $end, $userid, $courseid, $timesheetid=-1,
                 $dayofweek++; 
                 $date++;
                 $curr = strtotime('+1 day', $curr);
-                //error_log('curr: '.userdate($curr, '%m/%d/%y'));
             } while ($date <= $monthinfo['lastday'] && $dayofweek != 7);
             if($date >= $monthinfo['lastday']) break; 
-        }
+        }//this is a single "row" or "week"
         
         for($i = 0; $i < 6; $i++){
             $htmldoc.="\n<tr>\n";
