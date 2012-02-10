@@ -28,7 +28,6 @@ require_once('../../../config.php');
 require('timetracker_reportgenerator_form.php');
 
 global $CFG, $COURSE, $USER;
-
 require_login();
 
 //$courseid = required_param('id', PARAM_INTEGER);
@@ -40,6 +39,10 @@ $reportend = optional_param('reportend', 0, PARAM_INTEGER);
 $url = new moodle_url($CFG->wwwroot.'/blocks/timetracker/reports/reportgenerator.php');
 
 //$catid = 2;
+
+if($catid != 2){
+    exit('Not available to this category');
+}
 
 $context = get_context_instance(CONTEXT_COURSECAT, $catid); 
 $PAGE->set_context($context);
