@@ -430,15 +430,11 @@ function generate_html($start, $end, $userid, $courseid, $timesheetid=-1,
 	            userdate($start, get_string('dateformat', 'block_timetracker')).
                 ' to '.
 	            userdate($end, get_string('dateformat', 'block_timetracker'));
-        } else {
-            $desc =
-                'Time Sheet Submitted '.userdate($ts->submitted,
-                get_string('datetimeformat', 'block_timetracker'));
         }
 
         $htmldoc .='
         <tr>
-        <td colspan="2" style="height: 35px"><font size="13"><b>Total Hours/Earnings for '.
+        <td colspan="2" style="height: 35px"><font size="13"><b>Total Hours/Earnings  '.
             $desc.
             '</b></font><br /><font size="10">'.
             round($overallhoursum, 3).' / $'.
