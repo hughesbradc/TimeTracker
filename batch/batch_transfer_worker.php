@@ -110,7 +110,12 @@ if(($handle = fopen($file, "r")) !== FALSE){
             }
 
             if(isset($winner)){
-                $manual->enrol_user($winner, $worker->mdluserid, NULL, time());
+                $roleid = $DB->get_field('role', 'id', array(
+                    'archetype'=>'student'));
+                if($roleid)
+                    $manual->enrol_user($winner, $worker->mdluserid, $roleid, time());
+                else 
+                    $manual->enrol_user($winner, $worker->mdluserid, 5, time());
             }else{
                 echo "Cannot enroll $worker->firstname $worker->lastname\n";
             }

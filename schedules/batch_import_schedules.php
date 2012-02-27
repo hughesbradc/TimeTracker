@@ -18,7 +18,8 @@ global $CFG, $DB, $USER;
     **start time will be a 3/4 digit number i.e. 1200 130 1330 etc
 */
 
-$file='2012SpringStudentSchedules.csv';
+//$file='2012SpringStudentSchedules.csv';
+$file='updatedCourseSchedules.csv';
 
 $count = 0;
 if(($handle = fopen($file, "r")) !== FALSE){

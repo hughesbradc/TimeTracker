@@ -5,25 +5,26 @@ require_once('../../../config.php');
 require_once('../lib.php');
 
 /**
- The purpose of this script is to find earnings/max earnings for this term
+ The purpose of this script is to add a single work unit to each worker in a course.
 */
 global $CFG, $DB, $USER;
 
-//$courseid = 95; //residential living
+$courseid = 95; //residential living
 //$courseid = 111; //SGA
 //$courseid = 105;//Judicial
 //$courseid = 112; //test site
-$courseid = 119; //Dept_Gateway
+//$courseid = 119; //Dept_Gateway
 
 $duration = 1 * 3600; //1 hour
 //$date = 1; //put unit on first day of month
 
-$startmonth=01;
+$startmonth=02;
 $startyear=2012;
 
-$endmonth=01;
+$endmonth=02;
 $endyear=2012;
 
+//TODO -- Put where 'deleted=0' eventually here
 $courseworkers = $DB->get_records('block_timetracker_workerinfo',
     array('courseid'=>$courseid));
 
