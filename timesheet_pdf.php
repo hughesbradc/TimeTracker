@@ -425,12 +425,14 @@ function generate_html($start, $end, $userid, $courseid, $timesheetid=-1,
         <table border="1" cellpadding="5px" width="540px" '.
         'style="margin-left: auto; margin-right: auto">';
     if(!$samemonth){
+        $desc = '';
         if($timesheetid == -1){
             $desc = 
 	            userdate($start, get_string('dateformat', 'block_timetracker')).
                 ' to '.
 	            userdate($end, get_string('dateformat', 'block_timetracker'));
         }
+        
 
         $htmldoc .='
         <tr>
