@@ -113,7 +113,7 @@ if ($mform->is_cancelled()){ //user clicked cancel
 } else if ($formdata=$mform->get_data()){
     $formdata->courseid = $formdata->id;
     unset($formdata->id);
-    $formdata->payrate = $workerrecord->currpayrate;
+    //$formdata->payrate = $workerrecord->currpayrate;
     $formdata->lastedited = time();
     $formdata->lasteditedby = $formdata->editedby;
     $result = add_unit($formdata, true);

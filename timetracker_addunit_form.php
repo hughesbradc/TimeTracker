@@ -97,6 +97,8 @@ class timetracker_addunit_form  extends moodleform {
 
             $mform->addRule('payrate', 'Numeric values only', 'numeric',
                 null, 'server', false, false);
+        } else {
+            $mform->addElement('hidden', 'payrate', $userinfo->currpayrate);
         }
 		
         $this->add_action_buttons(true,get_string('savebutton','block_timetracker'));
