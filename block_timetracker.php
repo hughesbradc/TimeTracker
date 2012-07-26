@@ -356,6 +356,14 @@
                     $closetomax = true; 
                 }
 
+                $this->content->text .= '<br /><span style="font-weight: bold;">'.
+                    '*Official term earnings: $'.
+                    number_format(get_official_earnings_this_term($ttuserid, $COURSE->id), 2).
+                    '</span><br /><br />';
+                $this->content->text .= '<span style="font-size: x-small">*This represents
+                hours for which you have already been paid</span>';
+                $this->content->text .= '<hr />';
+
                 if($this->config->block_timetracker_show_month_hours ||
                     $this->config->block_timetracker_show_term_hours ||
                     $this->config->block_timetracker_show_ytd_hours ||
@@ -410,14 +418,18 @@
 					}
                 
       
+                    
+                    
 				if ($this->config->block_timetracker_show_month_earnings ||
 				    $this->config->block_timetracker_show_term_earnings ||
 				    $this->config->block_timetracker_show_ytd_earnings ||
 				    $this->config->block_timetracker_show_total_earnings) {
 
+
 					$this->content->text .= '<br /><br />';
 					$this->content->text .= '<span style="font-weight: bold">'.
                         get_string('earningstitle','block_timetracker').'</span>';
+
 
 					if ($this->config->block_timetracker_show_month_earnings){
 						$this->content->text .= '<br />';
