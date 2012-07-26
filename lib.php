@@ -1111,6 +1111,26 @@ function get_hours_this_term($userid, $courseid=-1){
     return get_hours($total, $courseid);
 }
 
+function get_official_earnings_this_term($userid, $courseid){
+    $boundaries = get_term_boundaries($courseid);
+    
+    $units = get_split_units($boundaries['termstart'], $boundaries['termend'],
+        $userid, $courseid);
+
+    if(!$units) return 0;
+    $round = get_rounding_config($courseid);
+    $earnings = 0;
+    foreach($units as $unit){
+        if($unit->submitted){
+            $hours = round_time($unit->timeout - $unit->timein);
+            $hours = round($hours/3600, 3);
+            $earnings += $hours * $unit->payrate;
+        }
+    }
+    return round($earnings, 2);
+    
+}
+
 function get_earnings_this_term($userid, $courseid){
 
     $boundaries = get_term_boundaries($courseid);
